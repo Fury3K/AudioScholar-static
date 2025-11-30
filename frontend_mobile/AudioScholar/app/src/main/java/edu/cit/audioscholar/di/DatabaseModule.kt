@@ -39,4 +39,10 @@ object DatabaseModule {
     fun provideRecordingMetadataDao(appDatabase: AppDatabase): RecordingMetadataDao {
         return appDatabase.recordingMetadataDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideUserNoteDao(appDatabase: AppDatabase): edu.cit.audioscholar.data.local.dao.UserNoteDao {
+        return appDatabase.userNoteDao()
+    }
 }

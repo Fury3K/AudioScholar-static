@@ -7,8 +7,10 @@ import android.net.Uri
 import android.util.Log
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
+import edu.cit.audioscholar.data.local.dao.UserNoteDao
 import edu.cit.audioscholar.data.local.file.RecordingFileHandler
 import edu.cit.audioscholar.data.local.model.RecordingMetadata
+import edu.cit.audioscholar.data.local.model.UserNoteEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
@@ -22,6 +24,7 @@ import javax.inject.Singleton
 import edu.cit.audioscholar.data.local.file.InsufficientStorageException
 import java.io.FileOutputStream
 import java.util.Date
+import java.util.TimeZone
 import java.util.UUID
 
 private const val RECORDINGS_DIRECTORY_NAME = "Recordings"
@@ -36,7 +39,9 @@ class LocalAudioRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val application: Application,
     private val gson: Gson,
-    private val recordingFileHandler: RecordingFileHandler
+    private val recordingFileHandler: RecordingFileHandler,
+    private val userNoteDao: UserNoteDao,
+    private val remoteAudioRepository: RemoteAudioRepository
 ) : LocalAudioRepository {
 
     private fun getJsonFileForAudio(audioFilePath: String): File? {
@@ -584,6 +589,71 @@ class LocalAudioRepositoryImpl @Inject constructor(
                 retriever?.release()
             } catch (e: Exception) {
                 Log.e(TAG_LOCAL_REPO, "Error releasing MediaMetadataRetriever in getDurationForFile", e)
+            }
+        }
+    }
+
+    override fun getNotesForRecording(filePath: String): Flow<List<UserNoteEntity>> {
+        return userNoteDao.getNotesForRecording(filePath)
+    }
+
+    override suspend fun createLocalNote(
+        filePath: String,
+        content: String,
+        tags: List<String>
+    ): UserNoteEntity {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        val now = dateFormat.format(Date())
+
+        val note = UserNoteEntity(
+            recordingFilePath = filePath,
+            content = content,
+            tags = tags,
+            createdAt = now,
+            updatedAt = now,
+            isSynced = false
+        )
+        userNoteDao.insertNote(note)
+        return note
+    }
+
+    override suspend fun updateLocalNote(note: UserNoteEntity) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val updatedNote = note.copy(
+            updatedAt = dateFormat.format(Date()),
+            isSynced = false // Mark as unsynced on edit
+        )
+        userNoteDao.insertNote(updatedNote)
+    }
+
+    override suspend fun deleteLocalNote(noteId: String) {
+        userNoteDao.deleteNoteById(noteId)
+    }
+
+    override suspend fun syncPendingNotes(filePath: String, remoteRecordingId: String) {
+        withContext(Dispatchers.IO) {
+            val unsyncedNotes = userNoteDao.getUnsyncedNotes().filter { it.recordingFilePath == filePath }
+            Log.d(TAG_LOCAL_REPO, "Found ${unsyncedNotes.size} unsynced notes for $filePath")
+            
+            for (note in unsyncedNotes) {
+                try {
+                    remoteAudioRepository.createNote(remoteRecordingId, note.content, note.tags)
+                        .collect { result ->
+                            result.onSuccess { remoteNote ->
+                                remoteNote.id?.let { remoteId ->
+                                    userNoteDao.markAsSynced(note.id, remoteId)
+                                    Log.d(TAG_LOCAL_REPO, "Synced note ${note.id} -> $remoteId")
+                                }
+                            }.onFailure { e ->
+                                Log.e(TAG_LOCAL_REPO, "Failed to sync note ${note.id}", e)
+                            }
+                        }
+                } catch (e: Exception) {
+                    Log.e(TAG_LOCAL_REPO, "Exception syncing note ${note.id}", e)
+                }
             }
         }
     }

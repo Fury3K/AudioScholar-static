@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.data.local.model.RecordingMetadata
+import edu.cit.audioscholar.data.local.model.UserNoteEntity
 import edu.cit.audioscholar.data.remote.dto.GlossaryItemDto
 import edu.cit.audioscholar.data.remote.dto.RecommendationDto
 import edu.cit.audioscholar.data.remote.dto.SummaryResponseDto
@@ -208,10 +209,10 @@ class RecordingDetailsViewModel @Inject constructor(
                         }
                         configurePlayback(localMetadata = metadata)
 
-                        if (remoteId != null) {
-                            // Always fetch notes if we have a remote ID
-                            launch { loadUserNotes(remoteId) }
+                        // Always load notes (local source of truth)
+                        launch { loadUserNotes(remoteId ?: "") }
 
+                        if (remoteId != null) {
                             if (!isSummaryCacheValid || !areRecommendationsCacheValid) {
                                 Log.d("DetailsViewModel", "[Local Load] Remote ID exists and cache is invalid/incomplete. Starting listener and attempting immediate fetch.")
                                 listenForProcessingCompletion(remoteId, !isSummaryCacheValid, !areRecommendationsCacheValid)
@@ -389,6 +390,14 @@ class RecordingDetailsViewModel @Inject constructor(
                         }
                     } else {
                          Log.d("DetailsViewModel", "FCM signal received, but data seems already loaded. Ignoring signal.")
+                    }
+
+                    // Sync any pending local notes now that we have a processed remote recording
+                    if (!uiState.value.isCloudSource) {
+                        Log.d("DetailsViewModel", "FCM signal: Triggering sync of pending local notes for $targetId")
+                        launch {
+                            localAudioRepository.syncPendingNotes(uiState.value.filePath, targetId)
+                        }
                     }
 
                     Log.d("DetailsViewModel", "Processed signal for $targetId. Fetches launched if needed.")
@@ -1247,114 +1256,212 @@ class RecordingDetailsViewModel @Inject constructor(
     }
 
     fun loadUserNotes(recordingId: String) {
-        if (recordingId.isBlank()) return
+        val state = uiState.value
 
-        _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
+        if (state.isCloudSource) {
+            if (recordingId.isBlank()) return
+            _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
 
-        viewModelScope.launch {
-            remoteAudioRepository.getNotes(recordingId)
-                .collect { result ->
-                    result.onSuccess { notes ->
+            viewModelScope.launch {
+                remoteAudioRepository.getNotes(recordingId)
+                    .collect { result ->
+                        result.onSuccess { notes ->
+                            _uiState.update {
+                                it.copy(
+                                    userNotes = notes,
+                                    isLoadingNotes = false
+                                )
+                            }
+                        }.onFailure { e ->
+                            val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to load notes.")
+                            _uiState.update { it.copy(isLoadingNotes = false, noteError = errorMsg) }
+                        }
+                    }
+            }
+        } else {
+            // Local source
+            val filePath = state.filePath
+            if (filePath.isEmpty()) return
+            // No loading spinner needed for local flow observation usually, but we can set it
+            // _uiState.update { it.copy(isLoadingNotes = true) }
+
+            viewModelScope.launch {
+                localAudioRepository.getNotesForRecording(filePath)
+                    .collect { entities ->
+                        val dtos = entities.map { entity ->
+                            UserNoteDto(
+                                id = entity.id,
+                                userId = state.currentUserId,
+                                recordingId = entity.remoteNoteId ?: "", // Using remoteNoteId or empty if not synced
+                                content = entity.content,
+                                tags = entity.tags,
+                                createdAt = entity.createdAt,
+                                updatedAt = entity.updatedAt
+                            )
+                        }
                         _uiState.update {
                             it.copy(
-                                userNotes = notes,
+                                userNotes = dtos,
                                 isLoadingNotes = false
                             )
                         }
-                    }.onFailure { e ->
-                        val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to load notes.")
-                        _uiState.update {
-                            it.copy(
-                                isLoadingNotes = false,
-                                noteError = errorMsg
-                            )
-                        }
                     }
-                }
+            }
         }
     }
 
     fun createUserNote(content: String, tags: List<String>?) {
         val state = _uiState.value
-        val recordingId = state.remoteRecordingId ?: state.cloudId
+        
+        if (state.isCloudSource) {
+            val recordingId = state.remoteRecordingId ?: state.cloudId
+            if (recordingId.isNullOrBlank()) {
+                _uiState.update { it.copy(noteError = "Cannot create note: Invalid recording ID") }
+                return
+            }
 
-        if (recordingId.isNullOrBlank()) {
-            _uiState.update { it.copy(noteError = "Cannot create note: Invalid recording ID") }
-            return
-        }
+            _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
 
-        _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
-
-        viewModelScope.launch {
-            remoteAudioRepository.createNote(recordingId, content, tags)
-                .collect { result ->
-                    result.onSuccess {
-                        loadUserNotes(recordingId)
-                        _infoMessageEvent.trySend("Note added")
-                    }.onFailure { e ->
-                        val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to create note.")
-                        _uiState.update {
-                            it.copy(
-                                isLoadingNotes = false,
-                                noteError = errorMsg
-                            )
+            viewModelScope.launch {
+                remoteAudioRepository.createNote(recordingId, content, tags)
+                    .collect { result ->
+                        result.onSuccess {
+                            loadUserNotes(recordingId)
+                            _infoMessageEvent.trySend("Note added")
+                        }.onFailure { e ->
+                            val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to create note.")
+                            _uiState.update { it.copy(isLoadingNotes = false, noteError = errorMsg) }
                         }
                     }
+            }
+        } else {
+            // Local creation
+            val filePath = state.filePath
+            if (filePath.isEmpty()) {
+                _uiState.update { it.copy(noteError = "Cannot create note: File path missing") }
+                return
+            }
+            
+            viewModelScope.launch {
+                try {
+                    localAudioRepository.createLocalNote(filePath, content, tags ?: emptyList())
+                    _infoMessageEvent.trySend("Note added locally")
+                    
+                    // Trigger sync if we have a remote ID
+                    val remoteId = state.remoteRecordingId
+                    if (remoteId != null) {
+                        localAudioRepository.syncPendingNotes(filePath, remoteId)
+                    }
+                } catch (e: Exception) {
+                    Log.e("DetailsViewModel", "Failed to create local note", e)
+                    _uiState.update { it.copy(noteError = "Failed to save note locally.") }
                 }
+            }
         }
     }
 
     fun updateUserNote(noteId: String, content: String?, tags: List<String>?) {
-        _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
+        val state = _uiState.value
+        
+        if (state.isCloudSource) {
+            _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
 
-        viewModelScope.launch {
-            remoteAudioRepository.updateNote(noteId, content, tags)
-                .collect { result ->
-                    result.onSuccess {
-                        val recordingId = _uiState.value.remoteRecordingId ?: _uiState.value.cloudId
-                        if (recordingId != null) {
-                            loadUserNotes(recordingId)
-                        } else {
-                            _uiState.update { it.copy(isLoadingNotes = false) }
-                        }
-                        _infoMessageEvent.trySend("Note updated")
-                    }.onFailure { e ->
-                        val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to update note.")
-                        _uiState.update {
-                            it.copy(
-                                isLoadingNotes = false,
-                                noteError = errorMsg
-                            )
+            viewModelScope.launch {
+                remoteAudioRepository.updateNote(noteId, content, tags)
+                    .collect { result ->
+                        result.onSuccess {
+                            val recordingId = state.remoteRecordingId ?: state.cloudId
+                            if (recordingId != null) {
+                                loadUserNotes(recordingId)
+                            } else {
+                                _uiState.update { it.copy(isLoadingNotes = false) }
+                            }
+                            _infoMessageEvent.trySend("Note updated")
+                        }.onFailure { e ->
+                            val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to update note.")
+                            _uiState.update { it.copy(isLoadingNotes = false, noteError = errorMsg) }
                         }
                     }
+            }
+        } else {
+            // Local update
+            viewModelScope.launch {
+                try {
+                    // We need the full entity to update. Since we only have ID, we technically need to fetch it or create a partial update.
+                    // However, we can construct an entity with the ID and new content.
+                    // But wait, updateLocalNote implementation replaces the entity. We need the original filePath and createdAt.
+                    // Let's assume the UI passes us valid data or we can fetch it.
+                    // Actually, the DAO's insertNote(OnConflict.REPLACE) will overwrite everything.
+                    // Ideally we should have a specific update method in DAO that only updates content/tags/updatedAt.
+                    // For now, let's find the note from current state userNotes.
+                    
+                    val currentNoteDto = state.userNotes.find { it.id == noteId }
+                    if (currentNoteDto != null) {
+                        val entity = UserNoteEntity(
+                            id = noteId,
+                            recordingFilePath = state.filePath,
+                            content = content ?: currentNoteDto.content,
+                            tags = tags ?: currentNoteDto.tags ?: emptyList(),
+                            createdAt = currentNoteDto.createdAt ?: "", // Should maintain original creation time
+                            updatedAt = "", // Will be set in repo
+                            isSynced = false,
+                            remoteNoteId = if (currentNoteDto.recordingId.isNotEmpty()) currentNoteDto.recordingId else null // recordingId mapped to remoteNoteId in loadUserNotes
+                        )
+                        localAudioRepository.updateLocalNote(entity)
+                        _infoMessageEvent.trySend("Note updated locally")
+                        
+                        val remoteId = state.remoteRecordingId
+                        if (remoteId != null) {
+                            localAudioRepository.syncPendingNotes(state.filePath, remoteId)
+                        }
+                    } else {
+                         Log.e("DetailsViewModel", "Could not find note in local state to update: $noteId")
+                    }
+                } catch (e: Exception) {
+                    Log.e("DetailsViewModel", "Failed to update local note", e)
+                    _uiState.update { it.copy(noteError = "Failed to update note locally.") }
                 }
+            }
         }
     }
 
     fun deleteUserNote(noteId: String) {
-        _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
+         val state = _uiState.value
+         
+         if (state.isCloudSource) {
+            _uiState.update { it.copy(isLoadingNotes = true, noteError = null) }
 
-        viewModelScope.launch {
-            remoteAudioRepository.deleteNote(noteId)
-                .collect { result ->
-                    result.onSuccess {
-                        val recordingId = _uiState.value.remoteRecordingId ?: _uiState.value.cloudId
-                        if (recordingId != null) {
-                            loadUserNotes(recordingId)
-                        } else {
-                            _uiState.update { it.copy(isLoadingNotes = false) }
-                        }
-                        _infoMessageEvent.trySend("Note deleted")
-                    }.onFailure { e ->
-                        val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to delete note.")
-                        _uiState.update {
-                            it.copy(
-                                isLoadingNotes = false,
-                                noteError = errorMsg
-                            )
+            viewModelScope.launch {
+                remoteAudioRepository.deleteNote(noteId)
+                    .collect { result ->
+                        result.onSuccess {
+                            val recordingId = state.remoteRecordingId ?: state.cloudId
+                            if (recordingId != null) {
+                                loadUserNotes(recordingId)
+                            } else {
+                                _uiState.update { it.copy(isLoadingNotes = false) }
+                            }
+                            _infoMessageEvent.trySend("Note deleted")
+                        }.onFailure { e ->
+                            val errorMsg = mapErrorToUserFriendlyMessage(e, "Failed to delete note.")
+                            _uiState.update { it.copy(isLoadingNotes = false, noteError = errorMsg) }
                         }
                     }
+            }
+        } else {
+            // Local delete
+            viewModelScope.launch {
+                try {
+                    localAudioRepository.deleteLocalNote(noteId)
+                    _infoMessageEvent.trySend("Note deleted locally")
+                    // Note: If the note was synced, we might want to queue a remote deletion too,
+                    // but the current requirement is just local-first saving. Deletion sync might be a future task.
+                    // For now, we just delete locally.
+                } catch (e: Exception) {
+                    Log.e("DetailsViewModel", "Failed to delete local note", e)
+                     _uiState.update { it.copy(noteError = "Failed to delete note locally.") }
                 }
+            }
         }
     }
 }

@@ -141,9 +141,11 @@ object NetworkModule {
         @ApplicationContext context: Context,
         application: Application,
         gson: Gson,
-        recordingFileHandler: RecordingFileHandler
+        recordingFileHandler: RecordingFileHandler,
+        userNoteDao: edu.cit.audioscholar.data.local.dao.UserNoteDao,
+        remoteAudioRepository: RemoteAudioRepository
     ): LocalAudioRepository {
-        return LocalAudioRepositoryImpl(context, application, gson, recordingFileHandler)
+        return LocalAudioRepositoryImpl(context, application, gson, recordingFileHandler, userNoteDao, remoteAudioRepository)
     }
 
     @Provides
