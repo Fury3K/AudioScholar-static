@@ -19,9 +19,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -34,6 +37,11 @@ import edu.cit.audioscholar.R
 import edu.cit.audioscholar.data.local.model.RecordingMetadata
 import edu.cit.audioscholar.data.remote.dto.AudioMetadataDto
 import edu.cit.audioscholar.data.remote.dto.TimestampDto
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernCard
+import edu.cit.audioscholar.ui.components.ModernDialog
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import edu.cit.audioscholar.ui.main.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -223,10 +231,10 @@ fun LibraryScreen(
     }
 
     if (uiState.showMultiDeleteConfirmation) {
-        AlertDialog(
+        ModernDialog(
             onDismissRequest = viewModel::cancelMultiDelete,
-            title = { Text(stringResource(R.string.dialog_multi_delete_title)) },
-            text = {
+            title = stringResource(R.string.dialog_multi_delete_title),
+            content = {
                 Text(
                     stringResource(
                         R.string.dialog_multi_delete_message,
@@ -235,7 +243,7 @@ fun LibraryScreen(
                 )
             },
             confirmButton = {
-                Button(
+                ModernButton(
                     onClick = viewModel::confirmMultiDelete,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
@@ -243,7 +251,7 @@ fun LibraryScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = viewModel::cancelMultiDelete) {
+                ModernOutlinedButton(onClick = viewModel::cancelMultiDelete) {
                     Text(stringResource(R.string.dialog_action_cancel))
                 }
             }
@@ -434,13 +442,27 @@ fun LocalRecordingsTabPage(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (!isLoading && uiState.localRecordings.isEmpty()) {
-            Text(
-                text = stringResource(R.string.library_empty_state_local),
-                style = MaterialTheme.typography.bodyLarge,
+            Column(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp),
-            )
+                    .fillMaxSize()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Mic,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.library_empty_state_local),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         } else if (uiState.localRecordings.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -455,7 +477,6 @@ fun LocalRecordingsTabPage(
                         onLongClick = { onItemLongClick(metadata.filePath) },
                         onClick = { onItemClick(metadata) },
                     )
-                    HorizontalDivider(thickness = 0.5.dp)
                 }
             }
         }
@@ -480,13 +501,27 @@ fun CloudRecordingsTabPage(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (!isLoading && uiState.cloudRecordings.isEmpty() && uiState.hasAttemptedCloudLoad) {
-            Text(
-                text = stringResource(R.string.library_empty_state_cloud),
-                style = MaterialTheme.typography.bodyLarge,
+            Column(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp),
-            )
+                    .fillMaxSize()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CloudOff,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.library_empty_state_cloud),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         } else if (uiState.cloudRecordings.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -506,7 +541,6 @@ fun CloudRecordingsTabPage(
                             onItemClick(metadataDto)
                         },
                     )
-                    HorizontalDivider(thickness = 0.5.dp)
                 }
             }
         }
@@ -528,67 +562,87 @@ fun LocalRecordingListItem(
 ) {
     val haptic = LocalHapticFeedback.current
     val checkboxAreaWidth = 48.dp
-    val listItemHeight = 72.dp
 
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(listItemHeight)
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = {
-                        if (!isMultiSelectActive) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onLongClick()
-                        }
-                    },
-                )
-                .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    ModernCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 16.dp)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    if (!isMultiSelectActive) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onLongClick()
+                    }
+                },
+            ),
+        colors = if (isSelected) {
+            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        } else {
+            CardDefaults.cardColors()
+        }
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .width(checkboxAreaWidth)
-                    .padding(end = 16.dp),
-            contentAlignment = Alignment.Center,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isMultiSelectActive) {
-                Checkbox(
-                    checked = isSelected,
-                    onCheckedChange = { onClick() },
-                )
+                Box(
+                    modifier = Modifier
+                        .width(checkboxAreaWidth)
+                        .padding(end = 8.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = { onClick() },
+                    )
+                }
+            } else {
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
             }
-        }
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = metadata.title ?: metadata.fileName,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = formatTimestampMillis(metadata.timestampMillis),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = metadata.title ?: metadata.fileName,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
-                Text(
-                    "•",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = formatDurationMillis(metadata.durationMillis),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = formatTimestampMillis(metadata.timestampMillis),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "•",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = formatDurationMillis(metadata.durationMillis),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
@@ -607,9 +661,10 @@ fun CloudRecordingListItem(
     val haptic = LocalHapticFeedback.current
     val checkboxAreaWidth = 48.dp
 
-    Row(
+    ModernCard(
         modifier = modifier
             .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 16.dp)
             .combinedClickable(
                 onClick = onItemClick,
                 onLongClick = {
@@ -618,73 +673,87 @@ fun CloudRecordingListItem(
                         onLongClick()
                     }
                 },
-            )
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+            ),
+        colors = if (isSelected) {
+            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        } else {
+            CardDefaults.cardColors()
+        }
     ) {
-        Box(
-            modifier = Modifier
-                .width(if (isMultiSelectActive) checkboxAreaWidth else 0.dp)
-                .padding(end = if (isMultiSelectActive) 16.dp else 0.dp),
-            contentAlignment = Alignment.Center,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isMultiSelectActive) {
-                Checkbox(
-                    checked = isSelected,
-                    onCheckedChange = { onItemClick() },
-                )
-            }
-        }
-
-        Column(modifier = Modifier
-            .weight(1f)
-            .padding(end = 16.dp)) {
-            Text(
-                text = metadata.title ?: metadata.fileName ?: "Uploaded Recording",
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.wrapContentWidth(),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Cloud,
-                    contentDescription = stringResource(R.string.cd_cloud_recording_indicator),
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.size(16.dp),
-                )
-                Text(
-                    text = formatTimestampDto(metadata.uploadTimestamp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                formatFileSize(metadata.fileSize).takeIf { it.isNotEmpty() }?.let { size ->
-                    Text(
-                        "•",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Box(
+                    modifier = Modifier
+                        .width(checkboxAreaWidth)
+                        .padding(end = 8.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = { onItemClick() },
                     )
-                    Text(
-                        text = size,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                }
+            } else {
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Cloud,
+                        contentDescription = stringResource(R.string.cd_cloud_recording_indicator),
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(24.dp),
                     )
                 }
             }
-            metadata.description?.takeIf { it.isNotBlank() }?.let { description ->
-                Spacer(modifier = Modifier.height(4.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
+                    text = metadata.title ?: metadata.fileName ?: "Uploaded Recording",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.wrapContentWidth(),
+                ) {
+                    Text(
+                        text = formatTimestampDto(metadata.uploadTimestamp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    formatFileSize(metadata.fileSize).takeIf { it.isNotEmpty() }?.let { size ->
+                        Text(
+                            "•",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = size,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                metadata.description?.takeIf { it.isNotBlank() }?.let { description ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
@@ -699,42 +768,43 @@ fun ImportAudioDialog(
     var title by rememberSaveable(dialogState.fileUri) { mutableStateOf("") }
     var description by rememberSaveable(dialogState.fileUri) { mutableStateOf("") }
 
-    AlertDialog(
+    ModernDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dialog_import_details_title)) },
-        text = {
+        title = stringResource(R.string.dialog_import_details_title),
+        content = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
                     stringResource(R.string.dialog_import_selected_file, dialogState.originalFileName),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                OutlinedTextField(
+                ModernTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text(stringResource(R.string.dialog_import_field_title)) },
-                    placeholder = { Text(stringResource(R.string.dialog_import_field_title_placeholder)) },
+                    label = stringResource(R.string.dialog_import_field_title),
+                    placeholder = stringResource(R.string.dialog_import_field_title_placeholder),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                ModernTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.dialog_import_field_description)) },
-                    placeholder = { Text(stringResource(R.string.dialog_import_field_description_placeholder)) },
+                    label = stringResource(R.string.dialog_import_field_description),
+                    placeholder = stringResource(R.string.dialog_import_field_description_placeholder),
                     modifier = Modifier.fillMaxWidth(),
-                    minLines = 3
+                    minLines = 3,
+                    singleLine = false
                 )
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(title.trim(), description.trim()) }) {
+            ModernButton(onClick = { onConfirm(title.trim(), description.trim()) }) {
                 Text(stringResource(R.string.dialog_action_import))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            ModernOutlinedButton(onClick = onDismiss) {
                 Text(stringResource(R.string.dialog_action_cancel))
             }
         }

@@ -292,7 +292,7 @@
     <string name="about_feature_youtube">Get YouTube video recommendations</string>
     <string name="about_feature_login">Secure login via Email, Google, GitHub</string>
     <string name="about_feature_sync">Optional cloud sync with Nhost</string>
-    <string name="about_developer_credits_title">Crafted by:</string>
+    <string name="about_developer_credits_title">Developed by:</string>
     <string name="about_advisers_title">Advisers:</string>
     <string name="about_developer_adviser">Capstone Adviser / Overall Lead: Ralph P. Laviste</string>
     <string name="about_developer_adviser_group">Group Adviser: Jasmine A. Tulin</string>

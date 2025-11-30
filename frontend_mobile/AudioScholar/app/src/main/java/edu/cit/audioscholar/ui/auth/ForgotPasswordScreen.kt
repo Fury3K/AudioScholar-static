@@ -16,6 +16,8 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.LockReset
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -158,10 +160,10 @@ fun ForgotPasswordForm(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        ModernTextField(
             value = email,
             onValueChange = onEmailChange,
-            label = { Text(stringResource(R.string.forgot_password_email_label)) },
+            label = stringResource(R.string.forgot_password_email_label),
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
@@ -177,11 +179,10 @@ fun ForgotPasswordForm(
             enabled = !isLoading
         )
 
-        Button(
+        ModernButton(
             onClick = onSubmit,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+                .fillMaxWidth(),
             enabled = !isLoading
         ) {
             if (isLoading) {
@@ -239,11 +240,10 @@ fun ForgotPasswordSuccess(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
+        ModernButton(
             onClick = onNavigateBack,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
         ) {
             Text("Go to Login Now")
         }

@@ -56,6 +56,10 @@ import edu.cit.audioscholar.R
 import edu.cit.audioscholar.data.remote.dto.GlossaryItemDto
 import edu.cit.audioscholar.data.remote.dto.RecommendationDto
 import edu.cit.audioscholar.data.remote.dto.UserNoteDto
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernDialog
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import edu.cit.audioscholar.ui.theme.AudioScholarTheme
 import edu.cit.audioscholar.util.Resource
 import kotlinx.coroutines.flow.collectLatest
@@ -318,7 +322,7 @@ fun RecordingDetailsScreen(
                             // Process Recording Button (if available)
                             if (uiState.filePath.isNotEmpty() && uiState.remoteRecordingId == null && !uiState.isProcessing) {
                                 Spacer(modifier = Modifier.height(16.dp))
-                                Button(
+                                ModernButton(
                                     onClick = viewModel::onProcessRecordingClicked,
                                     modifier = Modifier.fillMaxWidth(),
                                     enabled = !uiState.isProcessing
@@ -408,12 +412,12 @@ fun RecordingDetailsScreen(
         }
 
         if (uiState.showDeleteConfirmation) {
-            AlertDialog(
+            ModernDialog(
                 onDismissRequest = { if (!uiState.isDeleting) viewModel.cancelDelete() },
-                title = { Text(stringResource(R.string.dialog_delete_title)) },
-                text = { Text(stringResource(R.string.dialog_delete_message_details, uiState.title)) },
+                title = stringResource(R.string.dialog_delete_title),
+                content = { Text(stringResource(R.string.dialog_delete_message_details, uiState.title)) },
                 confirmButton = {
-                    Button(
+                    ModernButton(
                         onClick = viewModel::confirmDelete,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                         enabled = !uiState.isDeleting
@@ -430,7 +434,7 @@ fun RecordingDetailsScreen(
                     }
                 },
                 dismissButton = {
-                    TextButton(
+                    ModernOutlinedButton(
                         onClick = viewModel::cancelDelete,
                         enabled = !uiState.isDeleting
                     ) {
@@ -465,41 +469,39 @@ fun RecordingDetailsScreen(
             var newTitle by remember { mutableStateOf(uiState.title) }
             var newDescription by remember { mutableStateOf(uiState.description) }
 
-            AlertDialog(
+            ModernDialog(
                 onDismissRequest = viewModel::closeEditDialog,
-                title = { Text("Edit Details") },
-                text = {
+                title = "Edit Details",
+                content = {
                     Column {
-                        OutlinedTextField(
+                        ModernTextField(
                             value = newTitle,
                             onValueChange = { newTitle = it },
-                            label = { Text("Title") },
+                            label = "Title",
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
+                        ModernTextField(
                             value = newDescription,
                             onValueChange = { newDescription = it },
-                            label = { Text("Description") },
+                            label = "Description",
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 3,
-                            maxLines = 5
+                            maxLines = 5,
+                            singleLine = false
                         )
                     }
                 },
                 confirmButton = {
-                    Button(
+                    ModernButton(
+                        text = "Save",
                         onClick = {
                             viewModel.updateRecordingDetails(newTitle, newDescription)
                         }
-                    ) {
-                        Text("Save")
-                    }
+                    )
                 },
                 dismissButton = {
-                    TextButton(onClick = viewModel::closeEditDialog) {
-                        Text("Cancel")
-                    }
+                    ModernOutlinedButton(text = "Cancel", onClick = viewModel::closeEditDialog)
                 }
             )
         }
@@ -592,36 +594,13 @@ fun SummaryEditDialog(
     // Use snapshot state list for reactive inline editing
     val keyPoints = remember { mutableStateListOf(*initialKeyPoints.toTypedArray()) }
 
-    Dialog(
+    ModernDialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Edit Summary Content") },
-                    navigationIcon = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(Icons.Filled.Close, contentDescription = "Cancel")
-                        }
-                    },
-                    actions = {
-                        TextButton(onClick = {
-                            // Filter out blank lines before saving
-                            val cleanedKeyPoints = keyPoints.map { it.trim() }.filter { it.isNotEmpty() }
-                            onConfirm(summary, cleanedKeyPoints)
-                        }) {
-                            Text("Save", fontWeight = FontWeight.Bold)
-                        }
-                    }
-                )
-            }
-        ) { paddingValues ->
+        title = "Edit Summary Content",
+        content = {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
                 // Summary Section
@@ -631,15 +610,14 @@ fun SummaryEditDialog(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                OutlinedTextField(
+                ModernTextField(
                     value = summary,
                     onValueChange = { summary = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 120.dp),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    label = { Text("Summary Text") },
-                    minLines = 5
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "Summary Text",
+                    minLines = 5,
+                    maxLines = 10,
+                    singleLine = false
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -668,12 +646,11 @@ fun SummaryEditDialog(
                             .padding(bottom = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedTextField(
+                        ModernTextField(
                             value = point,
                             onValueChange = { keyPoints[index] = it },
                             modifier = Modifier.weight(1f),
-                            textStyle = MaterialTheme.typography.bodyMedium,
-                            placeholder = { Text("Key point...") },
+                            placeholder = "Key point...",
                             trailingIcon = {
                                 if (point.isNotEmpty()) {
                                     IconButton(onClick = { keyPoints[index] = "" }) {
@@ -696,7 +673,7 @@ fun SummaryEditDialog(
                 }
 
                 // Add Button
-                Button(
+                ModernButton(
                     onClick = { keyPoints.add("") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -710,11 +687,21 @@ fun SummaryEditDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Add Key Point")
                 }
-                
-                Spacer(modifier = Modifier.height(32.dp))
             }
+        },
+        confirmButton = {
+            ModernButton(
+                text = "Save",
+                onClick = {
+                    val cleanedKeyPoints = keyPoints.map { it.trim() }.filter { it.isNotEmpty() }
+                    onConfirm(summary, cleanedKeyPoints)
+                }
+            )
+        },
+        dismissButton = {
+            ModernOutlinedButton(text = "Cancel", onClick = onDismiss)
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -726,42 +713,17 @@ fun GlossaryEditDialog(
 ) {
     val glossaryItems = remember { mutableStateListOf(*initialGlossary.toTypedArray()) }
 
-    Dialog(
+    ModernDialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Edit Glossary") },
-                    navigationIcon = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(Icons.Filled.Close, contentDescription = "Cancel")
-                        }
-                    },
-                    actions = {
-                        TextButton(onClick = {
-                            // Filter out items with both empty term and definition
-                            val cleanedItems = glossaryItems.filter { 
-                                !it.term.isNullOrBlank() || !it.definition.isNullOrBlank() 
-                            }
-                            onConfirm(cleanedItems)
-                        }) {
-                            Text("Save", fontWeight = FontWeight.Bold)
-                        }
-                    }
-                )
-            }
-        ) { paddingValues ->
+        title = "Edit Glossary",
+        content = {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
                 if (glossaryItems.isEmpty()) {
-                     Text(
+                    Text(
                         text = "No glossary terms added yet.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -771,14 +733,16 @@ fun GlossaryEditDialog(
 
                 glossaryItems.forEachIndexed { index, item ->
                     Card(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = "Term ${index + 1}", 
+                                    text = "Term ${index + 1}",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.weight(1f)
@@ -794,35 +758,39 @@ fun GlossaryEditDialog(
                                     )
                                 }
                             }
-                            
-                            OutlinedTextField(
+
+                            ModernTextField(
                                 value = item.term ?: "",
                                 onValueChange = { newValue ->
                                     glossaryItems[index] = item.copy(term = newValue)
                                 },
-                                label = { Text("Term") },
-                                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                                singleLine = true
+                                label = "Term",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp)
                             )
-                            
+
                             Spacer(modifier = Modifier.height(8.dp))
-                            
-                            OutlinedTextField(
+
+                            ModernTextField(
                                 value = item.definition ?: "",
                                 onValueChange = { newValue ->
                                     glossaryItems[index] = item.copy(definition = newValue)
                                 },
-                                label = { Text("Definition") },
+                                label = "Definition",
                                 modifier = Modifier.fillMaxWidth(),
-                                minLines = 2
+                                minLines = 2,
+                                singleLine = false
                             )
                         }
                     }
                 }
 
-                Button(
+                ModernButton(
                     onClick = { glossaryItems.add(GlossaryItemDto(term = "", definition = "")) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -832,11 +800,23 @@ fun GlossaryEditDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Add New Term")
                 }
-                
-                Spacer(modifier = Modifier.height(32.dp))
             }
+        },
+        confirmButton = {
+            ModernButton(
+                text = "Save",
+                onClick = {
+                    val cleanedItems = glossaryItems.filter {
+                        !it.term.isNullOrBlank() || !it.definition.isNullOrBlank()
+                    }
+                    onConfirm(cleanedItems)
+                }
+            )
+        },
+        dismissButton = {
+            ModernOutlinedButton(text = "Cancel", onClick = onDismiss)
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -952,7 +932,7 @@ fun InsightsTabContent(
                             )
                             if (uiState.summaryText.isNotEmpty() || uiState.keyPoints.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(12.dp))
-                                Button(
+                                ModernButton(
                                     onClick = viewModel::onCopySummaryAndNotes,
                                     modifier = Modifier.align(Alignment.End),
                                     enabled = !uiState.isProcessing
@@ -1294,7 +1274,7 @@ fun ResourcesTabContent(
                             color = LocalContentColor.current.copy(alpha = 0.7f)
                         )
                         if (uiState.remoteRecordingId == null && !uiState.isProcessing && !uiState.isDeleting) {
-                            Button(onClick = viewModel::requestAttachPowerPoint) {
+                            ModernButton(onClick = viewModel::requestAttachPowerPoint) {
                                 Icon(Icons.Filled.AttachFile, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
                                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                                 Text(stringResource(R.string.details_powerpoint_attach_button))

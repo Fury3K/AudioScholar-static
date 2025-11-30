@@ -14,6 +14,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import android.util.Log
 import edu.cit.audioscholar.data.remote.dto.UserNoteDto
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernDialog
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -224,20 +228,21 @@ fun AddEditNoteDialog(
     var content by remember { mutableStateOf(note?.content ?: "") }
     val isEditing = note != null
 
-    AlertDialog(
+    ModernDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isEditing) "Edit Note" else "Add Note") },
-        text = {
-            OutlinedTextField(
+        title = if (isEditing) "Edit Note" else "Add Note",
+        content = {
+            ModernTextField(
                 value = content,
                 onValueChange = { content = it },
-                label = { Text("Note Content") },
+                label = "Note Content",
                 modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
-                minLines = 3
+                minLines = 3,
+                singleLine = false
             )
         },
         confirmButton = {
-            Button(
+            ModernButton(
                 onClick = { if (content.isNotBlank()) onConfirm(content) },
                 enabled = content.isNotBlank()
             ) {
@@ -245,7 +250,7 @@ fun AddEditNoteDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            ModernOutlinedButton(onClick = onDismiss) {
                 Text("Cancel")
             }
         }

@@ -69,8 +69,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.CardDefaults
 import androidx.navigation.NavHostController
 import edu.cit.audioscholar.R
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernCard
+import edu.cit.audioscholar.ui.components.ModernDialog
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -166,19 +172,21 @@ fun RecordingScreen(
     }
 
     if (uiState.showStopConfirmationDialog) {
-        AlertDialog(
+        ModernDialog(
             onDismissRequest = { viewModel.dismissStopConfirmation() },
-            title = { Text(stringResource(R.string.dialog_stop_title)) },
-            text = { Text(stringResource(R.string.dialog_stop_message)) },
+            title = stringResource(R.string.dialog_stop_title),
+            content = { Text(stringResource(R.string.dialog_stop_message)) },
             confirmButton = {
-                Button(
+                ModernButton(
                     onClick = { viewModel.confirmStopRecording() }
                 ) {
                     Text(stringResource(R.string.dialog_action_stop_confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.dismissStopConfirmation() }) {
+                ModernOutlinedButton(
+                    onClick = { viewModel.dismissStopConfirmation() }
+                ) {
                     Text(stringResource(R.string.dialog_action_cancel))
                 }
             }
@@ -186,12 +194,12 @@ fun RecordingScreen(
     }
 
     if (uiState.showCancelConfirmationDialog) {
-        AlertDialog(
+        ModernDialog(
             onDismissRequest = { viewModel.dismissCancelConfirmation() },
-            title = { Text(stringResource(R.string.dialog_cancel_title)) },
-            text = { Text(stringResource(R.string.dialog_cancel_message)) },
+            title = stringResource(R.string.dialog_cancel_title),
+            content = { Text(stringResource(R.string.dialog_cancel_message)) },
             confirmButton = {
-                Button(
+                ModernButton(
                     onClick = { viewModel.confirmCancelRecording() },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
@@ -199,7 +207,9 @@ fun RecordingScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.dismissCancelConfirmation() }) {
+                ModernOutlinedButton(
+                    onClick = { viewModel.dismissCancelConfirmation() }
+                ) {
                     Text(stringResource(R.string.dialog_action_keep_recording))
                 }
             }
@@ -223,126 +233,141 @@ fun RecordingScreen(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (uiState.isRecording) {
-                AudioWaveformVisualizer(
-                    amplitude = uiState.currentAmplitude,
-                    isPaused = uiState.isPaused,
-                    modifier = Modifier.fillMaxSize()
+            // Visualizer and Status Section
+            ModernCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                 )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.isRecording) {
+                        AudioWaveformVisualizer(
+                            amplitude = uiState.currentAmplitude,
+                            isPaused = uiState.isPaused,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = uiState.elapsedTimeFormatted,
+                            style = MaterialTheme.typography.displayMedium,
+                            color = when {
+                                uiState.isRecording && !uiState.isPaused -> MaterialTheme.colorScheme.primary
+                                uiState.isPaused -> MaterialTheme.colorScheme.secondary
+                                uiState.showTitleDialog -> MaterialTheme.colorScheme.tertiary
+                                else -> LocalContentColor.current.copy(alpha = 0.8f)
+                            },
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        Text(
+                            text = when {
+                                uiState.isRecording && !uiState.isPaused -> stringResource(R.string.status_recording)
+                                uiState.isPaused -> stringResource(R.string.status_paused)
+                                uiState.showTitleDialog -> stringResource(R.string.status_saving)
+                                !uiState.permissionGranted -> stringResource(R.string.status_permission_needed)
+                                else -> stringResource(R.string.status_tap_to_record)
+                            },
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            // Controls Section
+            ModernCard(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.weight(0.5f))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    LargeFloatingActionButton(
+                        onClick = {
+                            if (uiState.showTitleDialog || uiState.showStopConfirmationDialog || uiState.showCancelConfirmationDialog) return@LargeFloatingActionButton
 
-                Text(
-                    text = uiState.elapsedTimeFormatted,
-                    style = MaterialTheme.typography.displayMedium,
-                    color = when {
-                        uiState.isRecording && !uiState.isPaused -> MaterialTheme.colorScheme.primary
-                        uiState.isPaused -> MaterialTheme.colorScheme.secondary
-                        uiState.showTitleDialog -> MaterialTheme.colorScheme.tertiary
-                        else -> LocalContentColor.current.copy(alpha = 0.8f)
-                    },
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Text(
-                    text = when {
-                        uiState.isRecording && !uiState.isPaused -> stringResource(R.string.status_recording)
-                        uiState.isPaused -> stringResource(R.string.status_paused)
-                        uiState.showTitleDialog -> stringResource(R.string.status_saving)
-                        !uiState.permissionGranted -> stringResource(R.string.status_permission_needed)
-                        else -> stringResource(R.string.status_tap_to_record)
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                LargeFloatingActionButton(
-                    onClick = {
-                        if (uiState.showTitleDialog || uiState.showStopConfirmationDialog || uiState.showCancelConfirmationDialog) return@LargeFloatingActionButton
-
-                        if (uiState.isRecording) {
-                            viewModel.requestStopConfirmation()
-                        } else {
-                            if (uiState.permissionGranted) {
-                                viewModel.startRecording()
+                            if (uiState.isRecording) {
+                                viewModel.requestStopConfirmation()
                             } else {
-                                multiplePermissionsLauncher.launch(permissionsToRequest)
+                                if (uiState.permissionGranted) {
+                                    viewModel.startRecording()
+                                } else {
+                                    multiplePermissionsLauncher.launch(permissionsToRequest)
+                                }
+                            }
+                        },
+                        modifier = Modifier.size(100.dp),
+                        shape = CircleShape,
+                        containerColor = if (uiState.isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Icon(
+                            imageVector = if (uiState.isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
+                            contentDescription = if (uiState.isRecording) {
+                                stringResource(R.string.cd_stop_button)
+                            } else {
+                                stringResource(R.string.cd_record_button)
+                            },
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+
+                    if (uiState.isRecording) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (!uiState.isPaused) {
+                                ModernOutlinedButton(
+                                    onClick = { viewModel.pauseRecording() },
+                                    enabled = !uiState.showStopConfirmationDialog && !uiState.showCancelConfirmationDialog
+                                ) {
+                                    Icon(Icons.Filled.Pause, contentDescription = stringResource(R.string.cd_pause_button))
+                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                    Text(stringResource(R.string.action_pause))
+                                }
+                            } else {
+                                ModernOutlinedButton(
+                                    onClick = { viewModel.resumeRecording() },
+                                    enabled = !uiState.showStopConfirmationDialog && !uiState.showCancelConfirmationDialog
+                                ) {
+                                    Icon(Icons.Filled.PlayArrow, contentDescription = stringResource(R.string.cd_resume_button))
+                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                    Text(stringResource(R.string.action_resume))
+                                }
+
+                                ModernOutlinedButton(
+                                    onClick = { viewModel.requestCancelConfirmation() },
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                                    enabled = !uiState.showStopConfirmationDialog && !uiState.showCancelConfirmationDialog
+                                ) {
+                                    Icon(Icons.Filled.Cancel, contentDescription = stringResource(R.string.cd_cancel_button))
+                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                    Text(stringResource(R.string.action_cancel))
+                                }
                             }
                         }
-                    },
-                    modifier = Modifier.size(100.dp),
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        imageVector = if (uiState.isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
-                        contentDescription = if (uiState.isRecording) {
-                            stringResource(R.string.cd_stop_button)
-                        } else {
-                            stringResource(R.string.cd_record_button)
-                        },
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (uiState.isRecording && !uiState.isPaused) {
-                        Button(
-                            onClick = { viewModel.pauseRecording() },
-                            enabled = !uiState.showStopConfirmationDialog && !uiState.showCancelConfirmationDialog
-                        ) {
-                            Icon(Icons.Filled.Pause, contentDescription = stringResource(R.string.cd_pause_button))
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text(stringResource(R.string.action_pause))
-                        }
-                    }
-
-                    if (uiState.isRecording && uiState.isPaused) {
-                        Button(
-                            onClick = { viewModel.resumeRecording() },
-                            enabled = !uiState.showStopConfirmationDialog && !uiState.showCancelConfirmationDialog
-                        ) {
-                            Icon(Icons.Filled.PlayArrow, contentDescription = stringResource(R.string.cd_resume_button))
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text(stringResource(R.string.action_resume))
-                        }
-
-                        Button(
-                            onClick = { viewModel.requestCancelConfirmation() },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                            enabled = !uiState.showStopConfirmationDialog && !uiState.showCancelConfirmationDialog
-                        ) {
-                            Icon(Icons.Filled.Cancel, contentDescription = stringResource(R.string.cd_cancel_button))
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text(stringResource(R.string.action_cancel))
-                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -426,7 +451,6 @@ fun AudioWaveformVisualizer(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordingTitleDialog(
     onConfirm: (String?) -> Unit,
@@ -434,24 +458,29 @@ fun RecordingTitleDialog(
 ) {
     var title by rememberSaveable { mutableStateOf("") }
 
-    AlertDialog(
+    ModernDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dialog_title_prompt_title)) },
-        text = {
-            OutlinedTextField(
+        title = stringResource(R.string.dialog_title_prompt_title),
+        content = {
+            ModernTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text(stringResource(R.string.dialog_title_prompt_label)) },
-                placeholder = { Text(stringResource(R.string.dialog_title_prompt_placeholder)) },
+                label = stringResource(R.string.dialog_title_prompt_label),
+                placeholder = stringResource(R.string.dialog_title_prompt_placeholder),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
         },
         confirmButton = {
-            Button(onClick = {
+            ModernButton(onClick = {
                 onConfirm(title.trim().ifEmpty { null })
             }) {
                 Text(stringResource(R.string.dialog_action_save))
+            }
+        },
+        dismissButton = {
+            ModernOutlinedButton(onClick = onDismiss) {
+                Text(stringResource(R.string.dialog_action_cancel))
             }
         }
     )

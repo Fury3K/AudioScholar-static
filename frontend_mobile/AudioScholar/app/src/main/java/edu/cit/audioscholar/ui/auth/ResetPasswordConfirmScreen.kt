@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -110,7 +112,7 @@ fun ResetPasswordConfirmScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
-                    Button(
+                    ModernButton(
                         onClick = viewModel::onNavigateToLogin,
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -140,10 +142,10 @@ fun ResetPasswordConfirmScreen(
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
-                    OutlinedTextField(
+                    ModernTextField(
                         value = uiState.newPassword,
                         onValueChange = viewModel::onNewPasswordChange,
-                        label = { Text(stringResource(R.string.settings_new_password)) },
+                        label = stringResource(R.string.settings_new_password),
                         singleLine = true,
                         visualTransformation = if (uiState.newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
@@ -203,10 +205,10 @@ fun ResetPasswordConfirmScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    OutlinedTextField(
+                    ModernTextField(
                         value = uiState.confirmPassword,
                         onValueChange = viewModel::onConfirmPasswordChange,
-                        label = { Text(stringResource(R.string.settings_confirm_new_password)) },
+                        label = stringResource(R.string.settings_confirm_new_password),
                         singleLine = true,
                         visualTransformation = if (uiState.confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
@@ -225,14 +227,22 @@ fun ResetPasswordConfirmScreen(
                             }
                         },
                         isError = uiState.confirmPasswordError != null,
-                        supportingText = { uiState.confirmPasswordError?.let { Text(it.asString()) } },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !uiState.isLoading
                     )
 
+                    if (uiState.confirmPasswordError != null) {
+                        Text(
+                            text = uiState.confirmPasswordError!!.asString(),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp).align(Alignment.Start)
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Button(
+                    ModernButton(
                         onClick = {
                             keyboardController?.hide()
                             viewModel.submitPasswordReset()
@@ -240,7 +250,6 @@ fun ResetPasswordConfirmScreen(
                         enabled = !uiState.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
                     ) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(

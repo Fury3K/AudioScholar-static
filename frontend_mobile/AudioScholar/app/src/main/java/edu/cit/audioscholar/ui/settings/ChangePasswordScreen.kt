@@ -54,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.domain.model.PasswordStrength
 import kotlinx.coroutines.launch
@@ -141,10 +143,10 @@ fun ChangePasswordScreen(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.currentPassword,
                 onValueChange = viewModel::onCurrentPasswordChange,
-                label = { Text(stringResource(R.string.settings_current_password)) },
+                label = stringResource(R.string.settings_current_password),
                 singleLine = true,
                 visualTransformation = if (uiState.currentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -160,17 +162,24 @@ fun ChangePasswordScreen(
                     }
                 },
                 isError = uiState.currentPasswordError != null,
-                supportingText = { uiState.currentPasswordError?.let { Text(it.asString(context)) } },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
             )
+            if (uiState.currentPasswordError != null) {
+                Text(
+                    text = uiState.currentPasswordError!!.asString(context),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.newPassword,
                 onValueChange = viewModel::onNewPasswordChange,
-                label = { Text(stringResource(R.string.settings_new_password)) },
+                label = stringResource(R.string.settings_new_password),
                 singleLine = true,
                 visualTransformation = if (uiState.newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -228,10 +237,10 @@ fun ChangePasswordScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
-                label = { Text(stringResource(R.string.settings_confirm_new_password)) },
+                label = stringResource(R.string.settings_confirm_new_password),
                 singleLine = true,
                 visualTransformation = if (uiState.confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -250,14 +259,21 @@ fun ChangePasswordScreen(
                     }
                 },
                 isError = uiState.confirmPasswordError != null,
-                supportingText = { uiState.confirmPasswordError?.let { Text(it.asString(context)) } },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
             )
+            if (uiState.confirmPasswordError != null) {
+                Text(
+                    text = uiState.confirmPasswordError!!.asString(context),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
+            ModernButton(
                 onClick = {
                     keyboardController?.hide()
                     viewModel.changePassword()

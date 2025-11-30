@@ -29,6 +29,9 @@ import androidx.navigation.compose.rememberNavController
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.ui.auth.LegalContent
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernDialog
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
 import edu.cit.audioscholar.ui.main.Screen
 import edu.cit.audioscholar.ui.theme.AudioScholarTheme
 import kotlinx.coroutines.CoroutineScope
@@ -305,12 +308,12 @@ fun SubscriptionPricingScreen(
             }
 
             if (uiState.error != null) {
-                AlertDialog(
+                ModernDialog(
                     onDismissRequest = { },
-                    title = { Text("Error") },
-                    text = { Text(uiState.error!!) },
+                    title = "Error",
+                    content = { Text(uiState.error!!) },
                     confirmButton = {
-                        Button(
+                        ModernButton(
                             onClick = { }
                         ) {
                             Text("OK")
@@ -512,7 +515,7 @@ fun EnhancedSubscriptionPlanCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (isCurrentPlan) {
-                OutlinedButton(
+                ModernOutlinedButton(
                     onClick = { },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
@@ -522,7 +525,7 @@ fun EnhancedSubscriptionPlanCard(
                     Text(stringResource(R.string.subscription_current_plan_button))
                 }
             } else {
-                Button(
+                ModernButton(
                     onClick = onSelectPlan,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)

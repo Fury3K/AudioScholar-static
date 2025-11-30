@@ -20,6 +20,9 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -181,10 +184,10 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            OutlinedTextField(
+            ModernTextField(
                 value = loginState.email,
                 onValueChange = viewModel::onEmailChange,
-                label = { Text(stringResource(R.string.login_email_label)) },
+                label = stringResource(R.string.login_email_label),
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
@@ -202,10 +205,10 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            ModernTextField(
                 value = loginState.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text(stringResource(R.string.login_password_label)) },
+                label = stringResource(R.string.login_password_label),
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -235,7 +238,7 @@ fun LoginScreen(
                 isError = loginState.errorMessage != null,
                 enabled = !loginState.isAnyLoading
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(
                 onClick = viewModel::onForgotPasswordClick,
@@ -246,7 +249,7 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
+            ModernButton(
                 onClick = viewModel::onLoginClick,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !loginState.isAnyLoading
@@ -281,7 +284,7 @@ fun LoginScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
+                ModernOutlinedButton(
                     onClick = viewModel::onGoogleSignInClick,
                     modifier = Modifier.padding(horizontal = 8.dp),
                     enabled = !loginState.isAnyLoading
@@ -304,7 +307,7 @@ fun LoginScreen(
                     }
                 }
 
-                OutlinedButton(
+                ModernOutlinedButton(
                     onClick = viewModel::onGitHubSignInClick,
                     modifier = Modifier.padding(horizontal = 8.dp),
                     enabled = !loginState.isAnyLoading
@@ -329,36 +332,37 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(32.dp))
 
-            val annotatedString = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
-                    append(stringResource(R.string.login_no_account_prefix))
-                    append(" ")
-                }
-                pushStringAnnotation(tag = "REGISTER", annotation = Screen.Registration.route)
-                withStyle(style = SpanStyle(
-                    color = MaterialTheme.colorScheme.primary,
-                    textDecoration = TextDecoration.Underline
-                )) {
-                    append(stringResource(R.string.login_register_link))
-                }
-                pop()
-            }
-
-            ClickableText(
-                text = annotatedString,
-                onClick = { offset ->
-                    if (!loginState.isAnyLoading) {
-                        annotatedString.getStringAnnotations(tag = "REGISTER", start = offset, end = offset)
-                            .firstOrNull()?.let { annotation ->
-                                navController.navigate(annotation.item) {
-                                    launchSingleTop = true
-                                }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.login_no_account_prefix),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                TextButton(
+                    onClick = {
+                        if (!loginState.isAnyLoading) {
+                            navController.navigate(Screen.Registration.route) {
+                                launchSingleTop = true
                             }
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+                        }
+                    },
+                    enabled = !loginState.isAnyLoading
+                ) {
+                    Text(
+                        text = stringResource(R.string.login_register_link),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        )
+                    )
+                }
+            }
         }
     }
 }

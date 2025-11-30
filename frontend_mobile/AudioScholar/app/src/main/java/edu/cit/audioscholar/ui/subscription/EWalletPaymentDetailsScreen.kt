@@ -35,6 +35,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.domain.repository.AuthRepository
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import edu.cit.audioscholar.ui.theme.AudioScholarTheme
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -330,7 +332,7 @@ fun EWalletPaymentDetailsScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    OutlinedTextField(
+                    ModernTextField(
                         value = contactNumber,
                         onValueChange = {
                             val newText = it.filter { char -> char.isDigit() }
@@ -339,8 +341,8 @@ fun EWalletPaymentDetailsScreen(
                             }
                             contactNumberError = null
                         },
-                        label = { Text(stringResource(R.string.payment_ewallet_contact_label)) },
-                        placeholder = { Text("+63 9XX XXX XXXX") },
+                        label = stringResource(R.string.payment_ewallet_contact_label),
+                        placeholder = "+63 9XX XXX XXXX",
                         leadingIcon = { Icon(Icons.Filled.PhoneAndroid, contentDescription = null) },
                         visualTransformation = PhilippinePhoneNumberVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
@@ -349,10 +351,16 @@ fun EWalletPaymentDetailsScreen(
                         ),
                         singleLine = true,
                         isError = contactNumberError != null,
-                        supportingText = { contactNumberError?.let { Text(stringResource(id = it)) } },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.fillMaxWidth()
                     )
+                    if (contactNumberError != null) {
+                        Text(
+                            text = stringResource(id = contactNumberError!!),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
                 }
             }
 
@@ -428,14 +436,12 @@ fun EWalletPaymentDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
+            ModernButton(
                 onClick = { handleSubmit() },
                 enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
