@@ -14,6 +14,51 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import edu.cit.audioscholar.ui.settings.ThemeStyle
+
+private val QuantumDarkColorScheme = darkColorScheme(
+    primary = Quantum_Dark_Primary,
+    onPrimary = Quantum_Dark_OnPrimary,
+    secondary = Quantum_Dark_Secondary,
+    onSecondary = Quantum_Dark_OnSecondary,
+    background = Quantum_Dark_Background,
+    onBackground = Quantum_Dark_OnBackground,
+    surface = Quantum_Dark_Surface,
+    onSurface = Quantum_Dark_OnSurface
+)
+
+private val QuantumLightColorScheme = lightColorScheme(
+    primary = Quantum_Light_Primary,
+    onPrimary = Quantum_Light_OnPrimary,
+    secondary = Quantum_Light_Secondary,
+    onSecondary = Quantum_Light_OnSecondary,
+    background = Quantum_Light_Background,
+    onBackground = Quantum_Light_OnBackground,
+    surface = Quantum_Light_Surface,
+    onSurface = Quantum_Light_OnSurface
+)
+
+private val ZenDarkColorScheme = darkColorScheme(
+    primary = Zen_Dark_Primary,
+    onPrimary = Zen_Dark_OnPrimary,
+    secondary = Zen_Dark_Secondary,
+    onSecondary = Zen_Dark_OnSecondary,
+    background = Zen_Dark_Background,
+    onBackground = Zen_Dark_OnBackground,
+    surface = Zen_Dark_Surface,
+    onSurface = Zen_Dark_OnSurface
+)
+
+private val ZenLightColorScheme = lightColorScheme(
+    primary = Zen_Light_Primary,
+    onPrimary = Zen_Light_OnPrimary,
+    secondary = Zen_Light_Secondary,
+    onSecondary = Zen_Light_OnSecondary,
+    background = Zen_Light_Background,
+    onBackground = Zen_Light_OnBackground,
+    surface = Zen_Light_Surface,
+    onSurface = Zen_Light_OnSurface
+)
 
 private val DarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,
@@ -82,6 +127,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun AudioScholarTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    themeStyle: ThemeStyle = ThemeStyle.Classic,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -90,6 +136,8 @@ fun AudioScholarTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+        themeStyle == ThemeStyle.Quantum -> if (darkTheme) QuantumDarkColorScheme else QuantumLightColorScheme
+        themeStyle == ThemeStyle.Zen -> if (darkTheme) ZenDarkColorScheme else ZenLightColorScheme
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

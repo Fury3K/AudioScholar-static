@@ -68,6 +68,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val showThemeDialog = remember { mutableStateOf(false) }
+    val showThemeStyleDialog = remember { mutableStateOf(false) }
     val showQualityDialog = remember { mutableStateOf(false) }
     val showSyncModeDialog = remember { mutableStateOf(false) }
     val showSyncFrequencyDialog = remember { mutableStateOf(false) }
@@ -78,9 +79,21 @@ fun SettingsScreen(
     val legalSheetContent = remember { mutableStateOf("") }
 
     val selectedTheme by viewModel.selectedTheme.collectAsState()
+    val selectedThemeStyle by viewModel.selectedThemeStyle.collectAsState()
     val selectedQuality by viewModel.selectedQuality.collectAsState()
     val selectedSyncMode by viewModel.selectedSyncMode.collectAsState()
     val selectedSyncFrequency by viewModel.selectedSyncFrequency.collectAsState()
+
+    if (showThemeStyleDialog.value) {
+        SelectionDialog(
+            title = stringResource(R.string.settings_dialog_title_theme_style),
+            options = ThemeStyle.entries,
+            currentSelection = selectedThemeStyle,
+            onSelectionChanged = { viewModel.updateThemeStyle(it) },
+            onDismissRequest = { showThemeStyleDialog.value = false },
+            optionLabel = { style -> stringResource(id = style.labelResId) }
+        )
+    }
 
     if (showThemeDialog.value) {
         SelectionDialog(
@@ -208,6 +221,11 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_item_theme),
                 subtitle = stringResource(id = selectedTheme.labelResId),
                 onClick = { showThemeDialog.value = true }
+            )
+            SettingsItemRow(
+                title = stringResource(R.string.settings_theme_style),
+                subtitle = stringResource(id = selectedThemeStyle.labelResId),
+                onClick = { showThemeStyleDialog.value = true }
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp))

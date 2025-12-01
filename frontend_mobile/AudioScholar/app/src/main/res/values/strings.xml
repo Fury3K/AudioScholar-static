@@ -217,6 +217,11 @@
     <string name="settings_section_app_prefs">App Preferences</string>
     <string name="settings_item_theme">Theme</string>
     <string name="settings_dialog_title_theme">Select Theme</string>
+    <string name="settings_theme_style">Theme Style</string>
+    <string name="settings_theme_style_classic">Classic</string>
+    <string name="settings_theme_style_quantum">Quantum Indigo</string>
+    <string name="settings_theme_style_zen">Zen Sage</string>
+    <string name="settings_dialog_title_theme_style">Select Theme Style</string>
     <string name="settings_dialog_title_quality">Select Recording Quality</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="settings_section_audio">Audio Recording Settings</string>

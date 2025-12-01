@@ -16,12 +16,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.data.remote.dto.admin.AdminUserDto
 
@@ -124,11 +129,26 @@ fun AdminUserItem(
                 modifier = Modifier.size(40.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    val context = LocalContext.current
+                    if (user.photoUrl != null) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(user.photoUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "User Avatar",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            error = painterResource(R.drawable.avatar_placeholder),
+                            placeholder = painterResource(R.drawable.avatar_placeholder)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
                 }
             }
 

@@ -55,6 +55,7 @@ import edu.cit.audioscholar.ui.profile.UserProfileScreen
 import edu.cit.audioscholar.ui.recording.RecordingScreen
 import edu.cit.audioscholar.ui.settings.SettingsViewModel
 import edu.cit.audioscholar.ui.settings.ThemeSetting
+import edu.cit.audioscholar.ui.settings.ThemeStyle
 import edu.cit.audioscholar.ui.theme.AudioScholarTheme
 import edu.cit.audioscholar.util.Resource
 import edu.cit.audioscholar.domain.repository.AuthRepository
@@ -279,6 +280,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val themeSetting by settingsViewModel.selectedTheme.collectAsStateWithLifecycle()
+            val themeStyle by settingsViewModel.selectedThemeStyle.collectAsStateWithLifecycle()
             val systemIsDark = isSystemInDarkTheme()
             val useDarkTheme = when (themeSetting) {
                 ThemeSetting.Light -> false
@@ -286,7 +288,10 @@ class MainActivity : ComponentActivity() {
                 ThemeSetting.System -> systemIsDark
             }
 
-            AudioScholarTheme(darkTheme = useDarkTheme) {
+            AudioScholarTheme(
+                darkTheme = useDarkTheme,
+                themeStyle = themeStyle
+            ) {
                 navController = rememberNavController()
 
                 LaunchedEffect(intent) {
