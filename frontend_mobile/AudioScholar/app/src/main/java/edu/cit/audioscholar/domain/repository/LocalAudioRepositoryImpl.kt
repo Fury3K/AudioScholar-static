@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
+import edu.cit.audioscholar.data.local.dao.RecordingMetadataDao
 import edu.cit.audioscholar.data.local.dao.UserNoteDao
 import edu.cit.audioscholar.data.local.file.RecordingFileHandler
 import edu.cit.audioscholar.data.local.model.RecordingMetadata
@@ -41,6 +42,7 @@ class LocalAudioRepositoryImpl @Inject constructor(
     private val gson: Gson,
     private val recordingFileHandler: RecordingFileHandler,
     private val userNoteDao: UserNoteDao,
+    private val recordingMetadataDao: RecordingMetadataDao,
     private val remoteAudioRepository: RemoteAudioRepository
 ) : LocalAudioRepository {
 
@@ -135,7 +137,8 @@ class LocalAudioRepositoryImpl @Inject constructor(
                 summaryId = parsedMetadata?.summaryId,
                 cachedRecommendations = parsedMetadata?.cachedRecommendations,
                 cacheTimestampMillis = parsedMetadata?.cacheTimestampMillis,
-                attachmentUri = parsedMetadata?.attachmentUri
+                attachmentUri = parsedMetadata?.attachmentUri,
+                isFavorite = parsedMetadata?.isFavorite ?: false
             )
             metadataResult = Result.success(finalMetadata)
 
@@ -150,20 +153,23 @@ class LocalAudioRepositoryImpl @Inject constructor(
 
 
     override fun getLocalRecordings(): Flow<List<RecordingMetadata>> = flow {
+        syncLocalFilesToDb()
+        emitAll(recordingMetadataDao.getAllRecordings())
+    }.flowOn(Dispatchers.IO)
+
+    private suspend fun syncLocalFilesToDb() {
         val recordingsDir = getRecordingsDirectory()
         if (recordingsDir == null || !recordingsDir.exists() || !recordingsDir.isDirectory) {
             Log.w(TAG_LOCAL_REPO, "Recordings directory not found or invalid.")
-            emit(emptyList())
-            return@flow
+            return
         }
 
         val recordingFiles = recordingsDir.listFiles { _, name ->
             name.startsWith(FILENAME_PREFIX) && SUPPORTED_LOCAL_AUDIO_EXTENSIONS.any { name.endsWith(it, ignoreCase = true) }
         } ?: emptyArray()
 
-        Log.d(TAG_LOCAL_REPO, "Found ${recordingFiles.size} potential recording audio files.")
+        Log.d(TAG_LOCAL_REPO, "Syncing ${recordingFiles.size} local files to database.")
 
-        val metadataList = mutableListOf<RecordingMetadata>()
         val dateFormat = SimpleDateFormat(FILENAME_DATE_FORMAT, Locale.US)
         val retriever = MediaMetadataRetriever()
 
@@ -203,41 +209,38 @@ class LocalAudioRepositoryImpl @Inject constructor(
                     }
                 }
 
-                metadataList.add(
-                    RecordingMetadata(
-                        filePath = filePath,
-                        fileName = fileName,
-                        title = parsedMetadata?.title ?: baseNameWithTimestamp.removePrefix(FILENAME_PREFIX).replace("_", " "),
-                        description = parsedMetadata?.description,
-                        timestampMillis = timestampMillis,
-                        durationMillis = if (parsedMetadata != null && parsedMetadata.durationMillis > 0) parsedMetadata.durationMillis else durationMillis,
-                        remoteRecordingId = parsedMetadata?.remoteRecordingId,
-                        cachedSummaryText = parsedMetadata?.cachedSummaryText,
-                        cachedGlossaryItems = parsedMetadata?.cachedGlossaryItems,
-                        cachedKeyPoints = parsedMetadata?.cachedKeyPoints,
-                        cachedTopics = parsedMetadata?.cachedTopics,
-                        summaryId = parsedMetadata?.summaryId,
-                        cachedRecommendations = parsedMetadata?.cachedRecommendations,
-                        cacheTimestampMillis = parsedMetadata?.cacheTimestampMillis,
-                        attachmentUri = parsedMetadata?.attachmentUri
-                    )
+                val metadata = RecordingMetadata(
+                    filePath = filePath,
+                    fileName = fileName,
+                    title = parsedMetadata?.title ?: baseNameWithTimestamp.removePrefix(FILENAME_PREFIX).replace("_", " "),
+                    description = parsedMetadata?.description,
+                    timestampMillis = timestampMillis,
+                    durationMillis = if (parsedMetadata != null && parsedMetadata.durationMillis > 0) parsedMetadata.durationMillis else durationMillis,
+                    remoteRecordingId = parsedMetadata?.remoteRecordingId,
+                    cachedSummaryText = parsedMetadata?.cachedSummaryText,
+                    cachedGlossaryItems = parsedMetadata?.cachedGlossaryItems,
+                    cachedKeyPoints = parsedMetadata?.cachedKeyPoints,
+                    cachedTopics = parsedMetadata?.cachedTopics,
+                    summaryId = parsedMetadata?.summaryId,
+                    cachedRecommendations = parsedMetadata?.cachedRecommendations,
+                    cacheTimestampMillis = parsedMetadata?.cacheTimestampMillis,
+                    attachmentUri = parsedMetadata?.attachmentUri,
+                    isFavorite = parsedMetadata?.isFavorite ?: false
                 )
+
+                recordingMetadataDao.insertOrUpdate(metadata)
+
             } catch (e: Exception) {
-                Log.e(TAG_LOCAL_REPO, "Error processing file in list: ${file.name}", e)
+                Log.e(TAG_LOCAL_REPO, "Error processing file sync: ${file.name}", e)
             }
         }
         try {
             retriever.release()
         } catch (e: Exception) {
-            Log.e(TAG_LOCAL_REPO, "Error releasing MediaMetadataRetriever", e)
+            Log.e(TAG_LOCAL_REPO, "Error releasing MediaMetadataRetriever during sync", e)
         }
-
-        metadataList.sortByDescending { it.timestampMillis }
-
-        Log.d(TAG_LOCAL_REPO, "Emitting ${metadataList.size} recording metadata items.")
-        emit(metadataList)
-
-    }.flowOn(Dispatchers.IO)
+        Log.d(TAG_LOCAL_REPO, "Finished syncing local files to database.")
+    }
 
     override suspend fun saveMetadata(metadata: RecordingMetadata): Boolean = withContext(Dispatchers.IO) {
         val jsonFile = getJsonFileForAudio(metadata.filePath)
@@ -250,6 +253,10 @@ class LocalAudioRepositoryImpl @Inject constructor(
             val jsonContent = gson.toJson(metadata)
             jsonFile.writeText(jsonContent)
             Log.i(TAG_LOCAL_REPO, "Successfully saved metadata to ${jsonFile.name}")
+            
+            // Sync with Database
+            recordingMetadataDao.insertOrUpdate(metadata)
+
             return@withContext true
         } catch (e: IOException) {
             Log.e(TAG_LOCAL_REPO, "IOException saving metadata to ${jsonFile.name}", e)
@@ -319,6 +326,52 @@ class LocalAudioRepositoryImpl @Inject constructor(
             saveMetadata(updatedMetadata)
         } catch (e: Exception) {
             Log.e(TAG_LOCAL_REPO, "Failed to update attachmentUri for $filePath", e)
+            false
+        }
+    }
+
+    override suspend fun updateFavoriteStatus(filePath: String, isFavorite: Boolean): Boolean = withContext(Dispatchers.IO) {
+        try {
+            var updateSuccessful = false
+
+            // Update JSON file first (Source of Truth for loading)
+            val audioFile = File(filePath)
+            if (audioFile.exists()) {
+                val jsonFile = getJsonFileForAudio(filePath)
+                if (jsonFile != null) {
+                    var metadata: RecordingMetadata? = null
+                    
+                    if (jsonFile.exists()) {
+                        try {
+                            val currentMetadata = gson.fromJson(jsonFile.readText(), RecordingMetadata::class.java)
+                            metadata = currentMetadata.copy(isFavorite = isFavorite)
+                        } catch (e: Exception) {
+                            Log.e(TAG_LOCAL_REPO, "Failed to update favorite status in JSON for $filePath", e)
+                        }
+                    }
+
+                    // If metadata is null (file didn't exist or parse failed), create it
+                    if (metadata == null) {
+                        val fileName = audioFile.name
+                        val fileExtension = SUPPORTED_LOCAL_AUDIO_EXTENSIONS.firstOrNull { fileName.endsWith(it, ignoreCase = true) } ?: ""
+                        if (fileExtension.isNotEmpty()) {
+                            val baseName = fileName.removeSuffix(fileExtension)
+                            metadata = createFallbackMetadata(audioFile, baseName, null).copy(isFavorite = isFavorite)
+                        }
+                    }
+
+                    if (metadata != null) {
+                        // saveMetadata now updates both JSON and DB
+                        updateSuccessful = saveMetadata(metadata)
+                    }
+                }
+            } else {
+                Log.w(TAG_LOCAL_REPO, "Audio file not found when updating favorite status: $filePath")
+            }
+
+            updateSuccessful
+        } catch (e: Exception) {
+            Log.e(TAG_LOCAL_REPO, "Failed to update favorite status for $filePath", e)
             false
         }
     }

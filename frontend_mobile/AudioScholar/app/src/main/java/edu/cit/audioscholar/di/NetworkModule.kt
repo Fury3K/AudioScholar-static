@@ -143,9 +143,10 @@ object NetworkModule {
         gson: Gson,
         recordingFileHandler: RecordingFileHandler,
         userNoteDao: edu.cit.audioscholar.data.local.dao.UserNoteDao,
+        recordingMetadataDao: edu.cit.audioscholar.data.local.dao.RecordingMetadataDao,
         remoteAudioRepository: RemoteAudioRepository
     ): LocalAudioRepository {
-        return LocalAudioRepositoryImpl(context, application, gson, recordingFileHandler, userNoteDao, remoteAudioRepository)
+        return LocalAudioRepositoryImpl(context, application, gson, recordingFileHandler, userNoteDao, recordingMetadataDao, remoteAudioRepository)
     }
 
     @Provides

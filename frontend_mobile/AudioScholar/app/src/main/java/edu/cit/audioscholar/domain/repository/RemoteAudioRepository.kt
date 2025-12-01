@@ -1,6 +1,7 @@
 package edu.cit.audioscholar.domain.repository
 
 import edu.cit.audioscholar.data.remote.dto.*
+import edu.cit.audioscholar.util.Resource
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -28,6 +29,8 @@ interface RemoteAudioRepository {
     fun getCloudRecordingDetails(recordingId: String): Flow<Result<AudioMetadataDto>>
 
     fun updateRecordingDetails(recordingId: String, title: String?, description: String?): Flow<Result<AudioMetadataDto>>
+
+    fun toggleFavorite(recordingId: String): Flow<Resource<FavoriteStatusDto>>
 
     fun updateSummary(
         summaryId: String,

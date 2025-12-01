@@ -44,3 +44,4 @@ src/main/resources/uploads/
 logs/
 .logs/
 **/*.log
+springboot.log.*

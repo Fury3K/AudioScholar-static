@@ -348,6 +348,7 @@ fun LibraryScreen(
                         isMultiSelectActive = uiState.isMultiSelectActive,
                         onItemClick = { metadata -> viewModel.onRecordingClicked(metadata) },
                         onItemLongClick = viewModel::enterMultiSelectMode,
+                        onToggleFavorite = { metadata -> viewModel.toggleFavorite(metadata) },
                         isLoading = uiState.isLoadingLocal && !uiState.isImporting,
                         navController = navController
                     )
@@ -357,6 +358,7 @@ fun LibraryScreen(
                         isMultiSelectActive = uiState.isMultiSelectActive,
                         onItemClick = { metadataDto -> viewModel.onRecordingClicked(metadataDto) },
                         onItemLongClick = { id -> viewModel.enterMultiSelectMode(id) },
+                        onToggleFavorite = { metadataDto -> viewModel.toggleFavorite(metadataDto) },
                         isLoading = uiState.isLoadingCloud,
                         navController = navController,
                         context = context,
@@ -437,6 +439,7 @@ fun LocalRecordingsTabPage(
     isMultiSelectActive: Boolean,
     onItemClick: (RecordingMetadata) -> Unit,
     onItemLongClick: (String) -> Unit,
+    onToggleFavorite: (RecordingMetadata) -> Unit,
     isLoading: Boolean,
     navController: NavHostController
 ) {
@@ -476,6 +479,7 @@ fun LocalRecordingsTabPage(
                         isSelected = isSelected,
                         onLongClick = { onItemLongClick(metadata.filePath) },
                         onClick = { onItemClick(metadata) },
+                        onToggleFavorite = { onToggleFavorite(metadata) }
                     )
                 }
             }
@@ -493,6 +497,7 @@ fun CloudRecordingsTabPage(
     isMultiSelectActive: Boolean,
     onItemClick: (AudioMetadataDto) -> Unit,
     onItemLongClick: (String) -> Unit,
+    onToggleFavorite: (AudioMetadataDto) -> Unit,
     isLoading: Boolean,
     navController: NavHostController,
     context: Context,
@@ -540,6 +545,7 @@ fun CloudRecordingsTabPage(
                         onItemClick = {
                             onItemClick(metadataDto)
                         },
+                        onToggleFavorite = { onToggleFavorite(metadataDto) }
                     )
                 }
             }
@@ -558,6 +564,7 @@ fun LocalRecordingListItem(
     isSelected: Boolean,
     onLongClick: () -> Unit,
     onClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
@@ -644,6 +651,15 @@ fun LocalRecordingListItem(
                     )
                 }
             }
+            if (!isMultiSelectActive) {
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (metadata.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = stringResource(if (metadata.isFavorite) R.string.cd_favorite_remove else R.string.cd_favorite_add),
+                        tint = if (metadata.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }
@@ -656,6 +672,7 @@ fun CloudRecordingListItem(
     isSelected: Boolean,
     onLongClick: () -> Unit,
     onItemClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
@@ -752,6 +769,15 @@ fun CloudRecordingListItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+            if (!isMultiSelectActive) {
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (metadata.isFavorite == true) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = stringResource(if (metadata.isFavorite == true) R.string.cd_favorite_remove else R.string.cd_favorite_add),
+                        tint = if (metadata.isFavorite == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

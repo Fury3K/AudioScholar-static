@@ -17,6 +17,7 @@ interface LocalAudioRepository {
 
     suspend fun saveMetadata(metadata: RecordingMetadata): Boolean
     fun getMetadataByRemoteId(remoteId: String): Flow<RecordingMetadata?>
+    suspend fun updateFavoriteStatus(filePath: String, isFavorite: Boolean): Boolean
 
     // Note Operations
     fun getNotesForRecording(filePath: String): Flow<List<UserNoteEntity>>

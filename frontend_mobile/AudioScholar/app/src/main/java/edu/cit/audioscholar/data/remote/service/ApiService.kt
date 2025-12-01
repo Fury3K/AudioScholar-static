@@ -90,6 +90,9 @@ interface ApiService {
         @Path("recordingId") recordingId: String
     ): Response<AudioMetadataDto>
 
+    @POST("/api/audio/recordings/{id}/favorite")
+    suspend fun toggleFavorite(@Path("id") recordingId: String): Response<FavoriteStatusDto>
+
     @PATCH("/api/audio/recordings/{recordingId}")
     suspend fun updateRecordingDetails(
         @Path("recordingId") recordingId: String,

@@ -244,12 +244,26 @@ fun RecordingDetailsScreen(
                         // Persistent Header Section
                         Column(modifier = Modifier.padding(16.dp)) {
                             // Title & Description
-                            Text(
-                                text = uiState.title,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = uiState.title,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                IconButton(onClick = viewModel::toggleFavorite) {
+                                    Icon(
+                                        imageVector = if (uiState.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                        contentDescription = stringResource(if (uiState.isFavorite) R.string.cd_favorite_remove else R.string.cd_favorite_add),
+                                        tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(32.dp)
+                                    )
+                                }
+                            }
                             if (uiState.description.isNotBlank()) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(

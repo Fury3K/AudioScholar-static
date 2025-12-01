@@ -64,7 +64,8 @@ data class RecordingDetailsUiState(
 
     val uploadProgressPercent: Int? = null,
 
-    val currentUserId: String? = null
+    val currentUserId: String? = null,
+    val isFavorite: Boolean = false
 ) {
     val isProcessing: Boolean
         get() = uploadProgressPercent != null ||

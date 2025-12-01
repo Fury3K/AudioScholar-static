@@ -30,6 +30,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "audioscholar_database"
         )
+        .addMigrations(AppDatabase.MIGRATION_7_8)
         .fallbackToDestructiveMigration()
         .build()
     }

@@ -119,6 +119,8 @@
     <string name="cd_powerpoint_section">PowerPoint attachment section</string>
     <string name="cd_youtube_recommendations_section">YouTube recommendations section</string>
     <string name="cd_delete_recording_action">Delete recording</string>
+    <string name="cd_favorite_add">Add to favorites</string>
+    <string name="cd_favorite_remove">Remove from favorites</string>
     <string name="details_playback_title">Playback</string>
     <string name="cd_play_playback">Play recording</string>
     <string name="cd_pause_playback">Pause recording</string>

@@ -1,5 +1,7 @@
 package edu.cit.audioscholar.data.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class TimestampDto(
     val seconds: Long? = null,
     val nanos: Long? = null
@@ -23,5 +25,7 @@ data class AudioMetadataDto(
     val summaryId: String? = null,
     val gptSummary: String? = null,
     val transcriptText: String? = null,
-    val durationSeconds: Int? = null
+    val durationSeconds: Int? = null,
+    @SerializedName("favorite")
+    val isFavorite: Boolean? = null
 )

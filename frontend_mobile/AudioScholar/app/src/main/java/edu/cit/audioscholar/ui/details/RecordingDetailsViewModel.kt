@@ -23,6 +23,8 @@ import edu.cit.audioscholar.ui.details.RecordingDetailsUiState
 import edu.cit.audioscholar.ui.details.SummaryStatus
 import edu.cit.audioscholar.ui.details.RecommendationsStatus
 import edu.cit.audioscholar.util.ProcessingEventBus
+import edu.cit.audioscholar.util.onSuccess
+import edu.cit.audioscholar.util.onFailure
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -204,7 +206,8 @@ class RecordingDetailsViewModel @Inject constructor(
                                 glossaryItems = if (isSummaryCacheValid) cachedGlossary ?: emptyList() else emptyList(),
                                 youtubeRecommendations = if (areRecommendationsCacheValid) cachedRecs ?: emptyList() else emptyList(),
                                 attachedPowerPoint = metadata.attachmentUri,
-                                isCloudSource = false
+                                isCloudSource = false,
+                                isFavorite = metadata.isFavorite
                             )
                         }
                         configurePlayback(localMetadata = metadata)
@@ -290,7 +293,8 @@ class RecordingDetailsViewModel @Inject constructor(
                     keyPoints = emptyList(),
                     glossaryItems = emptyList(),
                     youtubeRecommendations = emptyList(),
-                    isCloudSource = true
+                    isCloudSource = true,
+                    isFavorite = false // Will be updated by fetchCloudDetails
                 )
             }
 
@@ -315,7 +319,8 @@ class RecordingDetailsViewModel @Inject constructor(
                         it.copy(
                             description = dto.description ?: "",
                             title = dto.title ?: it.title,
-                            editableTitle = TextFieldValue(dto.title ?: it.title, selection = TextRange((dto.title ?: it.title).length))
+                            editableTitle = TextFieldValue(dto.title ?: it.title, selection = TextRange((dto.title ?: it.title).length)),
+                            isFavorite = dto.isFavorite ?: false
                         )
                     }
                 }.onFailure { e ->
@@ -855,6 +860,44 @@ class RecordingDetailsViewModel @Inject constructor(
             name = uri.lastPathSegment ?: "Attached File"
         }
         return name
+    }
+
+    fun toggleFavorite() {
+        val state = uiState.value
+        val newStatus = !state.isFavorite
+        
+        // Optimistic update
+        _uiState.update { it.copy(isFavorite = newStatus) }
+        
+        viewModelScope.launch {
+            if (state.isCloudSource) {
+                val idToUpdate = state.remoteRecordingId ?: state.cloudId
+                if (idToUpdate != null) {
+                    remoteAudioRepository.toggleFavorite(idToUpdate).collect { result ->
+                        result.onSuccess {
+                            Log.d("DetailsViewModel", "Favorite toggled successfully for $idToUpdate. New status: $newStatus. Emitting event.")
+                            processingEventBus.emitFavoriteToggled(idToUpdate, newStatus)
+                        }.onFailure { e ->
+                            Log.e("DetailsViewModel", "Failed to toggle favorite (cloud)", e)
+                            _uiState.update { it.copy(isFavorite = !newStatus) } // Revert
+                            _errorEvent.trySend("Failed to update favorite status")
+                        }
+                    }
+                }
+            } else {
+                if (state.filePath.isNotEmpty()) {
+                    val success = localAudioRepository.updateFavoriteStatus(state.filePath, newStatus)
+                    if (!success) {
+                         Log.e("DetailsViewModel", "Failed to toggle favorite (local)")
+                        _uiState.update { it.copy(isFavorite = !newStatus) } // Revert
+                        _errorEvent.trySend("Failed to update favorite status")
+                    } else {
+                        // Update current metadata to reflect change
+                        currentMetadata = currentMetadata?.copy(isFavorite = newStatus)
+                    }
+                }
+            }
+        }
     }
 
     fun detachPowerPoint() {

@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.data.remote.dto.*
 import edu.cit.audioscholar.data.remote.service.ApiService
+import edu.cit.audioscholar.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
@@ -404,6 +405,22 @@ class RemoteAudioRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG_REMOTE_REPO, "Unexpected exception updating recording details: ${e.message}", e)
             emit(Result.failure(IOException(application.getString(R.string.upload_error_unexpected, e.message ?: "Unknown error"), e)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun toggleFavorite(recordingId: String): Flow<Resource<FavoriteStatusDto>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = apiService.toggleFavorite(recordingId)
+            if (response.isSuccessful && response.body() != null) {
+                emit(Resource.Success(response.body()!!))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = if (errorBody.isNullOrEmpty()) "Unknown error" else errorBody
+                emit(Resource.Error(errorMessage))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An unexpected error occurred"))
         }
     }.flowOn(Dispatchers.IO)
 
