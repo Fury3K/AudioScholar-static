@@ -12,7 +12,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import edu.cit.audioscholar.dto.FavoriteStatusDto;
+import edu.cit.audioscholar.model.AudioMetadata;
 import edu.cit.audioscholar.model.Recording;
+import edu.cit.audioscholar.model.User;
 
 @Service
 public class RecordingService {
@@ -185,6 +188,59 @@ public class RecordingService {
 		log.debug("Found {} recording documents for user {}", results.size(), userId);
 		return results.stream().map(data -> Recording.fromMap((String) data.get("recordingId"), data))
 				.filter(Objects::nonNull).filter(r -> r.getRecordingId() != null).collect(Collectors.toList());
+	}
+
+	public FavoriteStatusDto toggleFavorite(String userId, String recordingId)
+			throws ExecutionException, InterruptedException {
+		if (!StringUtils.hasText(userId) || !StringUtils.hasText(recordingId)) {
+			throw new IllegalArgumentException("UserId and RecordingId must not be blank.");
+		}
+
+		User user = userService.getUserById(userId);
+		if (user == null) {
+			throw new IllegalArgumentException("User not found: " + userId);
+		}
+
+		Recording recording = getRecordingById(recordingId);
+		if (recording == null) {
+			throw new IllegalArgumentException("Recording not found: " + recordingId);
+		}
+
+		List<String> favorites = user.getFavoriteRecordingIds();
+		boolean isFavorite = favorites.contains(recordingId);
+		int count = recording.getFavoriteCount() != null ? recording.getFavoriteCount() : 0;
+
+		if (isFavorite) {
+			favorites.remove(recordingId);
+			count = Math.max(0, count - 1);
+			isFavorite = false;
+		} else {
+			favorites.add(recordingId);
+			count++;
+			isFavorite = true;
+		}
+
+		user.setFavoriteRecordingIds(favorites);
+		recording.setFavoriteCount(count);
+
+		userService.updateUser(user);
+		updateRecording(recording);
+
+		// Sync with AudioMetadata
+		try {
+			AudioMetadata metadata = firebaseService.getAudioMetadataByRecordingId(recordingId);
+			if (metadata != null) {
+				java.util.Map<String, Object> updates = new java.util.HashMap<>();
+				updates.put("favoriteCount", count);
+				firebaseService.updateData(firebaseService.getAudioMetadataCollectionName(), metadata.getId(), updates);
+				log.info("Synced favoriteCount to AudioMetadata {}", metadata.getId());
+			}
+		} catch (Exception e) {
+			log.error("Failed to sync favoriteCount to AudioMetadata for recording {}", recordingId, e);
+			// Non-blocking failure
+		}
+
+		return new FavoriteStatusDto(recordingId, isFavorite, count);
 	}
 
 	private String extractNhostIdFromUrl(String url) {
