@@ -1,44 +1,50 @@
-# Domain Layer
+# Domain Module
 
-**Layer:** Domain
+## Overview
+The Domain module encapsulates the core business logic, models, and repository interfaces of the AudioScholar application. It serves as the central layer in the Clean Architecture pattern, defining the rules and data structures that drive the application independent of external frameworks. It abstracts the data sources (handled by the Data layer) and provides pure business logic to the UI layer.
 
-## 1. Overview
+## Architecture
 
-The Domain Layer is the core of the AudioScholar application, encapsulating all its business logic. It is designed to be completely independent of the UI and Data layers, meaning it has no knowledge of how data is displayed or where it comes from. This layer defines the essential business models, the repository interfaces that dictate data access contracts, and the use cases (or interactors) that orchestrate the application's workflows.
+```mermaid
+graph TD
+    UI[UI Layer] --> Domain
+    Data[Data Layer] -->|Implements| Domain
+    Domain --> Models
+    Domain --> UseCases
+    Domain --> Repositories[Repository Interfaces]
+```
 
-## 2. Key Components
+## Key Components
 
-The Domain Layer is organized into three primary sub-packages:
+| Component | Role | Description |
+| :--- | :--- | :--- |
+| `PasswordStrength` | Model | Enum representing the strength level of a user's password. |
+| `QualitySetting` | Model | Enum defining recording quality presets (Low, Medium, High). |
+| `PasswordValidator` | Use Case | Validates password against complexity rules (length, case, digits, special chars). |
+| `AuthRepository` | Repository Interface | Defines contract for user authentication and profile management. |
+| `LocalAudioRepository` | Repository Interface | Defines contract for local audio file operations. |
+| `RemoteAudioRepository` | Repository Interface | Defines contract for cloud-based audio operations. |
+| `NotificationRepository`| Repository Interface | Defines contract for managing notification tokens. |
+| `AdminRepository` | Repository Interface | Defines contract for administrative data access. |
 
-*   `model`: Contains the fundamental data structures and business objects of the application (e.g., `PasswordStrength`, `QualitySetting`). These are plain Kotlin classes or enums that represent the core entities of the domain.
-*   `repository`: Defines the interfaces (`contracts`) for data access operations. These interfaces abstract the data sources, allowing the domain logic to remain unaware of whether data is fetched from a local database or a remote server.
-*   `usecase`: Holds the individual business rules and interactors. Each use case is responsible for a single, specific task (e.g., `PasswordValidator`). ViewModels in the UI layer call these use cases to execute business logic.
+## Dependencies
+This module is designed to be as independent as possible, but currently relies on:
+- `app/src/main/java/edu/cit/audioscholar/util/UiText.kt` (For localized error messages)
+- Android Framework (specifically `androidx.annotation.StringRes` in `QualitySetting`)
+- `edu.cit.audioscholar.R` (Resource references)
+- Kotlin Coroutines (`Flow` types in Repositories)
 
-## 3. Dependencies
-
-### Internal Dependencies
-*   None. The Domain Layer is the most central and independent layer in the application.
-
-### External Dependencies
-*   Kotlin Standard Library
-
-## 4. Usage / Integration
-
-The Domain Layer is integrated with the other layers in the following ways:
-
-*   **UI Layer:** ViewModels in the UI layer depend on and invoke use cases from the Domain Layer to perform business operations in response to user actions.
-*   **Data Layer:** The Data Layer provides concrete implementations for the repository interfaces defined in the Domain Layer. This dependency inversion is a key principle of Clean Architecture, ensuring the domain remains independent of data source specifics.
-
-### Example: How a ViewModel uses a Use Case
+## Usage
+The domain components are typically injected into ViewModels in the UI layer. Use cases are used to validate input or perform business logic, while repository interfaces are used to interact with data.
 
 ```kotlin
-// Example inside a ViewModel in the UI Layer
-class RegistrationViewModel(
-    private val passwordValidator: PasswordValidator // Injected from Domain Layer
-) : ViewModel() {
+// Example: Validating a password in a ViewModel
+val (strength, errors) = PasswordValidator.validatePassword(inputPassword)
 
-    fun onPasswordChanged(password: String) {
-        val (strength, errors) = PasswordValidator.validatePassword(password)
-        // Update UI state with the validation results
+if (strength == PasswordStrength.WEAK) {
+    // Map errors to UI
+    errors.forEach { uiText ->
+        val message = uiText.asString(context)
+        // Show message
     }
 }

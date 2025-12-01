@@ -1,47 +1,64 @@
-# Local Database
+# Local Database Components
 
-**Layer:** Data
+**Type:** Database & Persistence
+**Package:** `edu.cit.audioscholar.data.local`
+**Source:** [AppDatabase.kt](../../../app/src/main/java/edu/cit/audioscholar/data/local/db/AppDatabase.kt)
 
-## 1. Overview
+## Responsibility
+The Local Database component is responsible for persistent offline storage of application data. It manages structured data like recording metadata and user notes using Room, and unstructured key-value pairs (user profile) using DataStore. It also handles physical file management for audio recordings.
 
-The local database module handles all on-device data persistence for the AudioScholar application. It uses the Room Persistence Library to provide an abstraction layer over SQLite, enabling robust and fluent database access. This module is responsible for caching user data, recording metadata, and user notes to support an offline-first architecture. It also includes handlers for managing audio files on the local file system.
+## Public API
 
-## 2. Key Components
+### AppDatabase
+The main database holder, serving as the access point for the persisted data.
 
-*   `AppDatabase.kt`: The main Room database class that defines the database configuration, lists the entities, and provides access to the DAOs.
-*   `RecordingMetadataDao.kt`: Data Access Object for performing CRUD (Create, Read, Update, Delete) operations on the `recording_metadata` table.
-*   `UserNoteDao.kt`: Data Access Object for performing CRUD operations on the `user_notes` table.
-*   `RecordingMetadata.kt`: An entity class representing a single record in the `recording_metadata` table. It stores all information about a recording, including its local file path, title, duration, and cached summary data.
-*   `UserNoteEntity.kt`: An entity class representing a single user note associated with a recording.
-*   `Converters.kt`: Contains type converters that allow Room to persist complex data types, such as lists of custom objects, by converting them to and from JSON strings.
-*   `RecordingFileHandler.kt`: A utility class responsible for all interactions with the device's file system, including creating, reading, and deleting audio recording files.
-*   `UserDataStore.kt`: Utilizes Jetpack DataStore to persist simple key-value data, specifically the user's profile information, in a safe and asynchronous manner.
+#### `recordingMetadataDao(): RecordingMetadataDao`
+Provides access to the `RecordingMetadata` table operations.
 
-## 3. Dependencies
+#### `userNoteDao(): UserNoteDao`
+Provides access to the `UserNote` table operations.
 
-### Internal Dependencies
-*   None. This is a foundational module within the Data Layer.
+### Data Access Objects (DAOs)
 
-### External Dependencies
-*   [Room Persistence Library](https://developer.android.com/training/data-storage/room): The core component for local database management.
-*   [Jetpack DataStore](https://developer.android.com/topic/libraries/architecture/datastore): Used for storing user profile preferences.
-*   [Gson](https://github.com/google/gson): Used by the `Converters` class to serialize and deserialize complex objects into JSON strings for storage in the database.
+#### `RecordingMetadataDao`
+**Source:** [RecordingMetadataDao.kt](../../../app/src/main/java/edu/cit/audioscholar/data/local/dao/RecordingMetadataDao.kt)
 
-## 4. Usage / Integration
+- `getAllRecordings(): Flow<List<RecordingMetadata>>`: Observes all recordings ordered by timestamp.
+- `getRecordingByPath(filePath: String): Flow<RecordingMetadata?>`: Observes a specific recording.
+- `insertOrUpdate(metadata: RecordingMetadata)`: Inserts or updates a recording entry.
+- `deleteRecordingByPath(filePath: String)`: Deletes a specific recording entry.
+- `updateFavoriteStatus(filePath: String, isFavorite: Boolean)`: Toggles the favorite status.
+- `updateCachedSummary(...)`: Updates cached summary and glossary data from the remote source.
 
-DAOs are the primary interface for interacting with the local database. They are injected via Hilt into repository implementations.
+#### `UserNoteDao`
+**Source:** [UserNoteDao.kt](../../../app/src/main/java/edu/cit/audioscholar/data/local/dao/UserNoteDao.kt)
 
-### Example: How to get all recording metadata
+- `getNotesForRecording(filePath: String): Flow<List<UserNoteEntity>>`: Observes notes for a specific recording.
+- `getUnsyncedNotes(): List<UserNoteEntity>`: Retrieves notes that haven't been synced to the server.
+- `insertNote(note: UserNoteEntity)`: Saves a user note.
+- `markAsSynced(localId: String, remoteId: String)`: Updates the sync status of a note.
 
-The `RecordingMetadataDao` exposes a `Flow` that emits a new list of recordings whenever the underlying data changes. This allows the UI to be updated reactively.
+### UserDataStore
+**Source:** [UserDataStore.kt](../../../app/src/main/java/edu/cit/audioscholar/data/local/UserDataStore.kt)
+Manages user session and profile data.
 
-```kotlin
-// In a repository implementation
-class LocalAudioRepositoryImpl @Inject constructor(
-    private val recordingMetadataDao: RecordingMetadataDao
-) : LocalAudioRepository {
+- `userProfileFlow: Flow<UserProfileDto?>`: Observes the current user's profile.
+- `saveUserProfile(profile: UserProfileDto)`: Persists user profile data.
+- `clearUserProfile()`: Clears all user data (used on logout).
 
-    override fun getAllRecordings(): Flow<List<RecordingMetadata>> {
-        return recordingMetadataDao.getAllRecordings()
-    }
-}
+### RecordingFileHandler
+**Source:** [RecordingFileHandler.kt](../../../app/src/main/java/edu/cit/audioscholar/data/local/file/RecordingFileHandler.kt)
+Handles file system operations for audio files.
+
+- `setupMediaRecorderOutputFile(mediaRecorder: MediaRecorder): Result<File>`: Configures a media recorder with an output file.
+- `copyUriToLocalRecordings(sourceUri: Uri): Result<File>`: Imports an external audio file into the app's private storage.
+- `getRecordingsDirectory(): Result<File>`: Returns the directory where recordings are stored.
+
+## Collaborators
+- **Android Context**: Required for database initialization and file system access.
+- **Room Database**: Underlying SQLite abstraction.
+- **DataStore**: Underlying Preferences storage.
+
+## Implementation Details
+- **Threading**: All database interactions are suspended functions or Flows, designed to run off the main thread.
+- **Migration**: The `AppDatabase` handles schema versioning. Currently on version 8, with a migration to add `isFavorite` column.

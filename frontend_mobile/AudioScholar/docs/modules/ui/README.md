@@ -1,27 +1,58 @@
-# UI Layer
+# UI Module
 
-**Layer:** UI
+## Overview
+The **UI Module** encompasses all user-facing components of the AudioScholar application. It is built using **Jetpack Compose** following the **Material Design 3** (Material You) guidelines. The architecture follows the **MVVM (Model-View-ViewModel)** pattern, where UI components (Screens) observe state exposed by ViewModels.
 
-## 1. Overview
+## Architecture
 
-The UI layer is responsible for presenting the application's data to the user and handling all user interactions. It is built entirely with Jetpack Compose, a modern declarative UI toolkit for Android. This layer is structured into feature-specific packages, each containing composable screens and their corresponding ViewModels, which manage UI state and business logic.
+```mermaid
+graph TD
+    A[UI Screen (Composable)] -->|Events| B[ViewModel]
+    B -->|UI State (StateFlow)| A
+    B -->|UseCase/Repository| C[Domain Layer]
+    A -->|Navigation| D[NavHost]
+    A -->|Uses| E[Core Components]
+```
 
-## 2. Key Components
+## Key Components
 
-*   `MainActivity.kt`: The main entry point for the application's UI.
-*   `LoginScreen.kt`: Handles user authentication, including email/password and OAuth providers.
-*   `LibraryScreen.kt`: Displays the user's local and cloud-based audio recordings.
-*   `RecordingDetailsScreen.kt`: Shows detailed information and actions for a specific recording.
-*   `RecordingScreen.kt`: Provides the interface for capturing new audio recordings.
-*   `ModernButton.kt`: A custom, reusable button component used throughout the application.
+| Component | Role | Description |
+| :--- | :--- | :--- |
+| `Screen` Enums | Navigation | Defines routes and arguments for the Navigation Graph. |
+| `MainActivity` | Host | Sets up the `NavHost`, `ModalDrawer`, and global theme. |
+| `ViewModels` | State Holder | Manages business logic and exposes `UiState` to Composables. |
+| `Theme` | Styling | Provides colors, typography, and shapes (`Quantum`, `Zen`, `Classic` styles). |
 
-## 3. Dependencies
+## Dependencies
+- `app/src/main/java/edu/cit/audioscholar/domain/...` (Business Logic)
+- `app/src/main/java/edu/cit/audioscholar/service/...` (Playback/Recording Services)
+- External Lib: **Jetpack Compose** (UI Toolkit)
+- External Lib: **Hilt** (Dependency Injection)
+- External Lib: **Coil** (Image Loading)
+- External Lib: **Compose Markdown** (Rendering AI summaries)
 
-### Internal Dependencies
-*   Domain Layer: For accessing business logic and models.
-*   Data Layer: For observing data streams and triggering data operations via ViewModels.
+## Usage
 
-### External Dependencies
-*   [Jetpack Compose](https://developer.android.com/jetpack/compose): The core UI toolkit.
-*   [Hilt](https://dagger.dev/hilt/): For dependency injection in ViewModels.
-*   [Coil](https://coil-kt.github.io/coil/): For image loading.
+Screens are generally self-contained and accessed via the `NavHost` in `MainActivity`.
+
+```kotlin
+// Example Navigation Setup
+NavHost(navController = navController, startDestination = Screen.Library.route) {
+    composable(Screen.Library.route) {
+        LibraryScreen(
+            navController = navController,
+            drawerState = drawerState
+        )
+    }
+    // ... other screens
+}
+```
+
+## Module Structure
+
+- [**Authentication**](./authentication.md): Login, Registration, Password Reset.
+- [**Library**](./library.md): List of local and cloud recordings.
+- [**Recording**](./recording.md): Audio capture interface.
+- [**Player & Details**](./player.md): Playback, insights (summary, notes), and attachments.
+- [**Settings & Profile**](./settings.md): User configuration and profile management.
+- [**Core Components**](./core_components.md): Reusable widgets (`ModernButton`, `ModernTextField`, etc.).

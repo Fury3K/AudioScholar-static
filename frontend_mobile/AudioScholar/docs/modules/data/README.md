@@ -1,42 +1,55 @@
-# Data Layer
+# Data Module
 
-**Layer:** Data
+## Overview
+The Data Module is the foundation of the AudioScholar application, responsible for managing all data operations. It handles local persistence through Room Database and DataStore, manages remote API communication via Retrofit, and orchestrates data flow through various repositories. This module ensures that the application functions seamlessly offline while synchronizing with the cloud when a connection is available.
 
-## 1. Overview
+## Architecture
+The data layer follows the Clean Architecture principle, acting as the data source for the Domain layer.
 
-The Data Layer is responsible for all data operations in the AudioScholar application. It abstracts the data sources from the rest of the app, handling both local persistence and remote API communication. This layer ensures a consistent and reliable flow of data to the Domain Layer, managing an offline-first strategy through local caching of remote data.
+```mermaid
+graph TD
+    UI[UI Layer] --> Domain[Domain Layer]
+    Domain --> Repo[Repositories]
+    Repo --> Local[Local Data Source]
+    Repo --> Remote[Remote Data Source]
+    Local --> Room[Room Database]
+    Local --> DataStore[Proto DataStore]
+    Remote --> Retrofit[Retrofit Service]
+```
 
-## 2. Key Components
+## Key Components
 
-*   `local`: Contains all components related to on-device data storage, including Room database definitions, DAOs, and entities.
-*   `remote`: Manages all communication with the backend server, including Retrofit services and Data Transfer Objects (DTOs).
-*   `repository`: Implements the repository pattern, providing a single source of truth for data by coordinating between local and remote data sources.
+| Component | Role | Description |
+| :--- | :--- | :--- |
+| `AppDatabase` | Local Database | Room database configuration managing `RecordingMetadata` and `UserNoteEntity`. |
+| `ApiService` | Remote Service | Retrofit interface defining all network endpoints for authentication, audio management, and user data. |
+| `RecordingMetadataDao` | DAO | Data Access Object for performing CRUD operations on recording metadata. |
+| `UserNoteDao` | DAO | Data Access Object for managing user notes locally. |
+| `UserDataStore` | Persistence | Manages user profile and preferences using Jetpack DataStore. |
+| `RecordingFileHandler` | File Utility | Handles physical audio file operations like creation, deletion, and storage checks. |
+| `AdminRepositoryImpl` | Repository | Implementation of admin-related data operations. |
 
-## 3. Dependencies
+## Dependencies
+This module relies on the following internal and external dependencies:
 
-### Internal Dependencies
-*   Domain Layer: The Data Layer's repositories implement interfaces defined in the Domain Layer.
+- **Internal:**
+    - `edu.cit.audioscholar.domain.model` (Domain models)
+    - `edu.cit.audioscholar.util` (Resource wrapper, Constants)
+- **External:**
+    - `androidx.room:room-runtime` (Local Database)
+    - `androidx.datastore:datastore-preferences` (Key-Value Storage)
+    - `com.squareup.retrofit2:retrofit` (Network Requests)
+    - `com.squareup.okhttp3:logging-interceptor` (Network Logging)
+    - `com.google.dagger:hilt-android` (Dependency Injection)
 
-### External Dependencies
-*   [Room](https://developer.android.com/training/data-storage/room): For local database persistence.
-*   [Retrofit](https://square.github.io/retrofit/): For type-safe HTTP communication with the backend API.
-*   [Gson](https://github.com/google/gson): For serialization and deserialization of JSON data.
-*   [Jetpack DataStore](https://developer.android.com/topic/libraries/architecture/datastore): For storing simple key-value data, such as user profiles.
+## Usage
 
-## 4. Usage / Integration
-
-The Domain Layer interacts with the Data Layer through repository interfaces. This decouples the business logic from the specific data sources, allowing for easier testing and maintenance.
-
-### Example: How to fetch user data
-
-Repositories expose data using Kotlin Flows, allowing the UI to reactively update as data changes.
+The data layer is primarily consumed by the Domain layer through Repository interfaces. Direct usage in UI is discouraged.
 
 ```kotlin
-// From a ViewModel in the UI layer, interacting with a use case from the Domain layer
-viewModelScope.launch {
-    // The use case internally calls the appropriate repository in the Data Layer
-    val userProfileFlow = getUserProfileUseCase()
-    userProfileFlow.collect { resource ->
-        // Handle UI state based on the resource (Loading, Success, Error)
+// Example: Repository Usage in a Use Case or ViewModel
+class GetRecordingsUseCase(private val localAudioRepository: LocalAudioRepository) {
+    operator fun invoke(): Flow<List<RecordingMetadata>> {
+        return localAudioRepository.getLocalRecordings()
     }
 }

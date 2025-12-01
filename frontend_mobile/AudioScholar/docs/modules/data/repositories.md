@@ -1,51 +1,59 @@
-# Repositories
+# Data Repositories
 
-**Layer:** Data
+**Type:** Repository Pattern Implementation
+**Package:** `edu.cit.audioscholar.data.repository`
 
-## 1. Overview
+## Responsibility
+Repositories act as the single source of truth for the Domain layer, abstracting the underlying data sources (Local Database, Remote API, Files). They handle data synchronization, caching strategies, and error mapping.
 
-The repository module is a critical component of the Data Layer, implementing the Repository design pattern. Its primary responsibility is to act as a single source of truth for application data. Repositories abstract the data sources from the rest of the application, meaning the Domain Layer does not need to know whether the data is coming from a local database or a remote server. They manage data fetching, caching, and synchronization logic.
+## Key Repositories
 
-## 2. Key Components
+### AdminRepository
+**Implementation:** [AdminRepositoryImpl.kt](../../../app/src/main/java/edu/cit/audioscholar/data/repository/AdminRepositoryImpl.kt)
+**Interface:** [AdminRepository.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/repository/AdminRepository.kt)
 
-*   `AdminRepositoryImpl.kt`: The implementation of the `AdminRepository` interface defined in the Domain Layer. This repository handles all data operations related to administrative functions, such as fetching user lists, updating user roles, and retrieving analytics data from the remote API.
-*   `UserRepository.kt`: This repository manages user-specific data that is not directly related to the user's profile, such as registering an FCM token with the backend.
-*   Other Repositories (`AuthRepositoryImpl.kt`, `LocalAudioRepositoryImpl.kt`, `RemoteAudioRepositoryImpl.kt`): While their implementations are in the `domain/repository` package for this project, they logically function as part of the data layer's repository pattern. They handle user authentication, and local/remote audio data management respectively.
+Handles administrative operations such as user management and analytics retrieval.
 
-## 3. Dependencies
+#### Public Methods
+- `getUsers(limit: Int, pageToken: String?): Flow<Resource<AdminUserListResponse>>`: Fetches a paginated list of users.
+- `updateUserStatus(uid: String, disabled: Boolean)`: Enable or disable a user account.
+- `getAnalyticsOverview()`: Fetches high-level system analytics.
 
-### Internal Dependencies
-*   Domain Layer: Repositories in this module implement interfaces defined in the Domain Layer's `repository` package.
-*   `local` module: Repositories interact with DAOs and DataStore to access and persist data locally.
-*   `remote` module: Repositories use the `ApiService` to fetch data from and send data to the backend server.
+### UserRepository
+**Source:** [UserRepository.kt](../../../app/src/main/java/edu/cit/audioscholar/data/repository/UserRepository.kt)
 
-### External Dependencies
-*   [Kotlin Coroutines & Flow](https://kotlinlang.org/docs/coroutines-guide.html): Used extensively to handle asynchronous operations and provide reactive data streams to the upper layers.
-*   [Hilt](https://dagger.dev/hilt/): For dependency injection of `ApiService`, DAOs, and other components into the repositories.
+Handles user-specific data operations that don't fit into the Auth flow, such as FCM token registration.
 
-## 4. Usage / Integration
+#### Public Methods
+- `registerFcmToken(token: String): Boolean`: Registers the device's Firebase Cloud Messaging token with the backend.
 
-Use cases in the Domain Layer are injected with repository interfaces. This allows the use cases to request data without being coupled to the implementation details of the Data Layer.
+### AuthRepository
+**Interface:** [AuthRepository.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/repository/AuthRepository.kt)
 
-### Example: How admin analytics are fetched
+Manages the user's authentication state, login/registration flows, and token management.
 
-The `AdminRepository` provides a `Flow` of `Resource` objects, which encapsulates the data along with its loading or error state. This pattern is used throughout the application for a consistent way of handling data operations.
+### LocalAudioRepository
+**Interface:** [LocalAudioRepository.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/repository/LocalAudioRepository.kt)
 
-```kotlin
-// In a ViewModel, calling a use case that depends on AdminRepository
-viewModelScope.launch {
-    getAnalyticsOverviewUseCase().collect { resource ->
-        when (resource) {
-            is Resource.Loading -> {
-                // Show loading indicator
-            }
-            is Resource.Success -> {
-                // Display the analytics overview data
-                val overview = resource.data
-            }
-            is Resource.Error -> {
-                // Show error message
-            }
-        }
-    }
-}
+Manages audio recordings stored on the device.
+
+#### Responsibilities
+- CRUD operations for `RecordingMetadata` in the local Room database.
+- File system operations via `RecordingFileHandler`.
+- Synchronization of local changes (like renaming) to the remote server.
+
+### RemoteAudioRepository
+**Interface:** [RemoteAudioRepository.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/repository/RemoteAudioRepository.kt)
+
+Manages audio recordings stored in the cloud.
+
+#### Responsibilities
+- Uploading new audio files.
+- Fetching cloud recordings and their metadata (summaries, recommendations).
+- Syncing remote changes back to the local database.
+
+## Collaborators
+- `ApiService`: For network requests.
+- `AppDatabase`: For local caching.
+- `UserDataStore`: For user session management.
+- `RecordingFileHandler`: For file system access.

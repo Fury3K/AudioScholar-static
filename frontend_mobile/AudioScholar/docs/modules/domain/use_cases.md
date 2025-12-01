@@ -1,43 +1,63 @@
 # Domain Use Cases
 
-**Layer:** Domain
+**Type:** Use Case
+**Package:** `edu.cit.audioscholar.domain.usecase`
+**Source:** [PasswordValidator.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/usecase/PasswordValidator.kt)
 
-## 1. Overview
+## Responsibility
+This document details the Use Cases within the domain layer. Use Cases represent specific business rules or logic that the application performs. They are pure Kotlin implementations that encapsulate single responsibilities.
 
-This document describes the use cases (also known as interactors) within the Domain Layer. Each use case encapsulates a specific piece of business logic, orchestrating the flow of data between the UI and Data layers without being directly coupled to them. They represent the actions a user can perform within the application.
+---
 
-## 2. Key Components
+## 1. PasswordValidator
+**Source:** [PasswordValidator.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/usecase/PasswordValidator.kt)
 
-*   `PasswordValidator.kt`: A singleton object that provides a function to validate a user's password based on a set of predefined security rules. It checks for length, uppercase and lowercase characters, numbers, and special characters.
+A singleton object responsible for evaluating the strength of a given password string against defined security policies and returning specific validation errors if any policies are violated.
 
-## 3. Dependencies
+### Public API
 
-### Internal Dependencies
-*   `domain.model.PasswordStrength`: Used to classify the strength of the password.
-*   `util.UiText`: Used to provide localized error messages for display in the UI.
+#### `validatePassword(password: String): Pair<PasswordStrength, List<UiText>>`
+Evaluates a password string and returns its calculated strength along with a list of specific validation errors.
 
-### External Dependencies
-*   Kotlin Standard Library
+- **Parameters**:
+    - `password`: The plain text password string to evaluate.
+- **Returns**: A `Pair` containing:
+    1. `PasswordStrength`: The calculated strength level (`STRONG`, `MEDIUM`, `WEAK`).
+    2. `List<UiText>`: A list of localized error messages describing which criteria were not met.
 
-## 4. Usage / Integration
+### Business Rules
+The validator checks for the following criteria:
+1. **Length**: Must be at least 8 characters.
+2. **Uppercase**: Must contain at least one uppercase letter.
+3. **Lowercase**: Must contain at least one lowercase letter.
+4. **Digit**: Must contain at least one numeric digit.
+5. **Special Character**: Must contain at least one special character (non-letter/non-digit).
 
-Use cases are typically injected into ViewModels in the UI layer, which then call them to execute business logic.
+### Strength Calculation Logic
+- **STRONG**: 0 errors found (all criteria met).
+- **MEDIUM**: 1 error found.
+- **WEAK**: 2 or more errors found.
 
-### Example: Validating a password in a ViewModel
+### Collaborators
+- `PasswordStrength`: Enum for result type.
+- `UiText`: Utility for wrapping string resources to ensure errors are localizable.
+- `R.string`: References specific string resources for error messages (e.g., `settings_password_validation_length`).
+
+### Implementation Details
+The `validatePassword` function is a pure function (no side effects). It builds a mutable list of errors by checking the input string against each rule sequentially. The final strength is derived solely from the count of accumulated errors.
+
+### Usage Example
 
 ```kotlin
-// In RegistrationViewModel.kt (UI Layer)
-import edu.cit.audioscholar.domain.usecase.PasswordValidator
+val password = "MySecretPassword123!"
+val (strength, errors) = PasswordValidator.validatePassword(password)
 
-class RegistrationViewModel : ViewModel() {
-
-    fun validate(password: String) {
-        val (strength, errors) = PasswordValidator.validatePassword(password)
-        
-        // The ViewModel would then update its state to reflect the
-        // strength and the list of specific validation errors,
-        // allowing the UI to display appropriate feedback to the user.
-        // For example:
-        // _uiState.update { it.copy(passwordStrength = strength, passwordErrors = errors) }
+if (errors.isEmpty()) {
+    // Password is valid and STRONG
+    proceedWithRegistration()
+} else {
+    // Show errors to user
+    errors.forEach { errorUiText ->
+        showToast(errorUiText.asString(context))
     }
 }

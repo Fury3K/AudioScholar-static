@@ -39,3 +39,11 @@ Use this map to quickly locate the documentation for different parts of the appl
 | **Background processes**                           | [**Services Layer**](./modules/services/README.md)          |
 | &nbsp;&nbsp;&nbsp;↳ Background recording/playback  | `Services Layer > ...`                                      |
 | **Common helper functions**                        | [**Utils Layer**](./modules/utils/README.md)                |
+
+## 4. User Resources & Legal
+
+For end-user documentation and legal information, please refer to:
+
+*   [**Help Center**](./HelpCenter.md): FAQ and guides on how to use the application.
+*   [**Privacy Policy**](./PrivacyPolicy.md): Details on how we handle your data.
+*   [**Terms of Service**](./Terms.md): The terms governing your use of AudioScholar.

@@ -1,41 +1,60 @@
 # Domain Models
 
-**Layer:** Domain
+**Type:** Domain Model
+**Package:** `edu.cit.audioscholar.domain.model`
+**Source:** [PasswordStrength.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/model/PasswordStrength.kt), [QualitySetting.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/model/QualitySetting.kt)
 
-## 1. Overview
+## Responsibility
+This document covers the core domain models used throughout the application to represent business rules and settings configurations. These models are pure Kotlin classes/enums and do not depend on platform-specific implementations (except for necessary resource annotations).
 
-This document details the core data models (entities) that represent the fundamental business objects and states within the AudioScholar application. These models are plain Kotlin data classes or enums, ensuring they are simple, independent, and focused solely on representing business data.
+## Components
 
-## 2. Key Components
+### 1. PasswordStrength
+**Source:** [PasswordStrength.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/model/PasswordStrength.kt)
 
-*   `PasswordStrength.kt`: An enum representing the different levels of password security evaluated by the application. Its values are `NONE`, `WEAK`, `MEDIUM`, and `STRONG`. This is primarily used by the `PasswordValidator` use case to provide feedback to the user during registration or password changes.
-*   `QualitySetting.kt`: An enum that defines the available audio quality settings for recordings: `Low`, `Medium`, and `High`. Each setting is associated with a string resource for its label, making it easy to display in the UI.
+Enum representing the classification of a password's security level.
 
-## 3. Dependencies
+#### Enum Values
+- `NONE`: No password entered or validation not started.
+- `WEAK`: Password fails critical security checks (length, etc.).
+- `MEDIUM`: Password meets basic requirements but lacks some complexity.
+- `STRONG`: Password meets all complexity requirements.
 
-### Internal Dependencies
-*   None.
+---
 
-### External Dependencies
-*   Kotlin Standard Library
-*   Androidx Annotation (for `@StringRes`)
+### 2. QualitySetting
+**Source:** [QualitySetting.kt](../../../app/src/main/java/edu/cit/audioscholar/domain/model/QualitySetting.kt)
 
-## 4. Usage / Integration
+Enum defining the available audio recording quality presets. Each preset is associated with a localized string resource for UI display.
 
-These models are used throughout the application to ensure type safety and clarity when dealing with business-specific data.
+#### Properties
+- `labelResId`: `@StringRes Int` - The Android string resource ID for the localized label of the setting.
 
-### Example: Using QualitySetting to configure an audio recorder
+#### Enum Values
+| Value | Resource ID | Description |
+| :--- | :--- | :--- |
+| `Low` | `R.string.settings_quality_low` | Lower bitrate/sample rate for smaller file sizes. |
+| `Medium` | `R.string.settings_quality_medium` | Balanced quality and file size (Default). |
+| `High` | `R.string.settings_quality_high` | Highest bitrate/sample rate for best audio fidelity. |
+
+#### Companion Object
+- `PREF_KEY`: `const String = "pref_quality"` - Key used for persisting this setting.
+- `DEFAULT`: `const String = "Medium"` - The default fallback value.
+
+## Usage Example
 
 ```kotlin
-// In a ViewModel or Service
-fun startRecording(selectedQuality: QualitySetting) {
-    val bitRate = when (selectedQuality) {
-        QualitySetting.Low -> 64000 // 64 kbps
-        QualitySetting.Medium -> 128000 // 128 kbps
-        QualitySetting.High -> 256000 // 256 kbps
+// Working with QualitySetting
+val currentQuality = QualitySetting.Medium
+val labelId = currentQuality.labelResId
+// Display labelId in UI...
+
+// Working with PasswordStrength
+fun getStrengthColor(strength: PasswordStrength): Color {
+    return when(strength) {
+        PasswordStrength.STRONG -> Color.Green
+        PasswordStrength.MEDIUM -> Color.Yellow
+        PasswordStrength.WEAK -> Color.Red
+        PasswordStrength.NONE -> Color.Gray
     }
-    
-    // Configure MediaRecorder with the selected bitRate
-    // mediaRecorder.setAudioEncodingBitRate(bitRate)
-    // ...
 }

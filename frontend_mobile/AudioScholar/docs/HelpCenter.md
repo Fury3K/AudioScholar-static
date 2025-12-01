@@ -87,7 +87,11 @@ to get the most out of AudioScholar.
 ## Account and Data
 
 * **How do I log in?**
-  You can log in using your Google account or GitHub account.
+  You can log in using your email and password, or via your Google or GitHub account.
+* **How do I reset my password?**
+  If you use email/password login, tap the "Forgot Password?" link on the login screen to receive a
+  password reset email. For Google or GitHub accounts, please manage your password through those
+  services.
 * **What is the difference between non-logged-in, logged-in free, and logged-in premium users?**
   These tiers offer different levels of access to features:
     * **Non-Logged-In Users:** Local storage only, single summary limit, no account features, no

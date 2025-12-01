@@ -1,39 +1,43 @@
-# Recording Module
+# Recording Screen
 
-**Layer:** UI
+**Route:** `Screen.Record.route`
+**ViewModel:** [RecordingViewModel.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/recording/RecordingViewModel.kt)
+**Source:** [RecordingScreen.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/recording/RecordingScreen.kt)
 
-## 1. Overview
+## Overview
+Allows users to record new audio. It includes permission handling, a real-time waveform visualizer, recording controls (Start, Pause, Resume, Stop, Cancel), and a dialog to save the recording with a custom title. It interacts directly with the `RecordingService`.
 
-The Recording module provides the primary interface for users to capture new audio. It features a minimalist design centered around a large control button to start and stop recording. The screen displays a real-time elapsed timer and an audio waveform visualizer that reacts to microphone input. It also handles the necessary runtime permissions for audio recording and notifications.
+## UI State (RecordingUiState)
 
-## 2. Key Components
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `isRecording` | `Boolean` | True if recording is active. |
+| `isPaused` | `Boolean` | True if recording is paused. |
+| `elapsedTimeFormatted` | `String` | HH:MM:SS string of current duration. |
+| `currentAmplitude` | `Float` | Current microphone amplitude (0-1) for visualization. |
+| `permissionGranted` | `Boolean` | True if Microphone permission is granted. |
+| `showTitleDialog` | `Boolean` | Shows dialog to enter title after stopping. |
+| `showStopConfirmationDialog` | `Boolean` | Confirmation before stopping. |
+| `showCancelConfirmationDialog`| `Boolean` | Confirmation before discarding. |
+| `error` | `String?` | Error message (e.g., permission denied, service error). |
 
-*   `RecordingScreen.kt`: The main screen composable that presents the recording interface, including the timer, visualizer, and control buttons.
-*   `AudioWaveformVisualizer()`: A custom composable that renders a dynamic waveform based on the current audio amplitude, providing visual feedback to the user during recording.
-*   `RecordingTitleDialog()`: A dialog that appears after a recording is successfully stopped, prompting the user to provide an optional title before saving the file.
-*   The screen manages several states, including idle, recording, paused, and saving, with the UI updating accordingly to show relevant controls (e.g., pause/resume, cancel).
+## User Actions (Events)
 
-## 3. Dependencies
+- **Record Button Click**: Starts recording (if permission granted) or requests permissions.
+- **Stop Button Click**: Pauses and shows stop confirmation dialog.
+- **Pause/Resume Click**: Toggles pause state via `RecordingService`.
+- **Cancel Click**: Shows confirmation to discard the current recording.
+- **Save Dialog Confirm**: Finalizes the recording file and metadata.
 
-### Internal Dependencies
-*   `RecordingService`: The screen communicates with this background service (via the ViewModel) to manage the actual audio capture, allowing recording to continue even if the app is backgrounded.
+## Navigation
+- **From**: Main Navigation Drawer or Login Screen.
+- **To**: Stays on screen, but saves file to local storage which then appears in [Library](./library.md).
 
-### External Dependencies
-*   [Jetpack Compose](https://developer.android.com/jetpack/compose): For building all UI elements.
-*   [Hilt](https://dagger.dev/hilt/): For injecting the `RecordingViewModel`.
+## Key Components
+- `AudioWaveformVisualizer`: Custom Canvas-based component that draws bars based on amplitude history.
+- `RecordingTitleDialog`: Dialog for naming the file before saving.
+- `LargeFloatingActionButton`: Main control button.
 
-## 4. Usage / Integration
-
-The `RecordingScreen` is a main destination in the app's navigation structure. The recording flow begins when the user presses the microphone button. The `RecordingViewModel` first ensures that the necessary microphone permissions are granted before starting the `RecordingService`.
-
-### Example: Starting a Recording
-
-```kotlin
-// In RecordingScreen.kt, inside the main button's onClick lambda
-
-if (uiState.permissionGranted) {
-    viewModel.startRecording()
-} else {
-    // This triggers the system's permission request dialog
-    multiplePermissionsLauncher.launch(permissionsToRequest)
-}
+## Permissions
+- `Manifest.permission.RECORD_AUDIO`: Required to capture audio.
+- `Manifest.permission.POST_NOTIFICATIONS`: Required for the foreground service notification (Android 13+).

@@ -1,40 +1,131 @@
-# Authentication Module
+# Authentication Screens
 
-**Layer:** UI
+This document covers the UI screens and components related to user authentication, including Login, Registration, Password Recovery, and Email Verification.
 
-## 1. Overview
+## Login Screen
 
-The authentication module is responsible for all user-facing authentication flows. This includes user sign-in with email/password and third-party providers (Google, GitHub), new user registration, password recovery, and email verification. The module is composed of several screens, each with a dedicated ViewModel to handle its state and logic.
+**Route:** `Screen.Login.route`
+**ViewModel:** [LoginViewModel.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/LoginViewModel.kt)
+**Source:** [LoginScreen.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/LoginScreen.kt)
 
-## 2. Key Components
+### Overview
+Allows users to sign in using their email and password or via third-party providers (Google, GitHub). It handles navigation to Registration and Forgot Password screens.
 
-*   `LoginScreen.kt`: The primary entry point for unauthenticated users. It provides forms for email/password login and buttons for initiating Google and GitHub sign-in flows. It is responsible for handling the results from these external providers.
-*   `RegistrationScreen.kt`: Allows new users to create an account. It includes fields for user details, password creation with real-time validation, and a checkbox for accepting legal terms. It also supports registration via Google and GitHub.
-*   `ForgotPasswordScreen.kt`: A simple screen where users can enter their email address to receive a password reset link.
-*   `ResetPasswordConfirmScreen.kt`: The screen users are directed to from the password reset email. It allows them to set and confirm a new password.
-*   `EmailVerificationScreen.kt`: After registration, users are directed here to confirm their email address. It periodically checks the user's verification status and allows them to request a new verification email.
+### UI State (LoginUiState)
 
-## 3. Dependencies
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `email` | `String` | The current input for email. |
+| `password` | `String` | The current input for password. |
+| `isEmailLoginLoading` | `Boolean` | Shows loading spinner on the login button. |
+| `isGoogleLoginLoading` | `Boolean` | Shows loading spinner on the Google button. |
+| `isGitHubLoginLoading` | `Boolean` | Shows loading spinner on the GitHub button. |
+| `errorMessage` | `UiText?` | Error message displayed in a Snackbar. |
+| `navigateToRecordScreen` | `Boolean` | Trigger to navigate to the main app flow. |
+| `welcomeType` | `WelcomeMessageType` | Determines the welcome text (New vs Returning). |
 
-### Internal Dependencies
-*   Domain Layer: Interacts with use cases for validating user input and executing authentication logic.
-*   Data Layer: ViewModels rely on repositories from the Data Layer to communicate with the backend API and local data stores.
+### User Actions (Events)
 
-### External Dependencies
-*   [Jetpack Compose](https://developer.android.com/jetpack/compose): For building all UI elements.
-*   [Hilt](https://dagger.dev/hilt/): For injecting repositories and other dependencies into the ViewModels.
-*   [Google Sign-In for Android](https://developers.google.com/identity/sign-in/android/): Manages the Google authentication flow.
+- **Login Click**: Triggers `viewModel.onLoginClick()`. Validates input and attempts Firebase/API login.
+- **Google Sign-In**: Triggers `viewModel.onGoogleSignInClick()`. Launches the Google Sign-In intent.
+- **GitHub Sign-In**: Triggers `viewModel.onGitHubSignInClick()`. Launches a custom tab for GitHub OAuth.
+- **Register Click**: Navigates to the Registration screen.
+- **Forgot Password Click**: Navigates to the Forgot Password screen.
 
-## 4. Usage / Integration
+### Navigation
+- **From**: Splash Screen, Onboarding Screen, or after Logout.
+- **To**: 
+    - [Recording Screen](./recording.md) (on success)
+    - [Registration Screen](#registration-screen)
+    - [Forgot Password Screen](#forgot-password-screen)
+    - Email Verification Screen
 
-The authentication flow is managed by the main navigation graph. If a user is not authenticated, they are directed to the `LoginScreen`. From there, they can navigate to the `RegistrationScreen` or `ForgotPasswordScreen`.
+---
 
-### Example: Navigating to the Registration Screen
+## Registration Screen
 
-```kotlin
-// From LoginScreen.kt
+**Route:** `Screen.Registration.route`
+**ViewModel:** [RegistrationViewModel.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/RegistrationViewModel.kt)
+**Source:** [RegistrationScreen.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/RegistrationScreen.kt)
 
-// When the user clicks the "Register" button
-navController.navigate(Screen.Registration.route) {
-    launchSingleTop = true
-}
+### Overview
+Allows new users to create an account. Includes form validation for names, email, and password strength, as well as Terms of Service acceptance.
+
+### UI State (RegistrationUiState)
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `firstName` / `lastName` | `String` | User's name inputs. |
+| `email` | `String` | User's email input. |
+| `password` / `confirmPassword` | `String` | Password inputs. |
+| `termsAccepted` | `Boolean` | Checkbox state for ToS. |
+| `registrationInProgress` | `Boolean` | Loading state for email registration. |
+| `passwordValidationResult` | `PasswordValidationResult` | Helper state for password strength indicators. |
+
+### User Actions (Events)
+
+- **Register Click**: Triggers `viewModel.registerUser()`.
+- **Toggle Password Visibility**: Shows/hides password text.
+- **Terms Click**: Opens a bottom sheet with legal text.
+- **Google/GitHub Register**: OAuth registration flows.
+
+### Navigation
+- **To**: Email Verification Screen (on success), Login Screen.
+
+---
+
+## Forgot Password Screen
+
+**Route:** `Screen.ForgotPassword.route`
+**ViewModel:** [ForgotPasswordViewModel.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/ForgotPasswordViewModel.kt)
+**Source:** [ForgotPasswordScreen.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/ForgotPasswordScreen.kt)
+
+### Overview
+Allows users to request a password reset link via email.
+
+### UI State (ForgotPasswordUiState)
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `email` | `String` | Input for the account email. |
+| `isLoading` | `Boolean` | Loading state during API call. |
+| `isSuccess` | `Boolean` | Toggles the success view with countdown. |
+
+### User Actions (Events)
+
+- **Submit**: Calls `viewModel.sendResetLink()`.
+- **Back**: Navigates back to Login.
+
+---
+
+## Reset Password Confirm Screen
+
+**Route:** `Screen.ResetPasswordConfirm.route`
+**ViewModel:** [ResetPasswordConfirmViewModel.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/ResetPasswordConfirmViewModel.kt)
+**Source:** [ResetPasswordConfirmScreen.kt](../../../app/src/main/java/edu/cit/audioscholar/ui/auth/ResetPasswordConfirmScreen.kt)
+
+### Overview
+Deep-linked screen where users enter a new password after clicking the email link.
+
+### UI State (ResetPasswordConfirmUiState)
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `newPassword` | `String` | New password input. |
+| `confirmPassword` | `String` | Confirmation input. |
+| `passwordStrength` | `PasswordStrength` | Strength indicator for the new password. |
+| `oobCode` | `String` | The reset code from the URL. |
+| `resetSuccess` | `Boolean` | Shows success message and redirect countdown. |
+
+### User Actions (Events)
+
+- **Submit**: Calls `viewModel.submitPasswordReset()`.
+
+---
+
+## Key Components Used
+
+- `ModernButton`: Primary action buttons.
+- `ModernTextField`: Input fields with consistent styling.
+- `ModernOutlinedButton`: Secondary actions (OAuth).
+- `PasswordRequirementsIndicator`: Visual feedback for password strength (Registration).

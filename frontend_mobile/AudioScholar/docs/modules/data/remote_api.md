@@ -1,57 +1,81 @@
-# Remote API
+# Remote API Service
 
-**Layer:** Data
+**Base URL:** (Configurable)
+**Implementation:** `edu.cit.audioscholar.data.remote.service.ApiService`
+**Source:** [ApiService.kt](../../../app/src/main/java/edu/cit/audioscholar/data/remote/service/ApiService.kt)
 
-## 1. Overview
+## Overview
+The Remote API component handles all network communication between the mobile app and the backend server. It uses Retrofit to define endpoints for authentication, audio file management, metadata synchronization, and user administration.
 
-The Remote API module is responsible for all network communication with the AudioScholar backend server. It uses Retrofit to define a type-safe HTTP client for API interactions. This module handles the serialization and deserialization of data between the application's data models and the JSON format used by the API. It is central to fetching remote data, uploading new recordings, and authenticating users.
+## Authentication
+Most endpoints are protected and require a Bearer token.
+- [ ] Public (Login, Register)
+- [x] Protected (Requires `Authorization: Bearer <token>`)
 
-## 2. Key Components
+## Endpoints
 
-*   `ApiService.kt`: A Retrofit interface that defines all the API endpoints. It uses annotations to specify the HTTP method (e.g., GET, POST), URL path, and request/response bodies for each endpoint.
-*   `dto` package: This package contains all the Data Transfer Objects (DTOs). These are Kotlin data classes that model the JSON objects sent to and received from the API. They are used by Retrofit and Gson to automatically serialize and deserialize network request and response bodies.
-    *   `AuthDtos.kt`: Contains data classes for authentication-related requests and responses.
-    *   `AudioMetadataDto.kt`: Represents the metadata for a single audio recording on the server.
-    *   `UserProfileDto.kt`: Represents a user's profile data.
-    *   `UserNoteDto.kt`: Represents a user note on the server.
-    *   And many others for specific API interactions.
+### Audio Management
 
-## 3. Dependencies
+#### POST `/api/audio/upload`
+Uploads a new audio recording and optionally a PowerPoint file.
+- **Content-Type:** `multipart/form-data`
+- **Parts:** `file` (Audio), `powerpointFile` (Optional), `title`, `description`.
+- **Response:** [AudioMetadataDto](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/AudioMetadataDto.kt)
 
-### Internal Dependencies
-*   None. This module provides data to other parts of the Data Layer, primarily the repositories.
+#### GET `/api/audio/metadata`
+Retrieves a list of all audio recordings for the authenticated user.
+- **Response:** `List<AudioMetadataDto>`
 
-### External Dependencies
-*   [Retrofit](https://square.github.io/retrofit/): The core library used to create a type-safe HTTP client for interacting with the backend API.
-*   [OkHttp](https://square.github.io/okhttp/): Provides the underlying HTTP client and interceptors for Retrofit, used here to add authentication headers to outgoing requests.
-*   [Gson](https://github.com/google/gson): Used by Retrofit to convert JSON API responses into Kotlin DTO objects and vice versa.
+#### GET `/api/audio/recordings/{recordingId}`
+Retrieves detailed metadata for a specific recording.
+- **Response:** `AudioMetadataDto`
 
-## 4. Usage / Integration
+### Authentication
 
-The `ApiService` is injected via Hilt into repository implementations, which then call its methods to perform network operations. The repositories are responsible for handling the response and mapping the DTOs to domain models if necessary.
+#### POST `/api/auth/register`
+Registers a new user.
+- **Body:** [RegistrationRequest](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/AuthDtos.kt)
+- **Response:** `AuthResponse`
 
-### Example: How to fetch the user's profile
+#### POST `/api/auth/login`
+Authenticates an existing user.
+- **Body:** [LoginRequest](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/AuthDtos.kt)
+- **Response:** `AuthResponse`
 
-```kotlin
-// In a repository implementation
-class AuthRepositoryImpl @Inject constructor(
-    private val apiService: ApiService,
-    private val userDataStore: UserDataStore
-) : AuthRepository {
+### User Profile
 
-    override suspend fun fetchAndCacheUserProfile(): Resource<UserProfileDto> {
-        try {
-            val response = apiService.getUserProfile()
-            if (response.isSuccessful) {
-                val userProfile = response.body()
-                userProfile?.let {
-                    userDataStore.saveUserProfile(it)
-                    return Resource.Success(it)
-                }
-            }
-            return Resource.Error("Failed to fetch profile: ${response.message()}")
-        } catch (e: Exception) {
-            return Resource.Error("An error occurred: ${e.message}")
-        }
-    }
-}
+#### GET `/api/users/me`
+Fetches the currently authenticated user's profile.
+- **Response:** [UserProfileDto](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/UserProfileDto.kt)
+
+#### PUT `/api/users/me`
+Updates user profile information.
+- **Body:** `UpdateUserProfileRequest`
+- **Response:** `UserProfileDto`
+
+### Notes
+
+#### POST `/api/notes`
+Creates a new note for a recording.
+- **Body:** `CreateUserNoteRequest`
+- **Response:** `UserNoteDto`
+
+#### GET `/api/notes`
+Retrieves notes for a specific recording.
+- **Query Parameter:** `recordingId`
+- **Response:** `List<UserNoteDto>`
+
+### Admin & Analytics
+
+#### GET `/api/admin/users`
+Retrieves a paginated list of users (Admin only).
+- **Response:** `AdminUserListResponse`
+
+#### GET `/api/admin/analytics/overview`
+Retrieves system-wide analytics overview.
+- **Response:** `AnalyticsOverviewDto`
+
+## Data Models used
+- [AudioMetadataDto](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/AudioMetadataDto.kt)
+- [AuthDtos](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/AuthDtos.kt)
+- [UserProfileDto](../../../app/src/main/java/edu/cit/audioscholar/data/remote/dto/UserProfileDto.kt)
