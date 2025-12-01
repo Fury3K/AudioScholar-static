@@ -62,9 +62,9 @@ Change History
 
 Table of Contents
 
-[Change History](#_Toc197735724)
+[Change History](#_Toc215511012)
 
-[Table of Contents](#_Toc197735725)
+[Table of Contents](#_Toc215511013)
 
 [1. Introduction](#introduction)
 
@@ -96,6 +96,10 @@ Table of Contents
 
 [Module 8: Freemium Model (Mobile, Web, and Server-side)](#module-8-freemium-model-mobile-web-and-server-side)
 
+[Module 9: Admin Dashboard (Mobile & Web)](#module-9-admin-dashboard-mobile--web)
+
+[Module 10: User Notes (Mobile & Web)](#module-10-user-notes-mobile--web)
+
 [2.2. User characteristics](#user-characteristics)
 
 [2.4. Constraints](#24-constraints)
@@ -120,7 +124,7 @@ Table of Contents
 
 [Module 3: Learning Material Recommendation](#module-3-learning-material-recommendation)
 
-[Module 4: User Authentication & Account Management](#_Toc197735753)
+[Module 4: User Authentication & Account Management](#_Toc215511043)
 
 [Module 5: Cloud Synchronization](#module-5-cloud-synchronization)
 
@@ -130,21 +134,25 @@ Table of Contents
 
 [Module 8: Freemium Model](#module-8-freemium-model)
 
-[3.3 Non-functional requirements](#_Toc197735758)
+[Module 9: Admin Dashboard](#module-9-admin-dashboard)
 
-[Performance](#_Toc197735759)
+[Module 10: User Notes](#module-10-user-notes)
 
-[Security](#_Toc197735760)
+[3.3 Non-functional requirements](#_Toc215511050)
 
-[Reliability](#_Toc197735761)
+[Performance](#_Toc215511051)
 
-[Usability](#_Toc197735762)
+[Security](#_Toc215511052)
 
-[Efficiency](#_Toc197735763)
+[Reliability](#_Toc215511053)
 
-[Scalability](#_Toc197735764)
+[Usability](#_Toc215511054)
 
-[Offline Capability](#_Toc197735765)
+[Efficiency](#_Toc215511055)
+
+[Scalability](#_Toc215511056)
+
+[Offline Capability](#_Toc215511057)
 
 # Introduction
 
@@ -293,6 +301,7 @@ The system is decomposed into the following modules:
 -   Transaction 4.1: User Registration (Mobile)
 -   Transaction 4.2: User Login (Mobile) - Google, GitHub, Email/Password
 -   Transaction 4.3: Account Profile Management (Mobile)
+-   Transaction 4.4: User Logout (Mobile)
 
 ### Module 5: Cloud Synchronization (Mobile & Server-side)
 
@@ -317,6 +326,16 @@ The system is decomposed into the following modules:
 -   Transaction 8.3: Premium Subscription Signup and Payment (Web)
 -   Transaction 8.4: Update User Status to Premium
 
+### Module 9: Admin Dashboard (Mobile & Web)
+
+-   Transaction 9.1: User Management
+-   Transaction 9.2: Analytics & Insights
+-   Transaction 9.3: System Monitoring
+
+### Module 10: User Notes (Mobile & Web)
+
+-   Transaction 10.1: User Note Management
+
 ![](media/beaf67addd59fca62faf0a8cffc0fdfc.png)
 
 *Figure 2.1: Block Diagram of AudioScholar System Components*
@@ -340,8 +359,7 @@ The primary users of AudioScholar are college and university students. These use
     -   May have limitations on usage quotas or feature sets compared to premium users.
 -   **Premium User (Subscribed):**
     -   Full access to all features, including advanced summarization, expanded recommendation sources, priority processing, and potentially other premium features.
-
-No usage limitations (or higher quotas) compared to free users.![https://cdn.discordapp.com/attachments/1327114434707197974/1418670162059464744/XPBDZXCn48JlVefMBWk7l40EQ8T0KAGWHcG3HzJOlREM_1ErRPRmy-xOa_NAcPs8IoHNVUrqZUisHEIOh14ty4xZm6XNiFRC92CfE0HYk3iTAG0w1Hl2c9YWav92o2CRpnRZ2dg3BXu-xeGmT1yXUc0zF4HGkboalHC2PVGCYvqV1b9BxM33HECVB033U2g7olLCLYTx1eGerw0R3.png?ex=68cef70c&is=68cda58c&hm=a6748f4fdd38b46d8dd4d61f219fb5657ae2f607f6c12717c57b4fe299ebbea1&](media/cf64b45b85b23b54f2ad8802e4e9cd29.png)
+    -   No usage limitations (or higher quotas) compared to free users.![https://cdn.discordapp.com/attachments/1327114434707197974/1418670162059464744/XPBDZXCn48JlVefMBWk7l40EQ8T0KAGWHcG3HzJOlREM_1ErRPRmy-xOa_NAcPs8IoHNVUrqZUisHEIOh14ty4xZm6XNiFRC92CfE0HYk3iTAG0w1Hl2c9YWav92o2CRpnRZ2dg3BXu-xeGmT1yXUc0zF4HGkboalHC2PVGCYvqV1b9BxM33HECVB033U2g7olLCLYTx1eGerw0R3.png?ex=68cef70c&is=68cda58c&hm=a6748f4fdd38b46d8dd4d61f219fb5657ae2f607f6c12717c57b4fe299ebbea1&](media/cf64b45b85b23b54f2ad8802e4e9cd29.png)
 
 *Figure 2.2.1: Use Case Diagram for AudioScholar User Types and Feature Access*
 
@@ -387,11 +405,10 @@ The following assumptions and dependencies are relevant to the requirements outl
 -   **Operating System:**
     -   **Mobile Application:** Android OS (minimum version TBD, targeting recent versions).
     -   **Web Interface:** Compatible with modern web browsers (Chrome, Firefox, Safari, Edge) on Windows, and macOS.
-
-Server-side: Spring Boot (Java) for server-side application development.
-
--   **Server-side:** Windows-based server environment for Spring Boot application deployment.
--   **AI API:** Google Gemini AI API for audio processing, summarization, and learning material recommendations. Google Files API may be utilized for handling large file transfers associated with AI processing.
+    -   **Server-side**: Spring Boot (Java) for server-side application development.
+-   **AI API:** Google Gemini AI API for audio processing, summarization, and learning material recommendations.
+-   **Message Broker**: RabbitMQ for handling asynchronous audio processing tasks.
+-   **File Conversion API**: ConvertAPI for converting PowerPoint presentations to PDF.
 -   **Authentication APIs:**
     -   Google OAuth 2.0 API for Google login.
     -   GitHub OAuth 2.0 API for GitHub login.
@@ -424,7 +441,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 1: Lecture Recording & Upload
 
-#### **1.1 Start/Stop Lecture Recording (Mobile)**
+#### 1.1 Start/Stop Lecture Recording (Mobile)
 
 ##### Use Case Diagram
 
@@ -487,7 +504,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.1.3: Wireframe for Recording Screen (Mobile)*
 
-#### **1.2 Upload Audio File (Mobile & Web)**
+#### 1.2 Upload Audio File (Mobile & Web)
 
 ##### Use Case Diagram
 
@@ -577,7 +594,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 2: Audio Processing & Summarization
 
-#### **2.1 Receive Audio for Processing**
+#### 2.1 Receive Audio for Processing
 
 ##### Use Case Diagram (Internal Server-side Use Case, not directly initiated by user)
 
@@ -594,10 +611,10 @@ Server-side: Spring Boot (Java) for server-side application development.
     -   Audio file has been successfully uploaded from the mobile application or web interface.
     -   The server-side Audio Processing Module is running and ready to receive requests.
 -   **Normal Flow:**
-1.  The Audio Processing Module receives the uploaded audio file and associated metadata (e.g., user ID, recording title, upload timestamp).
-2.  The module validates the received audio file (e.g., checks file format, size - server-side limits).
-3.  The module queues the audio file for processing by the AI summarization service.
-4.  The module logs the receipt of the audio file and its processing status.
+1.  The Audio Processing Module (AudioProcessingService) receives the uploaded audio file and associated metadata (e.g., user ID, recording title, upload timestamp).
+2.  The module validates the received audio file (e.g., checks file format, size - server-side limits) and saves it to Nhost Storage.
+3.  The module queues the audio file for processing by sending a message to the RabbitMQ exchange (e.g., with routing key \`upload.audio\`).
+4.  The module logs the receipt of the audio file and updates its processing status in the database.
 -   **Alternative Flows:**
     -   **A1. File validation failed:** If the received audio file fails validation (e.g., unsupported format, exceeds server-side size limit, corrupted file), the module logs an error, rejects the file, and may notify the user (via mobile app/web interface feedback) about the upload failure and reason.
     -   **A2. Queueing failure:** If there is an issue queueing the audio file for processing (e.g., queue service unavailable, queue full), the module logs an error and may implement retry mechanisms or notify system administrators.
@@ -617,7 +634,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 -   As this module outlines server-side processes that do not involve direct user interface interactions, UI wireframes are not applicable.
 
-#### **2.2 Process Audio using AI API**
+#### 2.2 Process Audio using AI API
 
 ##### Use Case Diagram: (Internal Server-side Use Case)
 
@@ -628,27 +645,27 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Process Audio using AI API (Server-side)
 
 -   **Use Case ID:** UC_Process_AudioAI_Server
--   **Primary Actor:** Server-side System (Audio Processing Module)
--   **Goal:** To process queued audio files using the Google Gemini AI API to generate lecture summaries.
+-   **Primary Actor:** Server-side System (AudioTranscriptionListenerService)
+-   **Goal:** To process queued audio files using the Google Gemini AI API to generate a text transcript.
 -   **Preconditions:**
-    -   Audio files are queued for processing (from UC_Process_ReceiveAudio_Server).
-    -   The server-side Audio Processing Module is running and has access to the Google Gemini AI API (API key configured) and potentially the Google Files API for large file handling.
+    -   Audio files are uploaded to Nhost Storage and queued for transcription (from UC_Process_ReceiveAudio_Server).
+    -   The server-side AudioTranscriptionListenerService is running and has access to the Google Gemini AI API (API key configured).
     -   Internet connectivity is available for API communication.
 -   **Normal Flow:**
-1.  The Audio Processing Module retrieves an audio file from the processing queue.
-2.  The module prepares the audio data for submission to the Google Gemini AI API (e.g., format conversion if needed, API request construction).
-3.  The module sends a request to the Google Gemini AI API, including the audio data.
-4.  The module waits for a response from the AI API.
-5.  Upon receiving a successful response from the API, the module extracts the generated summary text from the API response.
+1.  The AudioTranscriptionListenerService consumes the transcription message from the RabbitMQ queue.
+2.  The service downloads the audio file from Nhost Storage.
+3.  The service calls the GeminiService to transcribe the audio using the Google Gemini AI API (handling API key rotation and retries).
+4.  The service receives the transcription text from the API.
+5.  The service saves the transcript to the database and triggers the summarization process (handled in Transaction 2.3).
 -   **Alternative Flows:**
     -   **A1. API request failure (network error):** If the API request fails due to network connectivity issues, the module implements retry logic (e.g., retry a certain number of times with backoff). If retries fail, the module logs an error and marks the audio processing as failed.
     -   **A2. API service unavailable:** If the Google Gemini AI API service is temporarily unavailable or returns an error response indicating service outage, the module logs an error, may implement retry logic with longer backoff, and potentially alerts system administrators.
-    -   **A3. API response error (invalid response format, no summary generated):** If the API returns a response but it is in an unexpected format or does not contain a valid summary, the module logs an error and marks the audio processing as failed.
+    -   **A3. API response error (invalid response format, no transcript generated):** If the API returns a response but it is in an unexpected format or does not contain a valid transcript, the module logs an error and marks the audio processing as failed.
     -   **A4. API usage limits exceeded:** If API usage limits are exceeded (e.g., rate limits, quota limits), the module implements rate limiting or pauses processing to avoid further API errors. It may also log warnings and alert administrators about potential quota issues.
 -   **Postconditions:**
-    -   The audio file has been processed by the Google Gemini AI API (attempted, may have failed in alternative flows).
-    -   If successful, a summary text is obtained from the API response.
-    -   Processing status (success or failure) is tracked for the audio file.
+    -   The audio file has been processed by the Google Gemini AI API.
+    -   If successful, a transcript is obtained and saved.
+    -   Processing status is updated and the summarization step is triggered.
 -   **Priority:** High (Core server-side functionality)
 -   **Frequency of Use:** On-demand, triggered by audio uploads and recordings.
 
@@ -662,7 +679,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 -   As this module outlines server-side processes that do not involve direct user interface interactions, UI wireframes are not applicable.
 
-#### **2.3 Generate Lecture Summary**
+#### 2.3 Generate Lecture Summary
 
 ##### Use Case Diagram: (Internal Server-side Use Case)
 
@@ -673,19 +690,21 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Generate Lecture Summary (Server-side)
 
 -   **Use Case ID:** UC_Generate_Summary_Server
--   **Primary Actor:** Server-side System (Audio Processing Module)
--   **Goal:** To take the raw summary text received from the Google Gemini AI API and structure and format it into a user-friendly lecture summary.
+-   **Primary Actor:** Server-side System (SummarizationListenerService)
+-   **Goal:** To generate a structured lecture summary from the transcript and optional PowerPoint context using the Google Gemini AI API.
 -   **Preconditions:**
-    -   Audio processing using the AI API has been successfully completed (UC_Process_AudioAI_Server).
-    -   Raw summary text is available from the API response.
+    -   Audio transcription has been successfully completed (UC_Transcription_Server).
+    -   Transcript is available in the database.
+    -   (Optional) PowerPoint conversion is complete if a PPTX was uploaded.
 -   **Normal Flow:**
-    1.  The Audio Processing Module receives the raw summary text from the AI API processing step.
-    2.  The module structures the summary text into logical sections or subsections (e.g., based on topic changes, keywords, or using heuristics to identify key points, and potentially generating a glossary of terms). (Initial version may be basic structuring, future versions can improve this)*.*
-    3.  The module formats the structured summary for display in the mobile application and web interface (e.g., using Markdown or similar formatting for headings, bullet points, bold text).
-    4.  The module stores the structured and formatted lecture summary in the database, associated with the original audio recording and user.
+1.  The SummarizationListenerService consumes the message from the summarization queue.
+2.  The service retrieves the transcript and any associated PDF context (from converted PowerPoint) from the database/storage.
+3.  The service calls the GeminiService to generate a structured summary (including key points, topics, and glossary) using the transcript and PDF context.
+4.  The service stores the structured and formatted lecture summary in the database, associated with the original audio recording and user.
+5.  The service triggers the Learning Material Recommendation process (Module 3).
 -   **Alternative Flows:**
-    -   **A1. No summary text received from API:** If, for some reason, the API processing step did not return any summary text (even if the API request was technically successful), the module logs a warning and may generate a placeholder summary message (e.g., “Summary generation failed”).
-    -   **A2. Structuring/formatting error:** If there is an error during the structuring or formatting process, the module logs an error and may store a fallback, unformatted version of the summary or a placeholder message.
+    -   **A1. Summary generation failure**: If the Gemini API fails to generate a summary, the service logs an error and may implement retry logic.
+    -   **A2. Data retrieval failure**: If the transcript or PDF context cannot be retrieved, the service logs an error.
 -   **Postconditions:**
     -   A structured and formatted lecture summary is generated.
     -   The summary is stored in the database, linked to the audio recording.
@@ -705,7 +724,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 3: Learning Material Recommendation
 
-#### **3.1 Analyze Lecture Content**
+#### 3.1 Analyze Lecture Content
 
 ##### Use Case Diagram: (Internal Server-side Use Case)
 
@@ -723,13 +742,11 @@ Server-side: Spring Boot (Java) for server-side application development.
     -   The Recommendation Module is running and ready to perform content analysis.
     -   The ID of the lecture recording (or summary) to be analyzed is available.
 -   **Normal Flow:**
-    1.  The Analyze Lecture Content transaction is initiated, receiving the lecture recording (or summary) ID as input.
-    2.  The module retrieves the lecture summary text from the database using the provided ID.
-    3.  The module applies Natural Language Processing (NLP) techniques to the summary text to:
-        -   **Extract Keywords:** Identify significant keywords and phrases that represent the core concepts of the lecture. This may involve techniques like term frequency-inverse document frequency (TF-IDF), keyword extraction algorithms, or using NLP libraries.
-            -   **Identify Key Topics:** Determine the main topics or themes discussed in the lecture. This may involve topic modeling techniques, semantic analysis, or rule-based topic identification. *Initial version may use simpler keyword-based topic identification, more advanced topic modeling for future versions.*
-    4.  The module outputs the extracted keywords and identified key topics as analysis results. These results will be used by the “Generate Learning Material Recommendations” transaction (3.2) to formulate search queries.
-    5.  The module logs the completion of the content analysis process and stores the analysis results (keywords, topics) temporarily or for future reference (optional).
+1.  The LearningMaterialRecommenderService initiates the analysis, receiving the lecture recording (or summary) ID as input.
+2.  The module retrieves the lecture summary from the database using the provided ID.
+3.  The module extracts the topics and keywords that were already generated and stored within the Summary object during the summarization process (Module 2.3).
+4.  The module prepares these keywords and topics to be used for formulating search queries for the learning material recommendations.
+5.  The module logs the retrieval of content analysis results.
 -   **Alternative Flows:**
     -   **A1. Summary retrieval failure:** If retrieving the lecture summary text from the database fails (e.g., due to database errors, invalid recording ID), the module logs an error and may indicate that content analysis could not be performed for this lecture.
     -   **A2. No keywords or topics extracted:** If the NLP analysis fails to extract any relevant keywords or identify key topics from the summary text (e.g., due to poor summary quality, insufficient text content), the module may output an empty set of keywords and topics or a message indicating that analysis yielded no results. In this case, recommendation generation may rely on default keywords or broader search terms (fallback strategy).
@@ -751,7 +768,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 -   This module details backend operations for generating learning material recommendations. Therefore, direct user interface wireframes are not relevant for its processes.
 
-#### **3.2 Generate Learning Material Recommendations**
+#### 3.2 Generate Learning Material Recommendations
 
 ##### Use Case Diagram
 
@@ -769,7 +786,7 @@ Server-side: Spring Boot (Java) for server-side application development.
     -   The Recommendation Module is running and has access to the YouTube Data API (API key configured).
     -   Internet connectivity is available for API communication.
 -   **Normal Flow:**
-1.  The Recommendation Module receives a request to generate recommendations for a specific lecture (triggered after summary generation or LoggedInFreeUser's request to view recommendations).
+1.  The Recommendation Module receives a request to generate recommendations for a specific lecture (triggered after summary generation or Logged-in Free User's request to view recommendations).
 2.  The module analyzes the lecture summary content to extract keywords, key topics, and relevant concepts.
 3.  The module uses the extracted keywords and topics to formulate search queries for the YouTube Data API.
 4.  The module sends search requests to the YouTube Data API.
@@ -800,7 +817,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 4: User Authentication & Account Management
 
-#### **4.1 User Authentication & Account Management**
+#### 4.1 User Authentication & Account Management
 
 ##### Use Case Diagram
 
@@ -853,9 +870,9 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.3: Wireframe for Registration Screen (Mobile)*
 
-#### **4.2 User Login (Mobile)**
+#### 4.2 User Login (Mobile)
 
-#### **4.2.1 User Login with Google OAuth 2.0 (Mobile)**
+#### 4.2.1 User Login with Google OAuth 2.0 (Mobile)
 
 ##### Use Case Diagram
 
@@ -866,7 +883,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: User Login with Google OAuth 2.0 (Mobile)
 
 -   **Use Case ID:** UC_Login_Google_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To log into the AudioScholar mobile application using their Google account via OAuth 2.0.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -907,7 +924,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.6: Wireframe for Login Screen (Mobile)*
 
-#### **4.2.2 User Login with GitHub OAuth 2.0 (Mobile)**
+#### 4.2.2 User Login with GitHub OAuth 2.0 (Mobile)
 
 ##### Use Case Diagram
 
@@ -918,7 +935,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: User Login with GitHub OAuth 2.0 (Mobile)
 
 -   **Use Case ID:** UC_Login_GitHub_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To log into the AudioScholar mobile application using their GitHub account via OAuth 2.0.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -959,7 +976,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.9: Wireframe for Login Screen (Mobile)*
 
-#### **4.2.3 User Login with Email/Password (Mobile)**
+#### 4.2.3 User Login with Email/Password (Mobile)
 
 ##### Use Case Diagram
 
@@ -970,7 +987,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description
 
 -   **Use Case ID:** UC_Login_EmailPassword_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To log into the AudioScholar mobile application using their registered email address and password.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1008,18 +1025,20 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.12: Wireframe for Login Screen (Mobile)*
 
-#### **4.3 Account Profile Management (Mobile)**
+#### 4.3 Account Profile Management (Mobile)
 
-#### **4.3.1 View User Profile (Mobile)**
+#### 4.3.1 View User Profile (Mobile)
 
 ##### Use Case Diagram
+
+![](media/578b5b8737dfdbd44c9059fb938af0b4.png)
 
 *Figure 3.2.4.13: Use Case Diagram for View User Profile (Mobile)*
 
 ##### Use Case Description: View User Profile (Mobile)
 
 -   **Use Case ID:** UC_View_Profile_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To view their user profile information within the AudioScholar mobile application.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1048,7 +1067,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.15: Wireframe for User Profile Screen (Mobile)*
 
-#### **4.3.2 Edit User Profile (Mobile)**
+#### 4.3.2 Edit User Profile (Mobile)
 
 ##### Use Case Diagram
 
@@ -1059,7 +1078,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Edit User Profile (Mobile)
 
 -   **Use Case ID:** UC_Edit_Profile_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To edit and update their user profile information within the AudioScholar mobile application.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1096,16 +1115,18 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.18: Wireframe for Edit User Profile Screen (Mobile)*
 
-#### **4.3.3 Change Password (Mobile)**
+#### 4.3.3 Change Password (Mobile)
 
 ##### Use Case Diagram
+
+![](media/09f1e9c03ead4d85a690ce159da7c000.png)
 
 *Figure 3.2.4.19: Use Case Diagram for Change Password (Mobile)*
 
 ##### Use Case Description: Change Password (Mobile)
 
 -   **Use Case ID:** UC_Change_Password_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To change their account password within the AudioScholar mobile application (for email/password registered accounts).
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1116,8 +1137,8 @@ Server-side: Spring Boot (Java) for server-side application development.
 2.  The application displays the change password screen, prompting for "Current Password," "New Password," and "Confirm New Password."
 3.  The student enters their current password, new password, and confirms the new password.
 4.  The application performs client-side validation on the entered passwords (e.g., password strength for new password, confirmation match).
-5.  The application sends a request to Firebase Authentication to change the password, including the current password for re-authentication and the new password.
-6.  Firebase Authentication verifies the current password and, if correct, updates the password to the new password.
+5.  The application sends a request to the AudioScholar server (AuthController) to change the password, including the current password and the new password.
+6.  The server interacts with Firebase Authentication to verify the current password and update it to the new password.
 7.  Upon successful password change, the application displays a confirmation message indicating that the password has been changed successfully.
 8.  The application may optionally log the user out after password change for security reasons, requiring them to log in again with the new password.
 -   **Alternative Flows:**
@@ -1143,9 +1164,30 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.4.21: Wireframe for Change Password Screen (Mobile)*
 
+#### 4.4 User Logout (Mobile)
+
+##### Use Case Description: User Logout (Mobile)
+
+-   **Use Case ID:** UC_User_Logout_Mobile
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To log out of the AudioScholar mobile application securely.
+-   **Preconditions:**
+    -   The AudioScholar mobile application is installed and running.
+    -   The student is logged into the application.
+-   **Normal Flow:**
+1.  The student selects the “Logout” option from the settings or profile menu.
+2.  The application sends a logout request to the server (TokenRevocationService).
+3.  The server adds the user’s current JWT to the denylist (JwtDenylistFilter).
+4.  The application clears the stored authentication tokens from the device’s local storage.
+5.  The application redirects the user to the login screen.
+-   **Postconditions:**
+    -   The user is logged out of the application.
+    -   The authentication token is invalidated on the server.
+    -   The application UI shows the login screen.
+
 ### Module 5: Cloud Synchronization
 
-#### 5.1 **Configure Cloud Sync Settings (Mobile)**
+#### 5.1 Configure Cloud Sync Settings (Mobile)
 
 ##### Use Case Diagram ![https://cdn.discordapp.com/attachments/1327114434707197974/1418672669808787617/VP8nZzH038Lx_ugdRO1YjpX4izMj0blTIKZBrSYNSPAH9kDbnW55YFzEdEpId4Jdw3q_VtRciHeNcyP4x_0vSbzuFABHKgGr2KkLkzXFHT0adG8kSsvn4REO-ugNAcYuoj9xrZAo7V4rSRQNvoUY99t152NsWo54JuoQYRWrBTWzQTzBsCUCSn7nhB83rxKWSZVdFWbsfob4lRI39.png?ex=68cef962&is=68cda7e2&hm=5ca84fd0b041ace90e5ec81230f970e98d5645a7901f3e389c2bedb24682a919&](media/19fb592079ed93e5655ea827441ead35.png)
 
@@ -1154,7 +1196,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Configure Cloud Sync Settings (Mobile)
 
 -   **Use Case ID**: UC_Configure_SyncSettings_Mobile
--   **Primary Actor**: LoggedInFreeUser
+-   **Primary Actor**: Logged-in Free User
 -   **Goal**: To configure the cloud synchronization settings for their AudioScholar account within the mobile application. This includes enabling/disabling cloud sync, setting the sync frequency, and choosing which data types to synchronize.
 -   **Preconditions**:
     -   The AudioScholar mobile application is installed and running.
@@ -1192,7 +1234,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.5.3: Wireframe for Sync Settings Screen (Mobile)*
 
-#### **5.2 Manual/Automatic Cloud Sync (Mobile)**
+#### 5.2 Manual/Automatic Cloud Sync (Mobile)
 
 ##### Use Case Diagram
 
@@ -1203,7 +1245,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Manual Cloud Synchronization (Mobile)
 
 -   **Use Case ID**: UC_Manual_CloudSync_Mobile
--   **Primary Actor**: LoggedInFreeUser
+-   **Primary Actor**: Logged-in Free User
 -   **Goal**: To manually initiate cloud synchronization of their AudioScholar data (recordings, summaries) from the mobile application to Nhost Cloud Storage and vice versa.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1214,8 +1256,8 @@ Server-side: Spring Boot (Java) for server-side application development.
     1.  The student initiates manual cloud synchronization from within the mobile application (e.g., by tapping a "Sync Now" button in settings or recordings list).
     2.  The application checks the user's cloud sync settings to confirm that cloud sync is enabled and to determine which data types (recordings, summaries) are configured for synchronization.
     3.  The application initiates the synchronization process:
-    4.  Upload Phase: The application identifies new or modified recordings and summaries on the device that need to be uploaded to the cloud. It uploads these data items to Nhost Cloud Storage.
-    5.  Download Phase: The application checks for new or modified recordings and summaries in Nhost Cloud Storage that are not yet present or are outdated on the device. It downloads these data items from Nhost Cloud Storage to the device.
+    4.  Upload Phase: The application identifies new or modified recordings on the device that need to be uploaded. It uploads these items to the AudioScholar Server (which then stores audio in Nhost Storage).
+    5.  Download Phase: The application checks for new or modified recordings and summaries. It downloads metadata and summaries from the AudioScholar Server, and media files from Nhost Storage.
     6.  During the synchronization process, the application displays a progress indicator to the user, showing the status of upload and download operations.
     7.  If any data conflicts are detected during synchronization (e.g., same recording modified both locally and in the cloud since last sync), the application attempts to handle them automatically (conflict resolution strategy TBD - e.g., prioritize cloud version, prioritize local version, prompt user for resolution - initial version may prioritize cloud or local, more complex conflict resolution for future).
     8.  Upon completion of the synchronization process (upload and download phases), the application displays a summary status message indicating whether the synchronization was successful or if any errors occurred.
@@ -1245,7 +1287,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 6: PowerPoint Integration
 
-#### **6.1 Upload PowerPoint (Mobile)**
+#### 6.1 Upload PowerPoint (Mobile)
 
 ##### Use Case Diagram
 
@@ -1256,28 +1298,29 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Upload PowerPoint (Mobile)
 
 -   **Use Case ID:** UC_Upload_PowerPoint_Mobile
--   **Primary Actor:** LoggedInFreeUser
--   **Goal:** To upload a PowerPoint presentation file (e.g., .pptx) from their mobile device to the AudioScholar application. The uploaded PowerPoint will be temporarily stored and intended to be associated with a lecture recording later.
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To upload a PowerPoint presentation file (e.g., .pptx) from their mobile device to the AudioScholar server. The server will then convert it to PDF for use in summarization.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
     -   The student is logged into the application (for logged-in user features).
     -   The PowerPoint presentation file is stored on the mobile device's local storage.
     -   The student has navigated to the PowerPoint upload section within the application.
 -   **Normal Flow:**
-    1.  The student navigates to the "Upload PowerPoint" section within the mobile application (e.g., from a menu or recording details screen).
-    2.  The application presents a file selection interface, allowing the student to browse the device's local storage.
-    3.  The student selects the PowerPoint presentation file (e.g., .pptx) to be uploaded.
-    4.  The application may (optionally) display a preview of the PowerPoint presentation (e.g., thumbnails of slides) for confirmation. *Initial version may skip preview for simplicity.*
-    5.  The application temporarily stores the uploaded PowerPoint file locally on the device. It is not yet uploaded to the cloud or server at this stage.
-    6.  The application displays a confirmation message indicating that the PowerPoint file has been uploaded and is ready to be associated with a recording.
+1.  The student navigates to the "Upload PowerPoint" section within the mobile application (e.g., from a menu or recording details screen).
+2.  The application presents a file selection interface, allowing the student to browse the device's local storage.
+3.  The student selects the PowerPoint presentation file (e.g., .pptx) to be uploaded.
+4.  The application uploads the file to the AudioScholar server (AudioController).
+5.  The server saves the file to Nhost Storage and triggers the PptxConversionListenerService to convert the PowerPoint to PDF using ConvertAPI.
+6.  The application displays a confirmation message indicating that the PowerPoint file has been uploaded and is being processed.
 -   **Alternative Flows:**
     -   **A1. No file selected:** If the student attempts to initiate upload without selecting a PowerPoint file, the application displays an error message prompting file selection.
     -   **A2. File format not supported:** If the selected file is not in a supported PowerPoint format (e.g., only .pptx supported initially), the application displays an error message indicating the unsupported format and prompts the user to select a valid file.
     -   **A3. File size limit exceeded:** If the selected file exceeds the maximum allowed file size for PowerPoint uploads (define limit), the application displays an error message indicating the file size limit.
-    -   **A4. Storage error (local storage full):** If there is insufficient local storage space to temporarily store the uploaded PowerPoint file, the application displays an error message and prompts the user to free up storage space.
+    -   **A4. Upload failure:** If the upload fails due to network or server issues, the application displays an error message.
 -   **Postconditions:**
-    -   The selected PowerPoint presentation file is temporarily uploaded and stored locally on the mobile device, ready for association with a lecture recording.
-    -   The application UI reflects the successful PowerPoint upload status.
+    -   The PowerPoint file is uploaded to the server and Nhost Storage.
+    -   The conversion process to PDF is initiated.
+    -   The application UI reflects the successful upload status.
 -   **Priority:** Medium (Enhancement for improved summarization)
 -   **Frequency of Use:** Less frequent than recording, used when users have PowerPoint slides for a lecture.
 
@@ -1293,7 +1336,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.6.3: Wireframe for PowerPoint Upload Screen (Mobile)*
 
-#### **6.2 Associate PowerPoint with Recording (Mobile)**
+#### 6.2 Associate PowerPoint with Recording (Mobile)
 
 ##### Use Case Diagram
 
@@ -1304,7 +1347,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Associate PowerPoint with Recording (Mobile)
 
 -   **Use Case ID:** UC_Associate_PowerPoint_Mobile
--   **Primary Actor:** LoggedInFreeUser
+-   **Primary Actor:** Logged-in Free User
 -   **Goal:** To associate a previously uploaded PowerPoint presentation file with a specific lecture recording within the AudioScholar mobile application. This link will inform the AI summarization process.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1346,7 +1389,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 7: Web Interface
 
-#### **7.1 View Recordings and Summaries (Web)**
+#### 7.1 View Recordings and Summaries (Web)
 
 ##### Use Case Diagram
 
@@ -1399,7 +1442,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.7.3: Wireframe for Views Recording and Summary (Web)*
 
-#### **7.2 Upload Audio Files (Web)**
+#### 7.2 Upload Audio Files (Web)
 
 ##### Use Case Diagram
 
@@ -1453,9 +1496,11 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.7.6: Wireframe for Audio Upload Screen (Web)*
 
-#### ** 7.3 Views Recommendations (Web)**
+#### 7.3 Views Recommendations (Web)
 
 ##### Use Case Diagram
+
+![](media/2d6750e954bef5597d8ff7a21748baeb.png)
 
 *Figure 3.2.7.7: Use Case Diagram for View Recommendations (Web)*
 
@@ -1503,7 +1548,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ### Module 8: Freemium Model
 
-#### **8.1 Feature Access Control based on User Status (Mobile & Web)**
+#### 8.1 Feature Access Control based on User Status (Mobile & Web)
 
 ##### Use Case Diagram
 
@@ -1556,7 +1601,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.8.3: Wireframe for Feature Restriction (Mobile & Web)*
 
-#### **8.2 Premium Subscription Management**
+#### 8.2 Premium Subscription Management
 
 ##### Use Case Diagram
 
@@ -1567,7 +1612,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Premium Subscription Management
 
 -   **Use Case ID:** UC_Premium_Subscription_Mobile
--   **Primary Actor:** LoggedInFreeUser (on Mobile)
+-   **Primary Actor:** Logged-in Free User (on Mobile)
 -   **Goal:** To allow a logged-in free user to subscribe to a premium tier of AudioScholar via the mobile application, process payment, and have their account status updated to “Premium”.
 -   **Preconditions:**
     -   User is logged into the mobile application.
@@ -1612,7 +1657,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 *Figure 3.2.8.4.B: Wireframe for Premium Subscription Management (Mobile)*
 
-#### **8.3 Premium Subscription Signup and Payment (Web)**
+#### 8.3 Premium Subscription Signup and Payment (Web)
 
 ##### Use Case Diagram
 
@@ -1623,7 +1668,7 @@ Server-side: Spring Boot (Java) for server-side application development.
 ##### Use Case Description: Premium Subscription Signup and Payment (Web)
 
 -   **Use Case ID:** UC_Premium_Subscription_Web
--   **Primary Actor:** LoggedInFreeUser (on Web Interface)
+-   **Primary Actor:** Logged-in Free User (on Web Interface)
 -   **Goal:** To allow a logged-in free user to subscribe to a premium tier of AudioScholar via the web interface, process payment, and have their account status updated to “Premium”.
 -   **Preconditions:**
     -   User is logged into the web interface.
@@ -1704,78 +1749,146 @@ Server-side: Spring Boot (Java) for server-side application development.
 
 ###### As this module outlines a backend system process that is triggered automatically after a successful payment, it does not involve a direct user interface. Therefore, UI wireframes are not applicable. The result of this process (the user's "Premium" status) is reflected in the user's profile and through the unlocking of premium features, as shown in other wireframes.
 
+### Module 9: Admin Dashboard
+
+#### 9.1 User Management
+
+##### Use Case Description: User Management
+
+-   **Use Case ID:** UC_Admin_UserManagement
+-   **Primary Actor:** Administrator
+-   **Goal:** To manage user accounts, including listing users, viewing details, updating roles, and banning/unbanning users.
+-   **Preconditions:**
+    -   User is logged in as an Administrator (ROLE_ADMIN).
+-   **Normal Flow:**
+1.  **List Users:** Admin requests a paginated list of users. System returns user list with details like email, display name, roles, and status.
+2.  **View Details:** Admin selects a user. System returns full profile details, including recording counts and login stats.
+3.  **Update Roles:** Admin promotes or demotes a user (e.g., adding ROLE_ADMIN). System updates user roles.
+4.  **Ban/Unban:** Admin disables or enables a user account. System updates account status in Firebase and database.
+-   **Postconditions:**
+    -   User accounts are updated according to admin actions.
+
+#### 9.2 Analytics & Insights
+
+##### Use Case Description: Analytics & Insights
+
+-   **Use Case ID:** UC_Admin_Analytics
+-   **Primary Actor:** Administrator
+-   **Goal:** To view system-wide analytics on user growth, activity, and content engagement.
+-   **Preconditions:**
+    -   User is logged in as an Administrator.
+-   **Normal Flow:**
+1.  **Overview Stats:** Admin views dashboard header. System returns aggregated counts (Total Users, Recordings, Storage, Active Users).
+2.  **Time-Series Activity:** Admin views activity charts. System returns historical data for new users or uploads over time.
+3.  **User Distribution:** Admin views user demographics. System returns breakdown by auth provider or roles.
+4.  **Content Insights:** Admin views top content. System returns most popular recordings based on engagement (e.g., favorites).
+
+#### 9.3 System Monitoring
+
+##### Use Case Description: System Monitoring
+
+-   **Use Case ID:** UC_Admin_Monitoring
+-   **Primary Actor:** Administrator
+-   **Goal:** To monitor the health and status of system infrastructure.
+-   **Preconditions:**
+    -   User is logged in as an Administrator.
+-   **Normal Flow:**
+1.  Admin navigates to System Health section.
+2.  System performs health checks on components (Database, Message Queue, Disk Space).
+3.  System returns status (UP/DOWN) and details for each component.
+
+### Module 10: User Notes
+
+#### 10.1 User Note Management
+
+##### Use Case Description: User Note Management
+
+-   **Use Case ID:** UC_User_Note_Management
+-   **Primary Actor:** Logged-in User
+-   **Goal:** To create, view, update, and delete personal notes associated with lecture recordings.
+-   **Preconditions:**
+    -   User is logged in.
+    -   A lecture recording exists.
+-   **Normal Flow:**
+1.  **Create Note:** User selects “Add Note” on a recording. App sends content/tags to UserNoteController. System saves note linked to recording.
+2.  **View Notes:** User views recording details. System retrieves and displays user’s notes for that recording.
+3.  **Update Note:** User edits a note. System updates the note content.
+4.  **Delete Note:** User deletes a note. System removes the note.
+-   **Postconditions:**
+    -   User notes are stored/updated/deleted in the database.
+
 ## 3.3 Non-functional requirements
 
 ### Performance
 
-##### Summarization Latency: The system shall generate lecture summaries within a reasonable timeframe after lecture recording or upload. Target average summarization time should be less than 15 minutes for a 1-hour lecture, assuming reasonable API processing times. (Note: Actual summarization time is heavily dependent on the AI API processing speed, which is an external factor.)
+#### Summarization Latency: The system shall generate lecture summaries within a reasonable timeframe after lecture recording or upload. Target average summarization time should be less than 15 minutes for a 1-hour lecture, assuming reasonable API processing times. (Note: Actual summarization time is heavily dependent on the AI API processing speed, which is an external factor.)
 
-##### Recommendation Latency: Learning material recommendations should be generated and available to the user within seconds of summary generation completion.
+#### Recommendation Latency: Learning material recommendations should be generated and available to the user within seconds of summary generation completion.
 
-##### Mobile Application Responsiveness: The mobile application UI shall be responsive and provide smooth transitions between screens. Recording should start and stop promptly upon user action.
+#### Mobile Application Responsiveness: The mobile application UI shall be responsive and provide smooth transitions between screens. Recording should start and stop promptly upon user action.
 
-##### Web Interface Responsiveness: The web interface shall load pages quickly and respond to user interactions without noticeable delays.
+#### Web Interface Responsiveness: The web interface shall load pages quickly and respond to user interactions without noticeable delays.
 
-##### Upload/Download Speeds: Audio file uploads and (optional) cloud synchronization should utilize network bandwidth efficiently to minimize upload/download times, within reasonable network conditions.
+#### Upload/Download Speeds: Audio file uploads and (optional) cloud synchronization should utilize network bandwidth efficiently to minimize upload/download times, within reasonable network conditions.
 
 ### Security
 
-##### User Authentication Security: User authentication credentials (passwords, OAuth tokens) shall be securely stored and transmitted. Firebase Authentication and OAuth 2.0 protocols are to be used for secure authentication.
+#### User Authentication Security: User authentication credentials (passwords, OAuth tokens) shall be securely stored and transmitted. Firebase Authentication and OAuth 2.0 protocols are to be used for secure authentication.
 
-##### Data Storage Security: User data, audio recordings, and summaries stored in Firebase shall be protected using Firebase security rules to prevent unauthorized access.
+#### Data Storage Security: User data, audio recordings, and summaries stored in Firebase shall be protected using Firebase security rules to prevent unauthorized access.
 
-##### Data Transmission Security: All communication between the mobile application, web interface, and server, especially when transmitting sensitive data (authentication tokens, user data), shall be encrypted using HTTPS.
+#### Data Transmission Security: All communication between the mobile application, web interface, and server, especially when transmitting sensitive data (authentication tokens, user data), shall be encrypted using HTTPS.
 
-##### API Key Security: API keys for Google Gemini AI API and authentication APIs shall be securely managed and protected from unauthorized access. Keys should not be hardcoded in client-side applications.
+#### API Key Security: API keys for Google Gemini AI API and authentication APIs shall be securely managed and protected from unauthorized access. Keys should not be hardcoded in client-side applications.
 
-##### Privacy: User data and recordings shall be handled with privacy in mind. Access to user data should be restricted to authorized users and system components. Data privacy policies should be considered and potentially documented.
+#### Privacy: User data and recordings shall be handled with privacy in mind. Access to user data should be restricted to authorized users and system components. Data privacy policies should be considered and potentially documented.
 
-##### Local Mobile Storage Security: Locally stored recordings on mobile devices shall be handled securely. Considerations must be made for potential security implications of offline data storage, such as employing appropriate file permissions or encryption if feasible within the project scope and platform capabilities.
+#### Local Mobile Storage Security: Locally stored recordings on mobile devices shall be handled securely. Considerations must be made for potential security implications of offline data storage, such as employing appropriate file permissions or encryption if feasible within the project scope and platform capabilities.
 
 ### Reliability
 
-##### System Uptime: The server-side system and core functionalities (recording, summarization, recommendation) shall aim for a 99% uptime to ensure continuous availability for users.
+#### System Uptime: The server-side system and core functionalities (recording, summarization, recommendation) shall aim for a 99% uptime to ensure continuous availability for users.
 
-##### Error Handling: The system shall implement robust error handling to gracefully manage unexpected errors, API failures, network issues, and other potential problems. Informative error messages should be displayed to the user when appropriate, and errors should be logged for debugging and monitoring.
+#### Error Handling: The system shall implement robust error handling to gracefully manage unexpected errors, API failures, network issues, and other potential problems. Informative error messages should be displayed to the user when appropriate, and errors should be logged for debugging and monitoring.
 
-##### Data Integrity: The system shall ensure the integrity of recorded audio, summaries, and user data. Data should not be corrupted or lost during processing, storage, or transmission.
+#### Data Integrity: The system shall ensure the integrity of recorded audio, summaries, and user data. Data should not be corrupted or lost during processing, storage, or transmission.
 
-##### Crash Resistance: The mobile application and web interface should be stable and resistant to crashes. Appropriate exception handling and testing should be implemented to minimize crashes.
+#### Crash Resistance: The mobile application and web interface should be stable and resistant to crashes. Appropriate exception handling and testing should be implemented to minimize crashes.
 
-##### Recovery: In case of system failures, the system should be designed to recover gracefully and minimize data loss. Consider backup and recovery strategies for critical data (future enhancement).
+#### Recovery: In case of system failures, the system should be designed to recover gracefully and minimize data loss. Consider backup and recovery strategies for critical data (future enhancement).
 
 ### Usability
 
-#### **Ease of Use:** The mobile application and web interface shall be user-friendly and intuitive, with a clear and easy-to-navigate UI. The application should be easy to learn and use for students with varying levels of technical proficiency.
+#### Ease of Use: The mobile application and web interface shall be user-friendly and intuitive, with a clear and easy-to-navigate UI. The application should be easy to learn and use for students with varying levels of technical proficiency.
 
-#### **User Interface Consistency:** The UI elements and design should be consistent across the mobile application and web interface to provide a cohesive user experience.
+#### User Interface Consistency: The UI elements and design should be consistent across the mobile application and web interface to provide a cohesive user experience.
 
-#### **Accessibility:** Consider basic accessibility guidelines in UI design to make the application usable by a wider range of students (e.g., sufficient color contrast, keyboard navigation - future enhancement).
+#### Accessibility: Consider basic accessibility guidelines in UI design to make the application usable by a wider range of students (e.g., sufficient color contrast, keyboard navigation - future enhancement).
 
-#### **Feedback and Guidance:** The application should provide clear feedback to users on their actions (e.g., recording status, upload progress, processing status). Guidance and tooltips may be provided to assist users in using the application features.
+#### Feedback and Guidance: The application should provide clear feedback to users on their actions (e.g., recording status, upload progress, processing status). Guidance and tooltips may be provided to assist users in using the application features.
 
-#### **Mobile-First Design (for App):** The mobile application should be designed with mobile usability in mind, considering screen size, touch interactions, and typical mobile usage scenarios.
+#### Mobile-First Design (for App): The mobile application should be designed with mobile usability in mind, considering screen size, touch interactions, and typical mobile usage scenarios.
 
 ### Efficiency
 
-##### Battery Efficiency (Mobile App): The mobile application should be designed to minimize battery consumption during lecture recording. Optimize audio recording processes and background tasks to conserve battery life.
+#### Battery Efficiency (Mobile App): The mobile application should be designed to minimize battery consumption during lecture recording. Optimize audio recording processes and background tasks to conserve battery life.
 
-##### Resource Efficiency (Server-side): The server-side application should be designed to efficiently utilize server resources (CPU, memory, network bandwidth) during audio processing and recommendation generation. Optimize algorithms and resource management to handle concurrent user requests effectively.
+#### Resource Efficiency (Server-side): The server-side application should be designed to efficiently utilize server resources (CPU, memory, network bandwidth) during audio processing and recommendation generation. Optimize algorithms and resource management to handle concurrent user requests effectively.
 
-##### Data Storage Efficiency: Consider efficient storage formats for audio recordings and summaries to minimize storage space usage, especially for free users with limited storage (if applicable in freemium model - future).
+#### Data Storage Efficiency: Consider efficient storage formats for audio recordings and summaries to minimize storage space usage, especially for free users with limited storage (if applicable in freemium model - future).
 
-##### Network Bandwidth Efficiency: Minimize data transfer sizes where possible to reduce network bandwidth consumption, especially for users with limited data plans.
+#### Network Bandwidth Efficiency: Minimize data transfer sizes where possible to reduce network bandwidth consumption, especially for users with limited data plans.
 
 ### Scalability
 
-##### User Scalability: The server-side infrastructure should be scalable to accommodate a growing number of users and concurrent requests as user adoption increases. Firebase’s scalable infrastructure is expected to provide a base for user scalability.
+#### User Scalability: The server-side infrastructure should be scalable to accommodate a growing number of users and concurrent requests as user adoption increases. Firebase’s scalable infrastructure is expected to provide a base for user scalability.
 
-##### Data Scalability: The system should be able to handle increasing volumes of audio recordings, summaries, and user data over time. Firebase database and storage scalability should be leveraged.
+#### Data Scalability: The system should be able to handle increasing volumes of audio recordings, summaries, and user data over time. Firebase database and storage scalability should be leveraged.
 
-##### Feature Scalability: The system architecture should be designed to allow for future feature additions and expansions without requiring major redesigns. Modular design and API-driven architecture should support feature scalability.
+#### Feature Scalability: The system architecture should be designed to allow for future feature additions and expansions without requiring major redesigns. Modular design and API-driven architecture should support feature scalability.
 
 ### Offline Capability
 
-##### Offline Recording (Mobile App): The mobile application must support lecture recording functionality even when there is no internet connectivity. Recordings should be stored locally and can be processed and synchronized later when connectivity is restored (for logged-in users).
+#### Offline Recording (Mobile App): The mobile application must support lecture recording functionality even when there is no internet connectivity. Recordings should be stored locally and can be processed and synchronized later when connectivity is restored (for logged-in users).
 
-##### Offline Access to Local Recordings (Mobile App): Users should be able to access and manage their locally stored recordings within the mobile application even in offline mode.
+#### Offline Access to Local Recordings (Mobile App): Users should be able to access and manage their locally stored recordings within the mobile application even in offline mode.
