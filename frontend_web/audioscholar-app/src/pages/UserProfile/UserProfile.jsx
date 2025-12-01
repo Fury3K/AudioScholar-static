@@ -131,7 +131,7 @@ const UserProfile = () => {
 
               </div>
 
-              <div className="mt-8 text-right space-x-4">
+              <div className="mt-8 flex flex-wrap justify-end gap-4">
                 {user?.roles?.includes('ROLE_ADMIN') && (
                   <Link
                     to="/admin"

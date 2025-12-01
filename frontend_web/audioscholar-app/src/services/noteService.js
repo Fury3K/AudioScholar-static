@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:8080/api/notes';
+import { API_BASE_URL as AUTH_API_BASE } from './authService';
+
+const API_BASE_URL = `${AUTH_API_BASE}api/notes`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('AuthToken');

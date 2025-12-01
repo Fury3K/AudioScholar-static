@@ -12,7 +12,7 @@ const AdminUserList = () => {
       setLoading(true);
       // Fetching all users for now. Pagination can be added if list grows large.
       const data = await adminService.getUsers(100);
-      setUsers(data);
+      setUsers(data.users || []);
     } catch (err) {
       console.error("Failed to fetch users:", err);
       setError("Failed to load users.");

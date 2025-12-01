@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:8080/api/admin';
+import { API_BASE_URL as AUTH_API_BASE } from './authService';
+
+const API_BASE_URL = `${AUTH_API_BASE}api/admin`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('AuthToken');
@@ -57,7 +59,7 @@ export const adminService = {
   },
 
   getUserDistribution: async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/users`, {
+    const response = await fetch(`${API_BASE_URL}/analytics/users/distribution`, {
       headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Failed to fetch user distribution');
@@ -65,7 +67,7 @@ export const adminService = {
   },
 
   getContentEngagement: async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/content`, {
+    const response = await fetch(`${API_BASE_URL}/analytics/content/engagement`, {
       headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Failed to fetch content engagement');
