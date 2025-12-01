@@ -284,6 +284,7 @@ The system is decomposed into the following modules:
 
 -   Transaction 1.1: Start/Stop Lecture Recording (Mobile)
 -   Transaction 1.2: Upload Audio File (Mobile & Web)
+-   Transaction 1.3: Toggle Favorite (Mobile)
 
 ### Module 2: Audio Processing & Summarization (Server-side)
 
@@ -318,6 +319,7 @@ The system is decomposed into the following modules:
 -   Transaction 7.1: View Recordings and Summaries (Web)
 -   Transaction 7.2: Upload Audio Files (Web)
 -   Transaction 7.3: View Recommendations (Web)
+-   Transaction 7.4: Toggle Favorite (Web)
 
 ### Module 8: Freemium Model (Mobile, Web, and Server-side)
 
@@ -592,6 +594,28 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 *Figure 3.2.1.7: Wireframe for Upload Audio Screen (Web)*
 
+#### 1.3 Toggle Favorite (Mobile)
+
+##### Use Case Description: Toggle Favorite (Mobile)
+
+-   **Use Case ID:** UC_Toggle_Favorite_Mobile
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To mark a lecture recording as a “Favorite” for easy access and to influence content engagement analytics.
+-   **Preconditions:**
+    -   The student is logged into the mobile application.
+    -   A lecture recording exists.
+-   **Normal Flow:**
+1.  The student navigates to a recording (in list or details view).
+2.  The student taps the “Favorite” icon (e.g., heart or star).
+3.  The application sends a request to the server to toggle the favorite status.
+4.  The server updates the recording’s favoriteCount and the user’s list of favorite recordings.
+5.  The application updates the UI to reflect the new state (e.g., filled icon).
+-   **Postconditions:**
+    -   The recording’s favorite status is updated in the database.
+    -   The engagement metrics (Module 9) reflect the change.
+-   **Priority:** Medium
+-   **Frequency of Use:** Frequent
+
 ### Module 2: Audio Processing & Summarization
 
 #### 2.1 Receive Audio for Processing
@@ -612,9 +636,10 @@ The following assumptions and dependencies are relevant to the requirements outl
     -   The server-side Audio Processing Module is running and ready to receive requests.
 -   **Normal Flow:**
 1.  The Audio Processing Module (AudioProcessingService) receives the uploaded audio file and associated metadata (e.g., user ID, recording title, upload timestamp).
-2.  The module validates the received audio file (e.g., checks file format, size - server-side limits) and saves it to Nhost Storage.
-3.  The module queues the audio file for processing by sending a message to the RabbitMQ exchange (e.g., with routing key \`upload.audio\`).
-4.  The module logs the receipt of the audio file and updates its processing status in the database.
+2.  The module validates the received audio file (e.g., checks file format, size - server-side limits) and saves it to a temporary local directory.
+3.  The module queues the audio file for upload and processing by sending a message to the RabbitMQ exchange (e.g., with routing key \\\`upload.audio\\\`).
+4.  The \`NhostUploadListenerService\` consumes the message, uploads the file to Nhost Storage, and triggers subsequent processing steps.
+5.  The module logs the receipt of the audio file and updates its processing status in the database.
 -   **Alternative Flows:**
     -   **A1. File validation failed:** If the received audio file fails validation (e.g., unsupported format, exceeds server-side size limit, corrupted file), the module logs an error, rejects the file, and may notify the user (via mobile app/web interface feedback) about the upload failure and reason.
     -   **A2. Queueing failure:** If there is an issue queueing the audio file for processing (e.g., queue service unavailable, queue full), the module logs an error and may implement retry mechanisms or notify system administrators.
@@ -1310,8 +1335,9 @@ The following assumptions and dependencies are relevant to the requirements outl
 2.  The application presents a file selection interface, allowing the student to browse the device's local storage.
 3.  The student selects the PowerPoint presentation file (e.g., .pptx) to be uploaded.
 4.  The application uploads the file to the AudioScholar server (AudioController).
-5.  The server saves the file to Nhost Storage and triggers the PptxConversionListenerService to convert the PowerPoint to PDF using ConvertAPI.
-6.  The application displays a confirmation message indicating that the PowerPoint file has been uploaded and is being processed.
+5.  The server (AudioProcessingService) saves the file to a temporary local directory and queues it for asynchronous upload via RabbitMQ (routing key \`upload.pptx\`).
+6.  The \`NhostUploadListenerService\` uploads the file to Nhost Storage and subsequently triggers the \`PptxConversionListenerService\` to convert the PowerPoint to PDF using ConvertAPI.
+7.  The application displays a confirmation message indicating that the PowerPoint file has been uploaded and is being processed.
 -   **Alternative Flows:**
     -   **A1. No file selected:** If the student attempts to initiate upload without selecting a PowerPoint file, the application displays an error message prompting file selection.
     -   **A2. File format not supported:** If the selected file is not in a supported PowerPoint format (e.g., only .pptx supported initially), the application displays an error message indicating the unsupported format and prompts the user to select a valid file.
@@ -1545,6 +1571,27 @@ The following assumptions and dependencies are relevant to the requirements outl
 ![A screenshot of a computer AI-generated content may be incorrect.](media/41dd56fda385226b4fc6d058f9e95c36.png)
 
 *Figure 3.2.7.9: Wireframe for Recording Details Screen (Web)*
+
+#### 7.4 Toggle Favorite (Web)
+
+##### Use Case Description: Toggle Favorite (Web)
+
+-   **Use Case ID:** UC_Toggle_Favorite_Web
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To mark a lecture recording as a “Favorite” via the web interface.
+-   **Preconditions:**
+    -   The user is logged into the web interface.
+    -   A lecture recording exists.
+-   **Normal Flow:**
+1.  The user views a recording in the web interface.
+2.  The user clicks the “Favorite” button/icon.
+3.  The web interface sends a request to the server.
+4.  The server updates the recording’s favoriteCount and user’s favorites.
+5.  The web interface updates the UI to show the recording is favorited.
+-   **Postconditions:**
+    -   The recording’s favorite status is updated.
+-   **Priority:** Medium
+-   **Frequency of Use:** Frequent
 
 ### Module 8: Freemium Model
 
