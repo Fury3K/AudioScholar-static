@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FiExternalLink, FiCopy, FiCheck, FiEdit, FiSave, FiX, FiLoader, FiAlertTriangle, FiCheckCircle, FiUploadCloud, FiClock, FiHeadphones, FiDownload, FiEye, FiEdit2 } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import { API_BASE_URL } from '../../services/authService';
+import { noteService } from '../../services/noteService';
 import { Header } from '../Home/HomePage';
 
 const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
@@ -238,24 +239,55 @@ const RecordingData = () => {
 
   // User Notes State
   const [userNotes, setUserNotes] = useState('');
+  const [noteId, setNoteId] = useState(null);
   const [isEditingNotes, setIsEditingNotes] = useState(true);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
-  // Load Notes from LocalStorage
+  // Load Notes from Backend
   useEffect(() => {
-    if (id) {
-      const savedNotes = localStorage.getItem(`user_notes_${id}`);
-      if (savedNotes) {
-        setUserNotes(savedNotes);
-        setIsEditingNotes(false); // Start in preview mode if notes exist
+    const loadNotes = async () => {
+      if (id) {
+        try {
+          const notes = await noteService.getNotes(id);
+          if (notes && notes.length > 0) {
+            // Assuming one note per recording for now, or taking the most recent
+            // If backend returns list, we pick the first one
+            const currentNote = notes[0];
+            setUserNotes(currentNote.content);
+            setNoteId(currentNote.id);
+            setIsEditingNotes(false); // Start in preview mode if notes exist
+          }
+        } catch (err) {
+          console.error('Failed to load notes:', err);
+          // Fallback or silent fail - maybe show a toast notification in a real app
+        }
       }
-    }
+    };
+    loadNotes();
   }, [id]);
 
-  // Save Notes to LocalStorage
-  const handleSaveNotes = () => {
-    if (id) {
-      localStorage.setItem(`user_notes_${id}`, userNotes);
+  // Save Notes to Backend
+  const handleSaveNotes = async () => {
+    if (!id) return;
+
+    setIsSavingNotes(true);
+    try {
+      if (noteId) {
+        // Update existing note
+        const updatedNote = await noteService.updateNote(noteId, userNotes);
+        setUserNotes(updatedNote.content);
+      } else {
+        // Create new note
+        const newNote = await noteService.createNote(id, userNotes);
+        setNoteId(newNote.id);
+        setUserNotes(newNote.content);
+      }
       setIsEditingNotes(false);
+    } catch (err) {
+      console.error('Failed to save note:', err);
+      alert('Failed to save note. Please try again.');
+    } finally {
+      setIsSavingNotes(false);
     }
   };
 
@@ -911,9 +943,14 @@ const RecordingData = () => {
                          {isEditingNotes && (
                              <button 
                                 onClick={handleSaveNotes}
-                                className="flex items-center px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition"
+                                disabled={isSavingNotes}
+                                className={`flex items-center px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition ${isSavingNotes ? 'opacity-70 cursor-wait' : ''}`}
                              >
-                                 <FiSave className="mr-1.5"/> Save
+                                 {isSavingNotes ? (
+                                    <><FiLoader className="mr-1.5 animate-spin"/> Saving...</>
+                                 ) : (
+                                    <><FiSave className="mr-1.5"/> Save</>
+                                 )}
                              </button>
                          )}
                     </div>
