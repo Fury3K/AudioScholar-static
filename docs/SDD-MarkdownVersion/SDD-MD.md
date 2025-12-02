@@ -69,6 +69,7 @@ Change History
 | 2.0     | 2025-19-09 | BIACOLO                  | Requirements Refactoring                           |
 | 2.1     | 2025-21-09 | ORLANES & BIACOLO        | Requirements Refactoring                           |
 | 2.2     | 2025-28-10 | ORLANES, DUTERTE & ALPEZ | Requirements Refactoring                           |
+| 2.3     | 2025-12-02 | BIACOLO & ORLANES             | Added Modules 9, 10, 11 and updated Component names|
 
 # Preface
 
@@ -115,6 +116,12 @@ Table of Contents
 [Module 7: Web Interface](#_Toc193547960)
 
 [Module 8: Freemium Model (Mobile Kotlin & Web ReactJS Version)](#_Toc193547961)
+
+[Module 9: Admin Dashboard](#module-9-admin-dashboard)
+
+[Module 10: User Notes](#module-10-user-notes)
+
+[Module 11: App Preferences & Settings](#module-11-app-preferences--settings)
 
 # Introduction
 
@@ -309,8 +316,8 @@ This SDD document details the software design that addresses the functional and 
 -   AudioUploadAPIClient (JavaScript Class - Web)
     -   Description and purpose: JavaScript class in the web interface to handle audio file uploads to the server using fetch API or axios. Manages API calls and progress updates.
     -   Component type or format: JavaScript Class
--   AudioUploadController (Spring Boot Controller - Server)
-    -   Description and purpose: Spring Boot REST controller on the server-side that exposes an endpoint (/api/upload/audio) to receive uploaded audio files. Handles file reception, server-side validation (including file type, and enforcing a maximum file size limit, e.g., 500MB), and queuing for processing.
+-   AudioController (Spring Boot Controller - Server)
+    -   Description and purpose: Spring Boot REST controller (`/api/audio`) on the server-side that exposes endpoints to receive uploaded audio files (`/upload`) and manage recording metadata. Handles file reception, server-side validation, and queuing for processing.
     -   Component type or format: Spring Boot Controller
 
 ##### Object-Oriented Components
@@ -510,7 +517,10 @@ This SDD document details the software design that addresses the functional and 
 
 ##### Back-end components(s)
 
--   LearningMaterialRecommender (Spring Boot Service)
+-   RecommendationController (Spring Boot Controller - Server)
+-   Description and purpose: Spring Boot REST controller (`/api/v1/recommendations`) that exposes endpoints to retrieve and manage learning material recommendations.
+-   Component type or format: Spring Boot Controller
+-   LearningMaterialRecommenderService (Spring Boot Service)
 -   Description and purpose: Server-side service that uses the analysis results (keywords, topics) to query the YouTube Data API and generate learning material recommendations.
 -   Component type or format: Spring Boot Service
 -   YouTubeAPIClient (Java/Kotlin Class)
@@ -595,8 +605,8 @@ This SDD document details the software design that addresses the functional and 
 
 ##### Back-end components(s)
 
--   UserAuthenticationController (Spring Boot Controller – Server)
--   Description and purpose: Spring Boot REST controller on the server-side that exposes an endpoint (/api/auth/login/google) to handle Google OAuth login requests. Verifies Google ID token using Firebase Admin SDK and manages user sessions.
+-   AuthController (Spring Boot Controller – Server)
+-   Description and purpose: Spring Boot REST controller (`/api/auth`) on the server-side that exposes endpoints to handle authentication requests, including registration, login (Google, GitHub, Email/Password), and token verification.
 -   Component type or format: Spring Boot Controller
 
 ##### Object-Oriented Components
@@ -834,8 +844,11 @@ This SDD document details the software design that addresses the functional and 
 
 ##### Back-end components(s)
 
--   RecordingRetrievalController (Spring Boot Controller - Server)
-    -   Description and purpose: Spring Boot REST controller to handle requests for retrieving user's recordings and summaries for the web interface.
+-   AudioController (Spring Boot Controller - Server)
+    -   Description and purpose: Spring Boot REST controller (`/api/audio`) used to retrieve user's recordings and metadata for the web interface.
+    -   Component type or format: Spring Boot Controller
+-   SummaryController (Spring Boot Controller - Server)
+    -   Description and purpose: Spring Boot REST controller (`/api/summaries`) used to retrieve lecture summaries.
     -   Component type or format: Spring Boot Controller
 
 ##### Object-Oriented Components
@@ -875,8 +888,8 @@ This SDD document details the software design that addresses the functional and 
 
 ##### Back-end components(s)
 
--   AudioUploadController (Spring Boot Controller - Server)
-    -   Description and purpose: Spring Boot REST controller on the server-side that exposes an endpoint (/api/upload/audio) to receive uploaded audio files. Handles file reception, validation, and queuing for processing. (Reused from Module 1.2, as the backend endpoint is the same for both Mobile and Web upload).
+-   AudioController (Spring Boot Controller - Server)
+    -   Description and purpose: Spring Boot REST controller (`/api/audio`) on the server-side that exposes an endpoint (`/upload`) to receive uploaded audio files. Handles file reception, validation, and queuing for processing.
     -   Component type or format: Spring Boot Controller
 
 ##### Object-Oriented Components
@@ -921,8 +934,8 @@ This SDD document details the software design that addresses the functional and 
 
 ##### Back-end components(s)
 
--   RecommendationRetrievalController (Spring Boot Controller - Server)
-    -   Description and purpose: Spring Boot REST controller to handle requests for retrieving learning material recommendations for a specific recording in the web interface. (Reusing the controller from 7.1, as it handles retrieval of both summaries and recommendations).
+-   RecommendationController (Spring Boot Controller - Server)
+    -   Description and purpose: Spring Boot REST controller (`/api/v1/recommendations`) to handle requests for retrieving learning material recommendations for a specific recording.
     -   Component type or format: Spring Boot Controller
 
 ##### Object-Oriented Components
@@ -1065,3 +1078,285 @@ This SDD document details the software design that addresses the functional and 
 
 -   UserSubscription (UserSubscriptionID PK, UserID FK, PlanID FK, StartDate, EndDate, Status ENUM('ACTIVE', 'EXPIRED', 'CANCELLED'), SimulatedTransactionID)
 -   UserProfile (from Module 4) may have a derived field or link to UserStatus (from 8.1) which is determined by UserSubscription.
+
+### Module 9: Admin Dashboard
+
+#### 9.1 User Management
+
+##### User Interface Design
+
+-   **Web (ReactJS):** The Admin Dashboard will feature a "User Management" section. This view will display a paginated table of registered users, showing details such as Display Name, Email, Role (User/Admin), Status (Active/Disabled), and Registration Date. Action buttons for each user will allow the admin to "Edit Roles" or "Disable/Enable Account". A search bar will allow filtering users by name or email.
+-   **Mobile (Kotlin):** A simplified Admin view accessible to users with the 'ADMIN' role. It will list users and provide basic management options like disabling an account or viewing detailed status.
+
+##### Front-end component(s)
+
+-   **AdminUserList (React Component)**
+    -   Description and purpose: React component to fetch and display the list of users from the server. Implements pagination and search functionality.
+    -   Component type: React Component
+-   **UserActionModal (React Component)**
+    -   Description and purpose: A modal dialog that appears when an admin wants to edit a user's role or status, providing form controls for these actions.
+    -   Component type: React Component
+-   **AdminUserListScreen (Kotlin Activity/Fragment)**
+    -   Description and purpose: Mobile screen for admins to view and manage users on the go.
+    -   Component type: Kotlin Activity/Fragment
+
+##### Back-end components(s)
+
+-   **AdminController (Spring Boot Controller)**
+    -   Description and purpose: Spring Boot REST controller (`/api/admin`) responsible for administrative operations.
+    -   **Endpoints:**
+        -   `GET /api/admin/users`: Lists users with pagination.
+        -   `PUT /api/admin/users/{uid}/status`: Updates a user's status (enable/disable).
+        -   `PUT /api/admin/users/{uid}/roles`: Updates a user's assigned roles.
+    -   Component type: Spring Boot Controller
+-   **UserService (Spring Boot Service)**
+    -   Description and purpose: Enhanced to support admin-level operations such as fetching all users from Firestore and updating sensitive fields like roles and status.
+    -   Component type: Spring Boot Service
+
+#### 9.2 Analytics & Insights
+
+##### User Interface Design
+
+-   **Web (ReactJS):** An "Analytics" dashboard page presenting key metrics using charts and summary cards. Metrics include Total Users, Total Recordings, Active Users (Daily/Monthly), and Storage Used. Charts may visualize user growth over time or content engagement (e.g., most favorite recordings).
+-   **Mobile (Kotlin):** A summary view of key statistics for quick monitoring.
+
+##### Front-end component(s)
+
+-   **AnalyticsDashboard (React Component)**
+    -   Description and purpose: Main container for analytics widgets.
+    -   Component type: React Component
+-   **StatCard (React Component)**
+    -   Description and purpose: Reusable component to display a single metric (e.g., "Total Users: 1,234").
+    -   Component type: React Component
+-   **ActivityChart (React Component)**
+    -   Description and purpose: Component rendering a line or bar chart showing user activity trends.
+    -   Component type: React Component
+
+##### Back-end components(s)
+
+-   **AnalyticsController (Spring Boot Controller)**
+    -   Description and purpose: Spring Boot REST controller (`/api/admin/analytics`) to serve aggregated data.
+    -   **Endpoints:**
+        -   `GET /api/admin/analytics/overview`: Returns high-level stats (counts).
+        -   `GET /api/admin/analytics/activity`: Returns time-series data for user activity.
+        -   `GET /api/admin/analytics/users/distribution`: Returns user demographic/role distribution.
+        -   `GET /api/admin/analytics/content/engagement`: Returns data on content interaction (e.g., favorites).
+    -   Component type: Spring Boot Controller
+-   **AnalyticsService (Spring Boot Service)**
+    -   Description and purpose: Aggregates data from Firestore and other sources to compute statistics.
+    -   Component type: Spring Boot Service
+
+#### 9.3 System Monitoring
+
+##### User Interface Design
+
+-   **Web (ReactJS):** A "System Health" indicator or section in the dashboard footer or a dedicated tab. It displays the status of core components: Database Connection, API Availability, and Storage Connectivity.
+
+##### Back-end components(s)
+
+-   **AdminController (Spring Boot Controller)**
+    -   **Endpoint:** `GET /api/admin/system/health`: Performs a basic health check of dependencies and returns a status (UP/DOWN).
+
+### Module 10: User Notes
+
+#### 10.1 User Note Management
+
+##### User Interface Design
+
+-   **Mobile (Kotlin):** Integrated into the "Recording Details" screen as a "Notes" tab. Displays a list of existing notes for the recording. A "Add Note" FAB (Floating Action Button) opens a dialog or new screen to compose a note. Tapping a note allows editing or deleting.
+-   **Web (ReactJS):** A "Notes" panel alongside the recording player/summary. Allows creating, editing, and deleting notes in place.
+
+##### Front-end component(s)
+
+-   **NotesList (React Component / Kotlin Fragment)**
+    -   Description and purpose: Displays the list of user notes associated with the current recording.
+-   **NoteEditor (React Component / Kotlin Dialog)**
+    -   Description and purpose: Form interface for creating or updating the text of a note.
+
+##### Back-end components(s)
+
+-   **UserNoteController (Spring Boot Controller)**
+    -   Description and purpose: Spring Boot REST controller (`/api/notes`) to manage user notes.
+    -   **Endpoints:**
+        -   `POST /api/notes`: Creates a new note.
+        -   `GET /api/notes?recordingId={id}`: Retrieves notes for a specific recording.
+        -   `GET /api/notes/{noteId}`: Retrieves a single note.
+        -   `PATCH /api/notes/{noteId}`: Updates an existing note.
+        -   `DELETE /api/notes/{noteId}`: Deletes a note.
+    -   Component type: Spring Boot Controller
+-   **UserNoteService (Spring Boot Service)**
+    -   Description and purpose: Handles business logic for notes, ensuring a user can only access and modify their own notes. Interacts with Firestore to store `UserNote` entities.
+    -   Component type: Spring Boot Service
+
+### Module 11: App Preferences & Settings
+
+#### 11.1 App Preferences (Mobile)
+
+##### User Interface Design
+
+-   **Mobile (Kotlin):** A "Settings" screen accessible from the main navigation.
+    -   **Theme:** Selector for Light, Dark, or System Default.
+    -   **Recording Quality:** Selector for audio quality settings (Low, Medium, High).
+    -   **Sync Settings:** (Covered in Module 5, but accessible here).
+
+##### Front-end component(s)
+
+-   **SettingsActivity (Kotlin Activity)**
+    -   Description and purpose: The main settings screen container.
+-   **PreferencesManager (Kotlin Class)**
+    -   Description and purpose: Wrapper around Android `SharedPreferences` or `DataStore` to persist local app settings like theme and quality preference.
+
+#### 11.2 Legal & Help Access
+
+##### User Interface Design
+
+-   **Mobile (Kotlin):** "About" or "Support" section within Settings.
+    -   **Help Center:** Opens a WebView or browser link to the help documentation.
+    -   **Privacy Policy:** Opens the privacy policy.
+    -   **Terms of Service:** Opens the terms of service.
+
+##### Front-end component(s)
+
+-   **LegalViewerActivity (Kotlin Activity)**
+    -   Description and purpose: A simple activity with a WebView to display static legal/help HTML content or load from a URL.
+
+### Module 9: Admin Dashboard
+
+#### 9.1 User Management
+
+##### User Interface Design
+
+-   **Web (ReactJS):** The Admin Dashboard will feature a "User Management" section. This view will display a paginated table of registered users, showing details such as Display Name, Email, Role (User/Admin), Status (Active/Disabled), and Registration Date. Action buttons for each user will allow the admin to "Edit Roles" or "Disable/Enable Account". A search bar will allow filtering users by name or email.
+-   **Mobile (Kotlin):** A simplified Admin view accessible to users with the 'ADMIN' role. It will list users and provide basic management options like disabling an account or viewing detailed status.
+
+##### Front-end component(s)
+
+-   **AdminUserList (React Component)**
+    -   Description and purpose: React component to fetch and display the list of users from the server. Implements pagination and search functionality.
+    -   Component type: React Component
+-   **UserActionModal (React Component)**
+    -   Description and purpose: A modal dialog that appears when an admin wants to edit a user's role or status, providing form controls for these actions.
+    -   Component type: React Component
+-   **AdminUserListScreen (Kotlin Activity/Fragment)**
+    -   Description and purpose: Mobile screen for admins to view and manage users on the go.
+    -   Component type: Kotlin Activity/Fragment
+
+##### Back-end components(s)
+
+-   **AdminController (Spring Boot Controller)**
+    -   Description and purpose: Spring Boot REST controller (`/api/admin`) responsible for administrative operations.
+    -   **Endpoints:**
+        -   `GET /api/admin/users`: Lists users with pagination.
+        -   `PUT /api/admin/users/{uid}/status`: Updates a user's status (enable/disable).
+        -   `PUT /api/admin/users/{uid}/roles`: Updates a user's assigned roles.
+    -   Component type: Spring Boot Controller
+-   **UserService (Spring Boot Service)**
+    -   Description and purpose: Enhanced to support admin-level operations such as fetching all users from Firestore and updating sensitive fields like roles and status.
+    -   Component type: Spring Boot Service
+
+#### 9.2 Analytics & Insights
+
+##### User Interface Design
+
+-   **Web (ReactJS):** An "Analytics" dashboard page presenting key metrics using charts and summary cards. Metrics include Total Users, Total Recordings, Active Users (Daily/Monthly), and Storage Used. Charts may visualize user growth over time or content engagement (e.g., most favorite recordings).
+-   **Mobile (Kotlin):** A summary view of key statistics for quick monitoring.
+
+##### Front-end component(s)
+
+-   **AnalyticsDashboard (React Component)**
+    -   Description and purpose: Main container for analytics widgets.
+    -   Component type: React Component
+-   **StatCard (React Component)**
+    -   Description and purpose: Reusable component to display a single metric (e.g., "Total Users: 1,234").
+    -   Component type: React Component
+-   **ActivityChart (React Component)**
+    -   Description and purpose: Component rendering a line or bar chart showing user activity trends.
+    -   Component type: React Component
+
+##### Back-end components(s)
+
+-   **AnalyticsController (Spring Boot Controller)**
+    -   Description and purpose: Spring Boot REST controller (`/api/admin/analytics`) to serve aggregated data.
+    -   **Endpoints:**
+        -   `GET /api/admin/analytics/overview`: Returns high-level stats (counts).
+        -   `GET /api/admin/analytics/activity`: Returns time-series data for user activity.
+        -   `GET /api/admin/analytics/users/distribution`: Returns user demographic/role distribution.
+        -   `GET /api/admin/analytics/content/engagement`: Returns data on content interaction (e.g., favorites).
+    -   Component type: Spring Boot Controller
+-   **AnalyticsService (Spring Boot Service)**
+    -   Description and purpose: Aggregates data from Firestore and other sources to compute statistics.
+    -   Component type: Spring Boot Service
+
+#### 9.3 System Monitoring
+
+##### User Interface Design
+
+-   **Web (ReactJS):** A "System Health" indicator or section in the dashboard footer or a dedicated tab. It displays the status of core components: Database Connection, API Availability, and Storage Connectivity.
+
+##### Back-end components(s)
+
+-   **AdminController (Spring Boot Controller)**
+    -   **Endpoint:** `GET /api/admin/system/health`: Performs a basic health check of dependencies and returns a status (UP/DOWN).
+
+### Module 10: User Notes
+
+#### 10.1 User Note Management
+
+##### User Interface Design
+
+-   **Mobile (Kotlin):** Integrated into the "Recording Details" screen as a "Notes" tab. Displays a list of existing notes for the recording. A "Add Note" FAB (Floating Action Button) opens a dialog or new screen to compose a note. Tapping a note allows editing or deleting.
+-   **Web (ReactJS):** A "Notes" panel alongside the recording player/summary. Allows creating, editing, and deleting notes in place.
+
+##### Front-end component(s)
+
+-   **NotesList (React Component / Kotlin Fragment)**
+    -   Description and purpose: Displays the list of user notes associated with the current recording.
+-   **NoteEditor (React Component / Kotlin Dialog)**
+    -   Description and purpose: Form interface for creating or updating the text of a note.
+
+##### Back-end components(s)
+
+-   **UserNoteController (Spring Boot Controller)**
+    -   Description and purpose: Spring Boot REST controller (`/api/notes`) to manage user notes.
+    -   **Endpoints:**
+        -   `POST /api/notes`: Creates a new note.
+        -   `GET /api/notes?recordingId={id}`: Retrieves notes for a specific recording.
+        -   `GET /api/notes/{noteId}`: Retrieves a single note.
+        -   `PATCH /api/notes/{noteId}`: Updates an existing note.
+        -   `DELETE /api/notes/{noteId}`: Deletes a note.
+    -   Component type: Spring Boot Controller
+-   **UserNoteService (Spring Boot Service)**
+    -   Description and purpose: Handles business logic for notes, ensuring a user can only access and modify their own notes. Interacts with Firestore to store `UserNote` entities.
+    -   Component type: Spring Boot Service
+
+### Module 11: App Preferences & Settings
+
+#### 11.1 App Preferences (Mobile)
+
+##### User Interface Design
+
+-   **Mobile (Kotlin):** A "Settings" screen accessible from the main navigation.
+    -   **Theme:** Selector for Light, Dark, or System Default.
+    -   **Recording Quality:** Selector for audio quality settings (Low, Medium, High).
+    -   **Sync Settings:** (Covered in Module 5, but accessible here).
+
+##### Front-end component(s)
+
+-   **SettingsActivity (Kotlin Activity)**
+    -   Description and purpose: The main settings screen container.
+-   **PreferencesManager (Kotlin Class)**
+    -   Description and purpose: Wrapper around Android `SharedPreferences` or `DataStore` to persist local app settings like theme and quality preference.
+
+#### 11.2 Legal & Help Access
+
+##### User Interface Design
+
+-   **Mobile (Kotlin):** "About" or "Support" section within Settings.
+    -   **Help Center:** Opens a WebView or browser link to the help documentation.
+    -   **Privacy Policy:** Opens the privacy policy.
+    -   **Terms of Service:** Opens the terms of service.
+
+##### Front-end component(s)
+
+-   **LegalViewerActivity (Kotlin Activity)**
+    -   Description and purpose: A simple activity with a WebView to display static legal/help HTML content or load from a URL.
