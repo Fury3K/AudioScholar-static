@@ -1,43 +1,41 @@
 # 🎓 AudioScholar: Transforming Audio into Actionable Insights for Learners
 
-AudioScholar is an intelligent, multi-user platform designed to enhance lecture note-taking and content comprehension for students. It records lecture audio and uses AI-driven summarization, cloud sync with **Nhost**, and video recommendation features to produce structured, actionable insights and personalized learning experiences — all accessible via web and mobile apps.
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Version](https://img.shields.io/badge/version-1.0.0-orange)
 
-![CITU Logo](https://cit.edu/wp-content/uploads/2023/07/cit-logo.png)
+AudioScholar is an intelligent, multi-user platform designed to record lecture audio and leverage AI-driven summarization techniques to produce structured insights for learners. As a dual-platform solution comprising an Android mobile application and a comprehensive web interface, it allows users to capture, summarize, and receive personalized learning material recommendations based on audio recordings. By transforming lengthy lectures into digestible key points, AudioScholar enhances note-taking efficiency and content comprehension.
+
+<p align="center">
+<img src="logo\AudioScholarLogoNoBG.png" alt="AudioScholar Logo" width="250"/>
+   <br>
+  <img src="https://cit.edu/wp-content/uploads/2023/07/cit-logo.png" alt="CITU Logo" width="350"/>
+</p>
 
 ---
 
 ## 🚀 Key Features
 
-### 🔊 Lecture Recording & Summarization
-- Record lectures via the mobile app.
-- AI generates structured summaries from captured audio.
-- Summaries are accessible across devices.
+### 🎙️ Lecture Recording & Processing
+- **Smart Recording:** Record lectures in real-time (online or offline) using the Android mobile app.
+- **Audio Uploads:** Upload pre-recorded audio files from both mobile and web interfaces.
+- **Playback & Management:** Centralized library with advanced playback controls and organizational tools.
 
-### 📤 Audio Upload
-- Upload existing audio files through the web or mobile interface.
-- Summaries auto-generate after processing.
+### 🧠 AI-Driven Insights
+- **Intelligent Summarization:** Leverages **Google Gemini AI API** to generate structured summaries, key topics, and glossaries.
+- **Contextual Enhancement:** Upload PowerPoint presentations to augment AI processing for higher accuracy.
+- **Smart Recommendations:** Automatically suggests relevant **YouTube** learning materials based on lecture content.
 
-### 📚 AI-Powered Learning Recommendations
-- Automatically suggests relevant **YouTube** videos based on lecture content.
+### 🌐 Platform & Connectivity
+- **Cross-Platform Access:** Seamless experience across **Android Mobile App** and **Web Interface**.
+- **Cloud Synchronization:** Securely sync recordings and summaries to **Nhost Storage** for access on any device.
+- **Offline Capabilities:** Record and access local data on mobile even without an internet connection.
 
-### 🔐 User Authentication & Account Management
-- Register/Login via **Firebase Authentication** (Email/Password, Google OAuth, or GitHub OAuth).
-- Manage profiles and change passwords securely.
-- Feature access is controlled via a **freemium model**.
-
-### ☁️ Cloud Synchronization
-- Sync recordings, summaries, and associated files to **Nhost Storage** (audio files) and **Firebase Firestore** (metadata, summaries).
-- Choose between manual or automatic syncing where applicable.
-- Data is accessible across authorized devices.
-
-### 📊 PowerPoint Integration
-- Upload and associate **PowerPoint presentations** with lecture recordings.
-- Enhances summarization and context for lectures.
-
-### 🌐 Web Interface
-- View uploaded recordings and summaries.
-- Upload audio files for summarization.
-- Access AI-generated learning resources.
+### 👤 User Experience & Security
+- **Flexible Authentication:** Secure login via **Google**, **GitHub**, or Email/Password using **Firebase Authentication**.
+- **User Notes:** Integrated note-taking system to add personal insights alongside AI summaries.
+- **Freemium Architecture:** Tiered feature access distinguishing between Free and Premium user experiences.
+- **Admin Dashboard:** Powerful tools for user management, analytics, and system monitoring.
 
 ---
 
@@ -46,7 +44,7 @@ AudioScholar is an intelligent, multi-user platform designed to enhance lecture 
 ### 📌 Prerequisites
 Ensure the following tools are installed on your system:
 
-- **Java Development Kit (JDK) 21**
+- **Java Development Kit (JDK) 24**
 - **Node.js** (v16+)
 - **npm** or **yarn**
 - **Git**
@@ -70,8 +68,14 @@ cd AudioScholar
    ```bash
    cd backend/audioscholar
    ```
-2. Set up environment variables and Firebase configuration:
-   Create a `.env` file in the `backend/audioscholar` directory for secrets:
+2. **Required Configuration Files:**
+   The backend requires two specific files to function correctly. You must create/place them in the specified locations:
+
+   *   **`.env` file**: Required at `backend\audioscholar\.env`
+   *   **Firebase Service Account**: Required at `backend\audioscholar\src\main\resources\firebase-service-account.json`
+
+3. **Set up `.env` content:**
+   Create the `.env` file in `backend/audioscholar/` with the following variables:
    ```dotenv
    # Nhost Storage Configuration
    NHOST_ADMIN_SECRET=your-nhost-admin-secret # Used by Spring Boot to access Nhost Storage
@@ -79,30 +83,25 @@ cd AudioScholar
    # API Keys
    GEMINI_API_KEY=your-gemini-api-key
    YOUTUBE_API_KEY=your-youtube-api-key
-   # Other secrets like JWT_SECRET, GOOGLE_CLIENT_ID/SECRET, GITHUB_CLIENT_ID/SECRET etc.
+   # Other secrets as needed
    # CONVERTAPI_SECRET=your-convertapi-secret
    # UPTIME_ROBOT_API=your-uptime-robot-api-key
    ```
+
+4. **Configure Application Properties:**
    In `backend/audioscholar/src/main/resources/application.properties`:
-   - Ensure `nhost.storage.url` is correctly set to your Nhost project's storage URL.
-     ```properties
-     # Example:
-     # nhost.storage.url=https://your-nhost-project-subdomain.storage.your-nhost-region.nhost.run/v1/files
-     ```
-   - Configure Firebase Admin SDK by placing your `firebase-service-account.json` (downloaded from Firebase Console > Project settings > Service accounts) into the `backend/audioscholar/src/main/resources/` directory.
-   - The `application.properties` should have the following configured:
+   - Ensure `nhost.storage.url` is correctly set.
+   - Configure Firebase properties:
      ```properties
      spring.cloud.gcp.project-id=your-firebase-project-id
      firebase.service-account.file=firebase-service-account.json
-     # Ensure other Firebase related properties like firebase.database.url (if using Realtime DB alongside Firestore, though Firestore is primary)
-     # and collection names are correctly set.
      ```
-   *Note: Replace placeholders with your actual details.*
-3. Run the backend:
+
+5. Run the backend:
    ```bash
    mvn spring-boot:run
    ```
-   Or run `AudioscholarApplication.java` from your IDE. (Spring Boot version `3.4.5`)
+   Or run `AudioscholarApplication.java` from your IDE. (Spring Boot version `3.5.8`)
 
 ---
 
@@ -120,22 +119,20 @@ cd AudioScholar
    # Backend API URL
    VITE_API_URL=http://localhost:8080
 
-   # Firebase Frontend Configuration (Find these in your Firebase project dashboard > Project settings > General > Your apps)
+   # Firebase Frontend Configuration
    VITE_FIREBASE_API_KEY=your-firebase-api-key
    VITE_FIREBASE_AUTH_DOMAIN=your-firebase-auth-domain
    VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
-   VITE_FIREBASE_STORAGE_BUCKET=your-firebase-storage-bucket # Optional, if using Firebase Storage directly from frontend
+   VITE_FIREBASE_STORAGE_BUCKET=your-firebase-storage-bucket
    VITE_FIREBASE_MESSAGING_SENDER_ID=your-firebase-messaging-sender-id
    VITE_FIREBASE_APP_ID=your-firebase-app-id
-   # VITE_FIREBASE_MEASUREMENT_ID=your-firebase-measurement-id # Optional
    ```
-   *Note: Ensure your React application is configured to use these Firebase environment variables.*
 4. Run the development server:
    ```bash
    npm run dev
    ```
-   (Uses Vite `~6.3.4`, React `^19.0.0`)
-   Open at: `http://localhost:3000` (or the port specified by Vite)
+   (Uses Vite `6.4.1`, React `19`)
+   Open at: `http://localhost:3000`
 
 ---
 
@@ -145,27 +142,24 @@ cd AudioScholar
    ```
    frontend_mobile/AudioScholar
    ```
-3. Sync Gradle files (Android Studio will prompt).
+3. Sync Gradle files.
 4. **Configure Firebase:**
-   - Download your `google-services.json` file from the Firebase Console (Project settings > General > Your apps > Android app).
-   - Place the `google-services.json` file in the `frontend_mobile/AudioScholar/app/` directory.
+   - Place `google-services.json` in `frontend_mobile/AudioScholar/app/`.
 5. **Configure API Base URL:**
-   In `frontend_mobile/AudioScholar/local.properties` (create it if it doesn't exist in the project root or `app/` directory). This file is typically ignored by Git.
+   In `frontend_mobile/AudioScholar/local.properties`:
    ```properties
-   # Backend API URL (Use your machine's local network IP, not localhost, if running on a physical device)
    API_BASE_URL=http://your-local-network-ip:8080
    ```
-   *Note: Ensure your Android app (e.g., Ktor client configuration) reads this `API_BASE_URL`.*
-6. Run on an emulator or physical device. Ensure the device can reach your `API_BASE_URL`.
+6. Run on an emulator or physical device.
 
 ---
 
 ## 🧭 Example Workflow
 
-1. Register or log in using **Firebase Authentication** (Email/Password or OAuth).
-2. Record a lecture using the mobile app. Audio is uploaded (typically via the backend) to **Nhost Storage**.
-3. Wait for AI processing (backend fetches audio from Nhost, processes, stores results and metadata in **Firebase Firestore**).
-4. View the summary on web or mobile under **My Lectures** (data fetched from your backend, which interacts with **Firebase Firestore** for metadata/summaries and Nhost for audio files).
+1. Register or log in using **Firebase Authentication**.
+2. Record a lecture using the mobile app. Audio is uploaded to **Nhost Storage**.
+3. AI processing generates summaries and metadata in **Firebase Firestore**.
+4. View the summary on web or mobile under **My Lectures**.
 5. Access recommended YouTube videos for deeper learning.
 
 ---
@@ -173,63 +167,70 @@ cd AudioScholar
 ## 🧩 Dependencies
 
 ### Backend
-- **Spring Boot 3.4.5**
-- **Nhost Interaction:** Via REST APIs to Nhost Storage (using URL configured in `application.properties` and `NHOST_ADMIN_SECRET`).
-- **Firebase Admin SDK:** For interacting with Firebase Firestore (database).
-- See full list in [`pom.xml`](./backend/audioscholar/pom.xml)
+- **Spring Boot 3.5.8**
+- **Nhost Interaction**
+- **Firebase Admin SDK**
+- **Google Gemini AI API**
+- **YouTube Data API v3**
 
 ### Web Frontend
 - **React 19**
-- **Vite ~6.3.4**
-- **Firebase SDK** (`firebase` package) for authentication and Firestore database access.
-- Interaction with Nhost Storage is likely handled via the backend.
-- See full list in [`package.json`](./frontend_web/audioscholar-app/package.json)
+- **Vite 6.4.1**
+- **Firebase SDK**
 
 ### Mobile Frontend
 - **Kotlin + Jetpack Compose**
 - **AndroidX**
-- **Firebase SDKs** (e.g., `firebase-auth-ktx`, potentially `firebase-firestore-ktx` or using the BOM for Firestore) for authentication and database access.
-- **Ktor client:** For network requests to the backend. The backend then interacts with Nhost Storage.
-- See configurations in [`build.gradle.kts`](./frontend_mobile/AudioScholar/build.gradle.kts) (app level) and ensure `google-services.json` is correctly set up.
+- **Firebase SDKs**
+- **Ktor Client**
+- **Media3 ExoPlayer**
 
 ---
 
 ## 🧪 Features Outside Initial Scope (Planned for Future Releases)
 
+The following features are explicitly noted as outside the scope of the initial AudioScholar release (v1.0):
+
 | Feature                              | Status                  |
 | ------------------------------------ | ----------------------- |
-| Real-time Transcription              | 🚫 Not yet implemented   |
-| iOS Mobile Support                   | 🚫 Not yet supported     |
-| Web Audio Recording                  | 🚫 Not yet supported     |
-| Multi-language Support               | 🚫 English only for v1.0 |
-| Background Recording (Free Users)    | 🚫 Not supported         |
-| Recommendation Engine beyond YouTube | 🚫 Future feature        |
-| Premium Subscription Management      | 🚫 Planned               |
+| Real-time Transcription              | 🚫 Future enhancement   |
+| iOS Mobile Platform Support          | 🚫 Android only for v1.0|
+| Web Interface Audio Recording        | 🚫 Upload only for v1.0 |
+| Multi-language Support               | 🚫 English only for v1.0|
+| Background Recording (Free Users)    | 🚫 Restricted feature   |
+| Recommendation Engine beyond YouTube | 🚫 Future enhancement   |
 
 ---
 
 ## 🎨 Design & Documentation
 
 - **Use Case & Activity Diagrams**: [View on Figma](https://www.figma.com/design/5cqAE14jvnfFDlKbqHObr7/AudioScholar?node-id=24-2315&t=su6Bkd3yHO2aCleY-1)
-
 - **Mobile Wireframes**: [View on Figma](https://www.figma.com/design/5cqAE14jvnfFDlKbqHObr7/AudioScholar?node-id=0-1&t=31ZcynnCihbXU6I4-1)  
-  
 - **Web Wireframes**: [View on Figma](https://www.figma.com/design/5cqAE14jvnfFDlKbqHObr7/AudioScholar?node-id=8-2267&t=31ZcynnCihbXU6I4-1)  
-  
 - **Database Schema & ER Diagrams**: [View on Figma](https://www.figma.com/design/5cqAE14jvnfFDlKbqHObr7/AudioScholar?node-id=24-2315&t=31ZcynnCihbXU6I4-1)
-
 
 ---
 
 ## 👨‍💻 Developers
 
+**Adviser/Lead:**
+- Ralph P. Laviste
+
+**Group Adviser:**
+- Jasmine A. Tulin
+
 **Proponents:**
 - Biacolo, Math Lee L.
 - Terence, John Duterte
 - Orlanes, John Nathan
+- Barrientos, Claive Justin
+- Alpez, Christian Brent
 
-**Adviser:**
-- Frederick L. Revilleza
+---
+
+## ⚖️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
