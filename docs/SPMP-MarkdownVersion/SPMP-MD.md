@@ -46,7 +46,7 @@ TULIWED11001200
 
 **Date of Submission:**
 
-September 20, 2025
+December 2, 2025
 
 # Table of Contents
 
@@ -162,7 +162,7 @@ September 20, 2025
 
 -   **Purpose:** AudioScholar is conceived as an intelligent, multi-user platform designed to record lecture audio and leverage AI-driven summarization techniques to produce structured, actionable insights specifically tailored for learners. It aims to transform the inefficient process of traditional note-taking during lectures into an efficient one, allowing students to focus on active listening and receive well-organized study materials afterwards. The project addresses the inefficiency of traditional note-taking by providing a demonstrably more efficient alternative.
 -   **Scope:** The AudioScholar software product will be delivered as a dual-platform solution: a mobile application for Android devices (Version 1.0) and a web interface accessible through standard web browsers. The system is designed to capture, summarize, and recommend learning materials based on audio recordings of lectures, not video.
-    -   **In Scope:** Lecture Recording (Mobile), Audio Upload (Mobile & Web), AI-Powered Summarization (using Google Gemini AI API), Personalized Learning Material Recommendations (initially YouTube), User Authentication and Account Management (Mobile: Email/Password, Google OAuth 2.0, GitHub OAuth 2.0), Optional Cloud Synchronization (Nhost Storage, Firebase Firestore), Optional PowerPoint Integration for Enhanced Summarization (Mobile & Web), Multi-User Support with Data Privacy, Web Interface for Comprehensive Access (Viewing summaries/recommendations, Audio Upload), Freemium Model Implementation.
+    -   **In Scope:** Lecture Recording (Mobile), Audio Upload (Mobile & Web), AI-Powered Summarization (using Google Gemini AI API), Personalized Learning Material Recommendations (initially YouTube), User Authentication and Account Management (Mobile: Email/Password, Google OAuth 2.0, GitHub OAuth 2.0), Optional Cloud Synchronization (Nhost Storage, Firebase Firestore), Optional PowerPoint Integration for Enhanced Summarization (Mobile & Web), Multi-User Support with Data Privacy, Web Interface for Comprehensive Access (Viewing summaries/recommendations, Audio Upload), Freemium Model Implementation, Admin Dashboard (Mobile & Web), User Notes (Mobile & Web), App Preferences & Settings (Mobile).
     -   **Out of Scope (Initial Version):** Real-time Transcription, iOS Mobile Platform Support, Web Interface Audio Recording, Multi-language Support (beyond English initially), Recommendation Engine Beyond YouTube (for Free Users).
 -   **Objectives (SMART Goals):**
     -   **Enable Efficient Lecture Recording and Upload:** Develop mobile (Android) recording (offline capable) and upload; web upload. (Target Completion: End of Week 2)
@@ -173,6 +173,8 @@ September 20, 2025
     -   **Integrate PowerPoint Upload for Enhanced Summarization Context:** Allow optional PPT upload via mobile app and web application. (Target Completion: End of Week 6)
     -   **Develop a Web Interface for Content Access and Management:** Create web interface for access/review/upload. (Target Completion: progressively Weeks 3-8)
     -   **Implement a Freemium Model for Feature Access Control:** Control feature access based on user status (unauthenticated, free, premium). (Target Completion: End of Week 8)
+    -   **Enable Administrative Management:** Implement Admin Dashboard for user management and analytics. (Target Completion: End of Week 7)
+    -   **Enable User Note Taking:** Implement User Notes for recordings. (Target Completion: End of Week 5)
 
 ### Assumptions and constraints
 
@@ -186,7 +188,7 @@ September 20, 2025
     -   User acceptance of the freemium model's tiered access.
     -   The Google Gemini AI API will provide reasonably accurate and useful summaries.
 -   **Constraints:**
-    -   **Development Timeline:** Project completion within an 8-week academic semester timeframe. The estimated completion date for all objectives and deliverables is May 06, 2025.
+    -   **Development Timeline:** Project completion within an extended development timeframe. The estimated completion date for all objectives and deliverables is December 2, 2025.
     -   **Resource Limitations:** Development resources limited to the student team and available open-source tools/cloud services (Firebase free tier, Nhost Storage). AI API usage is managed by staying within free tier limits.
     -   **Platform Focus:** Initial mobile development restricted to Android (Kotlin). iOS is out of scope for v1.0.
     -   **AI API Dependency:** Core functionality relies on external Google Gemini AI API; changes in availability, pricing, or functionality could impact the project.
@@ -217,7 +219,7 @@ September 20, 2025
 
 ***
 
--   **Schedule:** The project development timeframe is constrained to 8 weeks, targeting completion by May 06, 2025. Development follows an Agile/Scrum methodology with weekly checkpoints and key increment deadlines (Weeks 2, 4, 6, 8). A detailed project schedule, including task lists, project board, and timeline, is maintained using ClickUp.
+-   **Schedule:** The project development timeframe follows an extended schedule, targeting completion by December 2, 2025. Development follows an Agile/Scrum methodology with weekly checkpoints and key increment deadlines. A detailed project schedule, including task lists, project board, and timeline, is maintained using ClickUp.
 -   **Budget:** No allocated monetary budget exists currently. The project utilizes free tiers of cloud services (Firebase, Nhost, Google Gemini AI, Render). A future potential allocation of P500 is considered for compensating application testers.
 
 ## 1.2 EVOLUTION OF PLAN
@@ -227,8 +229,8 @@ This SPMP document will be maintained and updated as needed throughout the proje
 # REFERENCES
 
 [1] Cebu Institute of Technology University, “Software Project Proposal for AudioScholar: Transforming Audio into Actionable Insights for Learners,” Cebu City, Philippines, Feb. 22, 2025.  
-[2] Cebu Institute of Technology University, “Software Requirements Specifications for AudioScholar: Transforming Audio into Actionable Insights for Learners,” Version 1.7, Cebu City, Philippines, April 30, 2025.  
-[3] Cebu Institute of Technology University, “Software Design Description for AudioScholar: Transforming Audio into Actionable Insights for Learners,” Version 1.7, Cebu City, Philippines, April 30, 2025.  
+[2] Cebu Institute of Technology University, “Software Requirements Specifications for AudioScholar: Transforming Audio into Actionable Insights for Learners,” Version 2.4, Cebu City, Philippines, December 2, 2025.
+[3] Cebu Institute of Technology University, “Software Design Description for AudioScholar: Transforming Audio into Actionable Insights for Learners,” Version 2.3, Cebu City, Philippines, December 2, 2025.
 [4] IEEE, “IEEE Recommended Practice for Software Requirements Specifications,” IEEE Std 830-1998, pp. 1–40, Oct. 1998, doi: <https://doi.org/10.1109/IEEESTD.1998.88286>.  
 [5] “Gemini API Docs and Reference \| Google AI for Developers,” Google for Developers. [Online]. Available: <https://ai.google.dev/gemini-api/docs>.  
 [6] D. Hardt, “The OAuth 2.0 Authorization Framework,” RFC 6749, [datatracker.ietf.org](http://datatracker.ietf.org/), Oct. 2012. [Online]. Available: <https://datatracker.ietf.org/doc/html/rfc6749>.  
@@ -457,7 +459,7 @@ Progress is reported informally within the team during daily coding meetings. Fo
 
 ***
 
--   *Time Reduction:* Measured by timing the duration from audio upload/completion to the display of generated content (target \~40-60s for 30min audio).
+-   *Time Reduction:* Measured by timing the duration from audio upload/completion to the display of generated content (target < 15 minutes for a 1-hour lecture).
 -   *Comprehension Improvement:* Assessed qualitatively via user feedback/surveys during testing.
 -   *Summary Quality Score:* Evaluated via manual review by target student users based on relevance and completeness during usability testing.
 -   *User Satisfaction:* Measured using feedback questionnaires/ratings during usability testing (Target: 4.5/5 stars).
@@ -479,7 +481,7 @@ Closeout involves completing all software deliverables, finalizing and submittin
 
 ## 6.1 PROCESS MODEL
 
-The project follows the Agile development methodology, specifically Scrum. The lifecycle involves iterative development within 2-week sprints. Key activities include sprint planning (setting goals based on backlog), daily coding meetings (serving as stand-ups), development work, continuous testing, weekly checkpoints (serving as sprint reviews), and ongoing backlog refinement. This model provides flexibility to adapt within the 8-week timeframe.
+The project follows the Agile development methodology, specifically Scrum. The lifecycle involves iterative development within 2-week sprints. Key activities include sprint planning (setting goals based on backlog), daily coding meetings (serving as stand-ups), development work, continuous testing, weekly checkpoints (serving as sprint reviews), and ongoing backlog refinement. This model provides flexibility to adapt within the development timeframe.
 
 ## 6.2 METHODS, TOOLS, AND TECHNIQUES
 
@@ -506,7 +508,7 @@ The project follows the Agile development methodology, specifically Scrum. The l
 -   **Criteria:** Acceptance is based on:
     -   Demonstration that all functional requirements outlined in the SRS are met.
     -   Meeting key non-functional requirements (usability, reliability, performance).
-    -   Successful generation of summaries within approximately 40-60 seconds for a 30-minute audio file.
+    -   Successful generation of summaries within a reasonable timeframe (target < 15 minutes for a 1-hour lecture).
     -   Positive feedback and validation from usability testing with target student users.
     -   Final approval from the Overall Capstone Lead.
 -   **Process:** Acceptance testing will involve final demonstrations and reviews of the software and documentation by the Project Adviser and Overall Capstone Lead. User feedback from UAT/usability testing will also be considered. Formal acceptance is signified by the Capstone Lead's approval.
