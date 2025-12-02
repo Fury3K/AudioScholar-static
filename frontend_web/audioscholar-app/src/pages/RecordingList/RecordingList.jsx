@@ -59,13 +59,23 @@ const RecordingList = () => {
             // Filter out locally deleted items
             const validRecordings = response.data.filter(rec => !deletedIdsRef.current.has(rec.id));
 
-            const sortedRecordings = validRecordings.sort((a, b) =>
+            // Normalize isFavorite/favorite field from backend to ensure consistency
+            const normalizedRecordings = validRecordings.map(rec => ({
+                ...rec,
+                isFavorite: rec.isFavorite !== undefined ? rec.isFavorite : (rec.favorite !== undefined ? rec.favorite : false)
+            }));
+
+            const sortedRecordings = normalizedRecordings.sort((a, b) =>
                 (b.uploadTimestamp?.seconds ?? 0) - (a.uploadTimestamp?.seconds ?? 0)
             );
 
             console.log("Fetched recordings:", sortedRecordings);
             setRecordings(sortedRecordings);
             setFilteredRecordings(sortedRecordings);
+            
+            // Update cache with fresh data
+            localStorage.setItem('recording_list', JSON.stringify(sortedRecordings));
+            
             return sortedRecordings;
 
         } catch (err) {
