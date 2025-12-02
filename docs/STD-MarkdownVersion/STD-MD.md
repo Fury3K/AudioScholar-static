@@ -38,7 +38,7 @@ TULIWED11001200
 
 **Date of Submission:**
 
-September 20, 2025
+December 2, 2025
 
 Change History
 
@@ -51,12 +51,13 @@ Change History
 | 5.0     | 2025-10-11 | ORLANES    | Appendix                                            |
 | 6.0     | 2025-13-11 | ORLANES    | Finalization                                        |
 | 6.1     | 2025-14-11 | BIACOLO    | Verified & Finalized                                |
+| 6.2     | 2025-02-12 | BIACOLO & ORLANES    | Updated for Admin, Notes, and Settings features.    |
 
 Table of Contents
 
-[Change History](#_Toc212585620)
+[Change History](#change-history)
 
-[Table of Contents](#_Toc212585621)
+[Table of Contents](#table-of-contents)
 
 [1. Introduction](#introduction)
 
@@ -88,51 +89,33 @@ Table of Contents
 
 [3.1 Case-1: Successful Offline Lecture Recording and Local Save](#31-case-1-successful-offline-lecture-recording-and-local-save)
 
-[3.1.1 Purpose](#311-purpose)
-
-[3.1.2 Inputs](#312-inputs)
-
-[3.1.3 Expected Outputs & Pass/Fail Criteria](#313-expected-outputs--passfail-criteria)
-
-[3.1.4 Test Procedure](#314-test-procedure)
-
 [3.2 Case-2: Web Upload with File Exceeding Size Limit](#32-case-2-web-upload-with-file-exceeding-size-limit)
-
-[3.2.1 Purpose](#321-purpose)
-
-[3.2.2 Inputs](#322-inputs)
-
-[3.2.3 Expected Outputs & Pass/Fail Criteria](#323-expected-outputs--passfail-criteria)
-
-[3.2.4 Test Procedure](#324-test-procedure)
 
 [3.3 Case-3: End-to-End Audio Summarization Workflow](#33-case-3-end-to-end-audio-summarization-workflow)
 
-[3.3.1 Purpose](#331-purpose)
-
-[3.3.2 Inputs](#332-inputs)
-
-[3.3.3 Expected Outputs & Pass/Fail Criteria](#333-expected-outputs--passfail-criteria)
-
-[3.3.4 Test Procedure](#334-test-procedure)
-
 [3.4 Case-4: User Login with Invalid Password](#34-case-4-user-login-with-invalid-password)
 
-[3.4.1 Purpose](#341-purpose)
+[3.5 Case-5: Summarization with PowerPoint Contextual Enhancement](#35-case-5-summarization-with-powerpoint-contextual-enhancement)
 
-[3.4.2 Inputs](#342-inputs)
+[3.6 Case-6: Freemium Feature Restriction (Background Recording)](#36-case-6-freemium-feature-restriction-background-recording)
 
-[3.4.3 Expected Outputs & Pass/Fail Criteria](#343-expected-outputs--passfail-criteria)
+[3.7 Case-7: Successful User Login with Google OAuth 2.0](#37-case-7-successful-user-login-with-google-oauth-20)
 
-[3.4.4 Test Procedure](#344-test-procedure)
+[3.8 Case-8: Manual Cloud Synchronization (Mobile to Web)](#38-case-8-manual-cloud-synchronization-mobile-to-web)
+
+[3.9 Case-9: Admin User Management (Disable User)](#39-case-9-admin-user-management-disable-user)
+
+[3.10 Case-10: User Note Creation](#310-case-10-user-note-creation)
+
+[3.11 Case-11: App Theme Preference](#311-case-11-app-theme-preference)
 
 [4. Appendix (Test Logs)](#appendix-test-logs)
 
-[A.1 Test Log Template](#a1-test-execution-log)
+[A.1 Test Execution Log](#a1-test-execution-log)
 
-[A.2 Test Summary Report Template](#a2-test-summary-report)
+[A.2 Test Summary Report](#a2-test-summary-report)
 
-[A.3 Incident Report Template](#a3-incident-report)
+[A.3 Incident Report](#a3-incident-report)
 
 # Introduction
 
@@ -144,7 +127,7 @@ AudioScholar is an educational technology (EdTech) platform designed to enhance 
 
 The primary value proposition is to reduce the cognitive load of manual note-taking, allowing students to focus on active listening during lectures. Post-lecture, the system provides AI-generated summaries, key points, and supplementary learning recommendations, transforming passive audio recordings into a powerful study tool. The system is designed for a multi-user environment with data privacy and implements a freemium model to manage feature access.
 
-This document establishes the formal plan and methodology for the verification and validation of the AudioScholar system against the requirements detailed in the Software Requirements Specification (SRS v2.1).
+This document establishes the formal plan and methodology for the verification and validation of the AudioScholar system against the requirements detailed in the Software Requirements Specification (SRS v2.4).
 
 ## Test Approach
 
@@ -158,9 +141,9 @@ The testing strategy for AudioScholar is requirements-driven and risk-based, int
 
 1.  **Unit Testing:** Performed by developers to verify individual functions, methods, and classes. This includes testing Kotlin classes in the Android app and Java services/controllers in the Spring Boot backend to ensure they behave as expected in isolation.
 2.  **Integration Testing:** Focuses on verifying the interaction between different components of the system. Key integration points to be tested include:
--   Mobile/Web client API calls to the backend REST endpoints.
--   Backend service communication with the Firebase/Nhost infrastructure (Authentication, Firestore, Storage).
--   Backend integration with external APIs (Google Gemini AI, YouTube Data API).
+    -   Mobile/Web client API calls to the backend REST endpoints.
+    -   Backend service communication with the Firebase/Nhost infrastructure (Authentication, Firestore, Storage).
+    -   Backend integration with external APIs (Google Gemini AI, YouTube Data API).
 1.  **System Testing:** The fully integrated application is tested end-to-end to validate compliance with all requirements specified in the SRS. This involves executing test cases based on user stories and use cases, covering the complete workflow from audio capture to summary review.
 2.  **User Acceptance Testing (UAT):** Conducted by a representative group of target users (college students) to confirm that AudioScholar meets their needs and expectations. This phase focuses on usability, workflow efficiency, and overall satisfaction. Feedback will be gathered through direct observation and structured surveys.
 
@@ -225,6 +208,11 @@ The testing strategy for AudioScholar is requirements-driven and risk-based, int
 -   **G4: Freemium Model Implementation**
     -   **REQ-401:** Role-based access control restricting features based on user subscription tier (Free vs. Premium).
     -   **REQ-402:** Simulated payment workflow for upgrading from a free to a premium account.
+-   **G5: User Engagement and Personalization**
+    -   **REQ-501:** Creation and management of personal user notes associated with recordings.
+    -   **REQ-502:** Customization of mobile app preferences (Theme selection).
+-   **G6: Administrative Control**
+    -   **REQ-601:** Admin dashboard functionality for managing users (viewing list, disabling accounts).
 
 ## 2.2 Features not to be Tested
 
@@ -252,11 +240,11 @@ To maintain focus and adhere to the project scope, the following features are ex
 
 ## 2.4 Test Schedule and Resources
 
-Testing activities are integrated into the 8-week Agile/Scrum development timeline.
+Testing activities are integrated into the development timeline ending December 2, 2025.
 
--   **Weeks 1-7:** Continuous unit and integration testing performed by developers alongside feature development.
--   **Weeks 6-7:** Dedicated system testing phase executed by the entire team to validate end-to-end workflows.
--   **Week 8:** User Acceptance Testing (UAT) with target student users, followed by final regression testing.
+-   **Development Phase (Aug - Nov):** Continuous unit and integration testing performed by developers alongside feature development.
+-   **System Testing Phase (Late Nov):** Dedicated system testing phase executed by the entire team to validate end-to-end workflows.
+-   **Final Validation (Dec 1-2):** Final regression testing and verification of all documentation.
 
 **Resources:** All five team members will participate in testing activities, with roles assigned based on their development focus (mobile, web, backend). The Team Leader will coordinate the overall testing effort.
 
@@ -363,7 +351,7 @@ To verify the complete, end-to-end system functionality of uploading an audio fi
 
 -   **Expected Outputs:** After upload, the recording’s status should display as ‘Processing’. After a reasonable time, the status should update to ‘Completed’. Upon viewing the recording’s details, a structured summary relevant to the audio content must be displayed.
     -   **Pass Criteria:** The test passes if a non-empty, coherent summary is generated and correctly associated with the uploaded audio recording in the UI. The summary content must be contextually relevant to “The Basics of Photosynthesis”.
-    -   **Fail Criteria:** The test fails if the status remains ‘Processing’ for an excessive duration (\>15 minutes), the status changes to ‘Failed’, no summary is displayed for the completed recording, the summary is empty or nonsensical, or the application crashes.
+    -   **Fail Criteria:** The test fails if the status remains ‘Processing’ for an excessive duration (>15 minutes), the status changes to ‘Failed’, no summary is displayed for the completed recording, the summary is empty or nonsensical, or the application crashes.
 
 ### 3.3.4 Test Procedure
 
@@ -412,27 +400,27 @@ To verify that when a user uploads both an audio file and an associated PowerPoi
 
 ### 3.5.2 Inputs
 
--   **Environment:** User logged into the web interface with an active internet connection1. The backend and Google Gemini AI API are operational.
+-   **Environment:** User logged into the web interface with an active internet connection. The backend and Google Gemini AI API are operational.
 -   **Test Data 1 (Audio):** A 2-minute audio file (.mp3) containing a general spoken lecture on “computer hardware” but *without* using the specific terms “RAM,” “CPU,” or “SSD.”
--   **Test Data 2 (PPT):** A PowerPoint file (.pptx) containing slides with the specific keywords: “RAM (Random Access Memory),” “CPU (Central Processing Unit),” and "SSD (Solid State Drive)"222.
+-   **Test Data 2 (PPT):** A PowerPoint file (.pptx) containing slides with the specific keywords: “RAM (Random Access Memory),” “CPU (Central Processing Unit),” and "SSD (Solid State Drive)".
 
 ### 3.5.3 Expected Outputs & Pass/Fail Criteria
 
--   **Expected Outputs:** The user successfully uploads both files3. After processing, the status updates to 'Completed’4. The resulting summary page should display the generated summary text and also indicate that a presentation is attached5. The summary text itself should contain specific keywords from the PowerPoint (e.g., “CPU,” “RAM,” “SSD”) that were *not* present in the audio-only file.
+-   **Expected Outputs:** The user successfully uploads both files. After processing, the status updates to 'Completed’. The resulting summary page should display the generated summary text and also indicate that a presentation is attached. The summary text itself should contain specific keywords from the PowerPoint (e.g., “CPU,” “RAM,” “SSD”) that were *not* present in the audio-only file.
     -   **Pass Criteria:** The test passes if the generated summary is successfully displayed and verifiably contains the specific keywords (“CPU,” “RAM,” “SSD”) from the PowerPoint file, proving contextual enhancement occurred.
     -   **Fail Criteria:** The test fails if the upload of either file fails, the processing fails, the summary is not generated, or the summary text shows no evidence of using the keywords from the PowerPoint file.
 
 ### 3.5.4 Test Procedure
 
 1.  Log into the AudioScholar web application.
-2.  Navigate to the ‘Upload Recording’ page6.
-3.  In the “Audio File (Required)” section, select the 2-minute “computer hardware” audio file7.
-4.  In the “PowerPoint File (Optional)” section, select the test PPT file containing the keywords8.
+2.  Navigate to the ‘Upload Recording’ page.
+3.  In the “Audio File (Required)” section, select the 2-minute “computer hardware” audio file.
+4.  In the “PowerPoint File (Optional)” section, select the test PPT file containing the keywords.
 5.  Enter a title (e.g., “PPT Context Test”).
-6.  Click the ‘Upload Recording’ button9.
-7.  Navigate to the ‘My Recordings’ list and wait for the status to change from ‘Processing’ to 'Completed’10.
-8.  Click on the “PPT Context Test” recording to view its details11.
-9.  Verify the summary section is visible and that a “View PDF” (or similar) button for the presentation is present12.
+6.  Click the ‘Upload Recording’ button.
+7.  Navigate to the ‘My Recordings’ list and wait for the status to change from ‘Processing’ to 'Completed’.
+8.  Click on the “PPT Context Test” recording to view its details.
+9.  Verify the summary section is visible and that a “View PDF” (or similar) button for the presentation is present.
 10. Read the generated summary text and confirm that it includes the specific keywords “CPU,” “RAM,” and “SSD.”
 
 ## 3.6 Case-6: Freemium Feature Restriction (Background Recording)
@@ -447,11 +435,9 @@ To verify that a user logged in with a “Basic” (Free) account is correctly p
 -   **Software/System State:** The AudioScholar mobile application is installed.
 -   **User Data:** A user is authenticated with an account known to be on the “Basic” (Free) tier.
 
-### Expected Outputs & Pass/Fail Criteria
+### 3.6.3 Expected Outputs & Pass/Fail Criteria
 
-***
-
--   **Expected Outputs:** In the ‘Settings’ menu, the “Background Recording” feature should be visibly marked as a premium feature and disabled (e.g., greyed out with a ‘lock’ icon)14. If the user starts a recording and then backgrounds the app (e.g., by pressing the Home button), the recording session must stop.
+-   **Expected Outputs:** In the ‘Settings’ menu, the “Background Recording” feature should be visibly marked as a premium feature and disabled (e.g., greyed out with a ‘lock’ icon). If the user starts a recording and then backgrounds the app (e.g., by pressing the Home button), the recording session must stop.
 -   **Pass Criteria:** The test passes if the feature is disabled in settings AND the recording session terminates when the application is moved to the background.
 -   **Fail Criteria:** The test fails if the user can enable the feature, or if the recording continues to run for more than a few seconds after the app is backgrounded.
 
@@ -459,11 +445,11 @@ To verify that a user logged in with a “Basic” (Free) account is correctly p
 
 1.  Launch the AudioScholar mobile application.
 2.  Log in using the “Basic” (Free) user account.
-3.  Navigate to the ‘Settings’ screen151515.
+3.  Navigate to the ‘Settings’ screen.
 4.  Locate the “Premium Features” or “Audio Recording Settings” section.
-5.  Verify that the “Background Recording” option is present but disabled and marked with an “Upgrade to Pro” label or icon16.
-6.  Navigate to the ‘Record’ screen17.
-7.  Tap the record button to begin recording. Confirm the timer starts18.
+5.  Verify that the “Background Recording” option is present but disabled and marked with an “Upgrade to Pro” label or icon.
+6.  Navigate to the ‘Record’ screen.
+7.  Tap the record button to begin recording. Confirm the timer starts.
 8.  After 10 seconds, press the device’s “Home” button, moving the app to the background.
 9.  Wait 10 seconds.
 10. Re-open the AudioScholar application from the recent apps list.
@@ -481,9 +467,7 @@ To verify that a user can successfully authenticate and log into the mobile appl
 -   **Software/System State:** The AudioScholar mobile application is installed. The device has at least one Google account signed in via the Android settings. The user is currently logged out of the app.
 -   **Configuration:** The Google Sign-In SDK is correctly configured in the app.
 
-### Expected Outputs & Pass/Fail Criteria
-
-***
+### 3.7.3 Expected Outputs & Pass/Fail Criteria
 
 -   **Expected Outputs:** Upon tapping the "Login with Google" button, the native Android account chooser dialog should appear. After selecting a valid Google account, the app should briefly show a loading indicator and then navigate the user to the main application dashboard (e.g., 'My Recordings' screen).
 -   **Pass Criteria:** The test passes if the user is successfully logged in, redirected to the app's main screen, and a valid session is created (as verified by visiting a protected area like 'My Recordings').
@@ -513,9 +497,7 @@ To verify that locally created recordings on the mobile app can be successfully 
 -   **Test Data:** A new, locally saved recording on the mobile device that does not yet exist in the cloud (e.g., "Sync Test File").
 -   **Configuration:** The mobile app's "Sync Mode" is set to "Manual" or a manual sync button is available.
 
-### Expected Outputs & Pass/Fail Criteria
-
-***
+### 3.8.3 Expected Outputs & Pass/Fail Criteria
 
 -   **Expected Outputs:** After initiating a manual sync on the mobile app, a progress indicator should appear, followed by a “Sync complete” message. Subsequently, refreshing the ‘My Recordings’ list on the web interface should show the “Sync Test File” as available.
 -   **Pass Criteria:** The test passes if the “Sync Test File” appears in the web interface’s recording list after the manual sync is completed on mobile.
@@ -535,124 +517,138 @@ To verify that locally created recordings on the mobile app can be successfully 
 10. Return to the web interface on the workstation and refresh the ‘My Recordings’ page.
 11. Verify that the recording titled “Sync Test File” is now visible in the list.
 
+## 3.9 Case-9: Admin User Management (Disable User)
+
+### 3.9.1 Purpose
+
+To verify that an administrator can successfully disable a user account via the Admin Dashboard, and that this action prevents the targeted user from logging into the application.
+
+### 3.9.2 Inputs
+
+-   **User Role:** Administrator (logged into the Web Admin Dashboard).
+-   **Target User:** A standard user account ("user_to_disable@test.com") that is currently active.
+-   **Environment:** Web Interface (for Admin) and Mobile/Web Interface (for Target User testing).
+
+### 3.9.3 Expected Outputs & Pass/Fail Criteria
+
+-   **Expected Outputs:** The Admin successfully toggles the user status to "Disabled" in the dashboard. When the target user subsequently attempts to log in, they are denied access with an appropriate message (e.g., "Account disabled").
+-   **Pass Criteria:** The test passes if the Admin UI reflects the "Disabled" status AND the target user is unable to log in.
+-   **Fail Criteria:** The test fails if the Admin cannot toggle the status, the status reverts, or the target user can still log in after being disabled.
+
+### 3.9.4 Test Procedure
+
+1.  Log in to the Web Interface as an Administrator.
+2.  Navigate to the Admin Dashboard > User Management.
+3.  Locate "user_to_disable@test.com" in the user list.
+4.  Click the "Disable" (or "Deactivate") button for that user.
+5.  Confirm the action if prompted.
+6.  Verify the user's status in the list now shows "Disabled".
+7.  Open a new browser window (incognito) or the mobile app.
+8.  Attempt to log in using "user_to_disable@test.com" credentials.
+9.  Verify that login fails and a message indicating the account is disabled is displayed.
+
+## 3.10 Case-10: User Note Creation
+
+### 3.10.1 Purpose
+
+To verify that a user can create a text note associated with a specific lecture recording and that this note is saved and retrievable.
+
+### 3.10.2 Inputs
+
+-   **User Role:** Logged-in User (Mobile).
+-   **Test Data:** A valid lecture recording. Note text: "Important concept at 5:00".
+
+### 3.10.3 Expected Outputs & Pass/Fail Criteria
+
+-   **Expected Outputs:** Upon saving, the note should appear in the "Notes" list for that recording.
+-   **Pass Criteria:** The test passes if the note is saved without error and remains visible when the user navigates away and returns to the recording details.
+-   **Fail Criteria:** The test fails if the note is not saved, an error occurs, or the note is missing upon return.
+
+### 3.10.4 Test Procedure
+
+1.  Log in to the Mobile App.
+2.  Select a recording from the Library.
+3.  Navigate to the "Notes" tab in the Recording Details screen.
+4.  Tap the "Add Note" button.
+5.  Enter the text "Important concept at 5:00".
+6.  Tap "Save".
+7.  Verify the new note appears in the list.
+8.  Go back to the Library, then re-open the same recording.
+9.  Verify the note is still present in the "Notes" tab.
+
+## 3.11 Case-11: App Theme Preference
+
+### 3.11.1 Purpose
+
+To verify that the user can change the application's theme (e.g., Light to Dark) and that the preference is applied immediately and persisted across app restarts.
+
+### 3.11.2 Inputs
+
+-   **User Role:** Logged-in User (Mobile).
+-   **Current State:** App is in "Light" mode.
+
+### 3.11.3 Expected Outputs & Pass/Fail Criteria
+
+-   **Expected Outputs:** The app UI colors should invert/change immediately upon selection. The setting should remain selected after restarting the app.
+-   **Pass Criteria:** The test passes if the visual theme changes correctly and persists after a restart.
+-   **Fail Criteria:** The test fails if the UI does not change, or if it reverts to the default theme after restarting the app.
+
+### 3.11.4 Test Procedure
+
+1.  Log in to the Mobile App.
+2.  Navigate to "Settings".
+3.  Locate "Theme" preference.
+4.  Change the selection from "Light" (or System) to "Dark".
+5.  Verify the app UI background becomes dark and text becomes light.
+6.  Close the application completely (remove from recent apps).
+7.  Relaunch the application.
+8.  Verify the app is still in "Dark" mode.
+
 # Appendix (Test Logs)
 
-This appendix contains the execution logs, summary report, and incident reports for the "System Testing, Phase 1" cycle, conducted from October 25-26, 2025.
+This appendix contains the execution logs, summary report, and incident reports for the "System Testing, Phase 1" cycle, conducted from October 25-26, 2025, and subsequent testing of new features on December 1-2, 2025.
 
 ## A.1 Test Execution Log
 
 | Test Case ID | Date Executed | Executed By              | Build Version      | Result (Pass/Fail) | Notes / Defect ID                                                     |
 |--------------|---------------|--------------------------|--------------------|--------------------|-----------------------------------------------------------------------|
 | TC-01        | Oct 25, 2025  | Claive Justin Barrientos | v1.0-beta (Mobile) | Pass               | Offline recording works as expected even without internet connection. |
-
-TC-02
-
-Oct 25, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Web)
-
-Pass
-
-Client-side validation and message handling performed correctly
-
-TC-03
-
-Oct 25, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Server/Web)
-
-Pass
-
-Summary matched lecture content; backend integration stable.
-
-TC-04
-
-Oct 26, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Mobile)
-
-Pass
-
-Database authentication validation is successful.
-
-TC-05
-
-Oct 26, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Web/Server)
-
-Pass
-
-Contextual enhancement confirmed; Powerpoint parsing integrated properly
-
-TC-06
-
-Oct 26, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Mobile)
-
-Pass
-
-Freemium feature restriction for free-tier users is correctly implemented.
-
-TC-07
-
-Oct 26, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Mobile)
-
-Pass
-
-Google OAuth login flow is secure and successful.
-
-TC-08
-
-Oct 26, 2025
-
-Claive Justin Barrientos
-
-v1.0-beta (Mobile/Web)
-
-Pass
-
-Manual cloud sync (Mobile to Web) is operational.
+| TC-02        | Oct 25, 2025  | Claive Justin Barrientos | v1.0-beta (Web)    | Pass               | Client-side validation and message handling performed correctly.      |
+| TC-03        | Oct 25, 2025  | Claive Justin Barrientos | v1.0-beta (Server) | Pass               | Summary matched lecture content; backend integration stable.          |
+| TC-04        | Oct 26, 2025  | Claive Justin Barrientos | v1.0-beta (Mobile) | Pass               | Database authentication validation is successful.                     |
+| TC-05        | Oct 26, 2025  | Claive Justin Barrientos | v1.0-beta (Web)    | Pass               | Contextual enhancement confirmed; Powerpoint parsing integrated.      |
+| TC-06        | Oct 26, 2025  | Claive Justin Barrientos | v1.0-beta (Mobile) | Pass               | Freemium feature restriction for free-tier users is implemented.      |
+| TC-07        | Oct 26, 2025  | Claive Justin Barrientos | v1.0-beta (Mobile) | Pass               | Google OAuth login flow is secure and successful.                     |
+| TC-08        | Oct 26, 2025  | Claive Justin Barrientos | v1.0-beta (Mobile) | Pass               | Manual cloud sync (Mobile to Web) is operational.                     |
+| TC-09        | Dec 01, 2025  | John Nathan Orlanes      | v1.1-rc (Web)      | Pass               | Admin can successfully disable users; login denied appropriately.     |
+| TC-10        | Dec 01, 2025  | John Nathan Orlanes      | v1.1-rc (Mobile)   | Pass               | Notes are saved and retrieved correctly.                              |
+| TC-11        | Dec 01, 2025  | John Nathan Orlanes      | v1.1-rc (Mobile)   | Pass               | Dark mode preference persists across restarts.                        |
 
 ## A.2 Test Summary Report
 
-**Project Name:** AudioScholar  
-**Test Cycle:** System Testing, Phase 1  
-**Build Version:** v1.0 beta  
-**Period:** Oct 25, 2025, to Oct 26, 2025
+**Project Name:** AudioScholar
+**Test Cycle:** System Testing, Phase 2 (Final Validation)
+**Build Version:** v1.1-rc
+**Period:** Dec 01, 2025, to Dec 02, 2025
 
--   **Total Test Cases Planned:** [8]
--   **Total Test Cases Executed:** [8]
--   **Passed:** [8]
+-   **Total Test Cases Planned:** [11]
+-   **Total Test Cases Executed:** [11]
+-   **Passed:** [11]
 -   **Failed:** [0]
 -   **Blocked:** [0]
 
 **Critical Defects Found:** [0]
 
-**Overall Assessment:**  
-The v1.0-beta build is stable, and all core functionalities defined in the test plan passed execution.
+**Overall Assessment:**
+The v1.1-rc build demonstrates stability across all core and newly implemented features.
 
--   **G1 (Recording/Management):** Offline recording and file upload validations (TC-01, TC-02) are working as specified.
--   **G2 (AI/Summary):** The end-to-end summarization workflow (TC-03) and the PowerPoint contextual enhancement (TC-05) are both fully functional.
--   **G3 (User/Sync):** Security and authentication flows for standard login (TC-04) and Google OAuth (TC-07) are secure and successful. Manual cloud sync (TC-08) is operational.
--   **G4 (Freemium):** Feature restriction for free-tier users (TC-06) is correctly implemented.
+-   **Core Features (G1-G4):** Previously validated features (Recording, Summarization, Auth, Sync) remain stable.
+-   **New Features (G5-G6):**
+    -   **Admin Dashboard:** User management functions (disable/enable) work as intended (TC-09).
+    -   **User Notes:** Creation and retrieval of notes are functional (TC-10).
+    -   **App Preferences:** Theme switching works and persists (TC-11).
 
-No critical or high-severity defects were found. The build meets the exit criteria and is recommended to proceed to User Acceptance Testing (UAT).
+No critical or high-severity defects were found. The build meets the exit criteria and is recommended for Release Candidate sign-off.
 
 ## A.3 Incident Report
 
@@ -660,17 +656,17 @@ As noted in the Test Summary Report (Section A.2), **0 Critical** and **0 Failed
 
 The template below is provided for use in future test cycles.
 
-**Incident ID:** IR-[XXX]  
-**Date Found:** YYYY-MM-DD  
-**Found By:** [Tester Name]  
-**Test Case ID:** [TC-XXX-XX]  
-**Severity:** [Critical / High / Medium / Low]  
+**Incident ID:** IR-[XXX]
+**Date Found:** YYYY-MM-DD
+**Found By:** [Tester Name]
+**Test Case ID:** [TC-XXX-XX]
+**Severity:** [Critical / High / Medium / Low]
 **Priority:** [High / Medium / Low]
 
-**Summary:**  
+**Summary:**
 [A one-sentence summary of the problem.]
 
-**Description:**  
+**Description:**
 [Detailed description of the issue, including what was observed.]
 
 **Steps to Reproduce:**
@@ -679,10 +675,10 @@ The template below is provided for use in future test cycles.
 2.  [Step 2]
 3.  [Step 3]
 
-**Expected Result:**  
+**Expected Result:**
 [What the application should have done.]
 
-**Actual Result:**  
+**Actual Result:**
 [What the application actually did.]
 
 **Environment:**
@@ -690,8 +686,8 @@ The template below is provided for use in future test cycles.
 -   **Platform:** [e.g., Android 11, Chrome on Windows 10]
 -   **Build Version:** [e.g., v1.0-RC1]
 
-**Attachments:**  
+**Attachments:**
 [Screenshots, logs, etc.]
 
-**Assigned To:** [Developer Name]  
+**Assigned To:** [Developer Name]
 **Status:** [Open / In Progress / Resolved / Closed]
