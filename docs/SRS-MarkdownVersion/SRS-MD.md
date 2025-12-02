@@ -59,100 +59,105 @@ Change History
 | 2.1     | 2025-20-09 | ORLANES, DUTERTE, ALPEZ, BARRIENTOS, BIACOLO | Requirements Refactoring                                                                   |
 | 2.2     | 2025-28-10 | ORLANES, DUTERTE & ALPEZ                     | Requirements Refactoring                                                                   |
 | 2.3     | 2025-01-12 | BIACOLO                                      | Fixing Inconsistencies                                                                     |
+| 2.4     | 2025-02-12 | BIACOLO                                      | Fixing Inconsistencies                                                                     |
 
 Table of Contents
 
-[Change History](#_Toc215511012)
+Change History
 
-[Table of Contents](#_Toc215511013)
+Table of Contents
 
-[1. Introduction](#introduction)
+1\. Introduction
 
-[1.1. Purpose](#purpose)
+1.1. Purpose
 
-[1.2. Scope](#scope)
+1.2. Scope
 
-[1.3. Definitions, Acronyms and Abbreviations](#definitions-acronyms-and-abbreviations)
+1.3. Definitions, Acronyms and Abbreviations
 
-[1.4. References](#references)
+1.4. References
 
-[2. Overall Description](#overall-description)
+2\. Overall Description
 
-[2.1. Product perspective](#product-perspective)
+2.1. Product perspective
 
-[Module 1: Lecture Recording & Upload (Mobile & Web)](#module-1-lecture-recording--upload-mobile--web)
+Module 1: Lecture Recording & Upload (Mobile & Web)
 
-[Module 2: Audio Processing & Summarization (Server-side)](#module-2-audio-processing--summarization-server-side)
+Module 2: Audio Processing & Summarization (Server-side)
 
-[Module 3: Learning Material Recommendation (Server-side)](#module-3-learning-material-recommendation-server-side)
+Module 3: Learning Material Recommendation (Server-side)
 
-[Module 4: User Authentication & Account Management (Mobile & Server-side)](#module-4-user-authentication--account-management-mobile--server-side)
+Module 4: User Authentication & Account Management (Mobile & Server-side)
 
-[Module 5: Cloud Synchronization (Mobile & Server-side)](#module-5-cloud-synchronization-mobile--server-side)
+Module 5: Cloud Synchronization (Mobile & Server-side)
 
-[Module 6: PowerPoint Integration (Mobile & Server-side)](#module-6-powerpoint-integration-mobile--server-side)
+Module 6: PowerPoint Integration (Mobile & Server-side)
 
-[Module 7: Web Interface (Web)](#module-7-web-interface-web)
+Module 7: Web Interface (Web)
 
-[Module 8: Freemium Model (Mobile, Web, and Server-side)](#module-8-freemium-model-mobile-web-and-server-side)
+Module 8: Freemium Model (Mobile, Web, and Server-side)
 
-[Module 9: Admin Dashboard (Mobile & Web)](#module-9-admin-dashboard-mobile--web)
+Module 9: Admin Dashboard (Mobile & Web)
 
-[Module 10: User Notes (Mobile & Web)](#module-10-user-notes-mobile--web)
+Module 10: User Notes (Mobile & Web)
 
-[2.2. User characteristics](#user-characteristics)
+Module 11: App Preferences & Settings (Mobile)
 
-[2.4. Constraints](#24-constraints)
+2.2. User characteristics
 
-[2.5. Assumptions and dependencies](#25-assumptions-and-dependencies)
+2.4. Constraints
 
-[3. Specific Requirements](#specific-requirements)
+2.5. Assumptions and dependencies
 
-[3.1. External interface requirements](#external-interface-requirements)
+3\. Specific Requirements
 
-[3.1.1. Hardware interfaces](#311-hardware-interfaces)
+3.1. External interface requirements
 
-[3.1.2. Software interfaces](#312-software-interfaces)
+3.1.1. Hardware interfaces
 
-[3.1.3. Communications interfaces](#313-communications-interfaces)
+3.1.2. Software interfaces
 
-[3.2. Functional requirements](#functional-requirements)
+3.1.3. Communications interfaces
 
-[Module 1: Lecture Recording & Upload](#module-1-lecture-recording--upload)
+3.2. Functional requirements
 
-[Module 2: Audio Processing & Summarization](#module-2-audio-processing--summarization)
+Module 1: Lecture Recording & Upload
 
-[Module 3: Learning Material Recommendation](#module-3-learning-material-recommendation)
+Module 2: Audio Processing & Summarization
 
-[Module 4: User Authentication & Account Management](#_Toc215511043)
+Module 3: Learning Material Recommendation
 
-[Module 5: Cloud Synchronization](#module-5-cloud-synchronization)
+Module 4: User Authentication & Account Management
 
-[Module 6: PowerPoint Integration](#module-6-powerpoint-integration)
+Module 5: Cloud Synchronization
 
-[Module 7: Web Interface](#module-7-web-interface)
+Module 6: PowerPoint Integration
 
-[Module 8: Freemium Model](#module-8-freemium-model)
+Module 7: Web Interface
 
-[Module 9: Admin Dashboard](#module-9-admin-dashboard)
+Module 8: Freemium Model
 
-[Module 10: User Notes](#module-10-user-notes)
+Module 9: Admin Dashboard
 
-[3.3 Non-functional requirements](#_Toc215511050)
+Module 10: User Notes
 
-[Performance](#_Toc215511051)
+Module 11: App Preferences & Settings
 
-[Security](#_Toc215511052)
+3.3 Non-functional requirements
 
-[Reliability](#_Toc215511053)
+Performance
 
-[Usability](#_Toc215511054)
+Security
 
-[Efficiency](#_Toc215511055)
+Reliability
 
-[Scalability](#_Toc215511056)
+Usability
 
-[Offline Capability](#_Toc215511057)
+Efficiency
+
+Scalability
+
+Offline Capability
 
 # Introduction
 
@@ -160,7 +165,7 @@ Table of Contents
 
 ***
 
-This Software Requirements Specification (SRS) document meticulously details the comprehensive requirements for the AudioScholar application. AudioScholar is conceived as an intelligent, multi-user platform designed to record lecture audio and leverage AI-driven summarization techniques to produce structured, actionable insights specifically tailored for learners. The primary audience for this document includes the AudioScholar development team, the project advisor, and key stakeholders. It is intended to provide a definitive and unambiguous understanding of the system’s requirements, ensuring all parties are aligned on the project goals and specifications. This SRS serves as the foundational blueprint guiding the design, development, and rigorous testing phases of the AudioScholar project, ensuring the final product effectively meets the needs of its users and stakeholders [2].
+This Software Requirements Specification (SRS) document details the requirements for the AudioScholar application. AudioScholar is designed as an intelligent, multi-user platform to record lecture audio and leverage AI-driven summarization techniques to produce structured insights for learners. The primary audience for this document includes the AudioScholar development team, the project advisor, and key stakeholders. It provides a clear understanding of the system’s requirements to ensure alignment on project goals and specifications. This SRS serves as the blueprint guiding the design, development, and testing phases of the AudioScholar project [2].
 
 ## Scope
 
@@ -171,17 +176,20 @@ The AudioScholar software product will be delivered as a dual-platform solution,
 The functionalities explicitly within the scope of the AudioScholar software include:
 
 -   **Lecture Recording:** Providing robust audio lecture recording capabilities via a dedicated mobile application. This feature accommodates real-time audio capture in both online and offline scenarios, offering flexibility for users in diverse learning environments. The recording functionality is designed to capture spoken content from lectures as high-quality audio.
+-   **Library & Playback:** Providing a centralized library to browse, search, and manage recordings on the mobile application. Includes a playback interface for reviewing audio, viewing AI-generated insights, and managing user notes.
 -   **Audio Upload:** Enabling users to upload pre-recorded audio files through both the web interface and the mobile application, supporting diverse user workflows and existing content.
 -   **AI-Powered Summarization:** Integrating with advanced AI APIs, specifically Google Gemini AI API [3], to automatically process audio recordings. This core feature will generate structured and concise summaries of lecture content, transforming lengthy audio into digestible key points.
 -   **Personalized Learning Material Recommendations:** Offering a personalized learning experience by recommending supplementary learning materials. The initial focus will be on curating relevant educational resources from YouTube, a widely used platform for academic content.
--   **User Authentication and Account Management:** Implementing a secure and user-friendly authentication system within the mobile application. This will support multiple authentication methods, including federated login via Google OAuth 2.0 [4] and GitHub OAuth 2.0 [5], as well as traditional email/password login for user convenience and accessibility.
+-   **User Authentication and Account Management:** Implementing a secure and user-friendly authentication system within the mobile application. This will support multiple authentication methods, including federated login via Google OAuth 2.0 [4] and GitHub OAuth 2.0 [5], traditional email/password login, forgot password recovery, and profile management for user convenience and accessibility.
 -   **Optional Cloud Synchronization:** Providing users with the option to synchronize their recordings and summaries to the cloud using Nhost Storage. This feature ensures data backup and accessibility across devices, enhancing user data security and flexibility.
 -   **PowerPoint Integration for Enhanced Summarization:** Allowing users to optionally upload lecture PowerPoint presentations. When available, these presentations will be used to augment the AI summarization process, significantly improving the accuracy and contextuality of the generated summaries by providing visual and structural context to the audio content.
 -   **Multi-User Support with Data Privacy:** Designing the system to support multiple users, each with individual accounts. Robust data privacy measures will be implemented to ensure that each user’s recordings, summaries, and personal data are securely segregated and protected.
 -   **Web Interface for Comprehensive Access:** Developing a web interface that provides users with a comprehensive platform to access their recordings, review generated summaries, and explore learning material recommendations. The web interface will also support audio file uploads, mirroring the functionality of the mobile application for broader accessibility.
 -   **Freemium Model Implementation:** Implementing a freemium service model with tiered feature access. The features available to users will be dynamically controlled based on their login status and subscription level, allowing for both free and premium user experiences.
+-   **App Preferences:** Allowing users to customize their mobile application experience through theme selection (including light/dark modes) and recording quality adjustments.
+-   **Legal & Help Access:** Providing direct access to support resources, privacy policies, and terms of service within the mobile application.
 
-The functionalities explicitly outside the scope of the AudioScholar software for its initial release include:
+    The functionalities explicitly outside the scope of the AudioScholar software for its initial release include:
 
 -   **Real-time Transcription:** Excluding real-time**,** live transcription of lectures. While the system records lectures in real-time, it does not provide immediate text transcription during the lecture. Summarization processes are applied post-lecture to ensure accuracy and resource efficiency, focusing on summarizing the audio content rather than providing live text transcripts.
 -   **iOS Mobile Platform Support:** Limiting initial mobile application development to the Android platform. Support for the iOS mobile platform is deferred and considered for future development phases.
@@ -272,7 +280,7 @@ This SRS document comprehensively specifies all functional and non-functional re
 
 AudioScholar is a standalone application designed to enhance the lecture note-taking process for students. It is composed of two main components: a mobile application for Android and a web interface.
 
-The mobile application, designed for Android devices, is the primary tool for lecture recording and on-the-go interaction. It allows students to record lectures in real-time, upload audio files, manage their accounts, configure cloud synchronization, and integrate PowerPoint presentations for enhanced summarization. The mobile app is intended for use during or immediately after lectures, providing quick access to recording and core functionalities.
+The mobile application, designed for Android devices, is the primary tool for lecture recording and on-the-go interaction. It allows students to record lectures in real-time, browse their library of recordings, play back audio, view AI-generated summaries and user notes, upload audio files, manage their accounts and preferences, configure cloud synchronization, and integrate PowerPoint presentations for enhanced summarization. The mobile app is intended for use during or immediately after lectures, providing quick access to recording and core functionalities.
 
 The web interface, accessible via standard web browsers, serves as a comprehensive platform for reviewing and managing lecture content. It allows users to access recordings and summaries, upload audio files, and view learning material recommendations on a larger screen. The web interface is designed for in-depth review, study, and management of lecture materials, offering a broader perspective and enhanced accessibility across different devices.
 
@@ -285,6 +293,8 @@ The system is decomposed into the following modules:
 -   Transaction 1.1: Start/Stop Lecture Recording (Mobile)
 -   Transaction 1.2: Upload Audio File (Mobile & Web)
 -   Transaction 1.3: Toggle Favorite (Mobile)
+-   Transaction 1.4: View Library (Mobile)
+-   Transaction 1.5: Playback & Details (Mobile)
 
 ### Module 2: Audio Processing & Summarization (Server-side)
 
@@ -303,6 +313,7 @@ The system is decomposed into the following modules:
 -   Transaction 4.2: User Login (Mobile) - Google, GitHub, Email/Password
 -   Transaction 4.3: Account Profile Management (Mobile)
 -   Transaction 4.4: User Logout (Mobile)
+-   Transaction 4.5: Forgot Password / Password Recovery (Mobile)
 
 ### Module 5: Cloud Synchronization (Mobile & Server-side)
 
@@ -337,6 +348,11 @@ The system is decomposed into the following modules:
 ### Module 10: User Notes (Mobile & Web)
 
 -   Transaction 10.1: User Note Management
+
+### Module 11: App Preferences & Settings (Mobile)
+
+-   Transaction 11.1: App Preferences
+-   Transaction 11.2: Legal & Help Access
 
 ![](media/beaf67addd59fca62faf0a8cffc0fdfc.png)
 
@@ -496,6 +512,43 @@ The following assumptions and dependencies are relevant to the requirements outl
 -   **Priority:** High
 -   **Frequency of Use:** Frequent (multiple times per lecture/day)
 
+##### Use Case Description: Pause/Resume Recording
+
+-   **Use Case ID:** UC_Record_PauseResume
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To temporarily pause and subsequently resume an active lecture recording.
+-   **Preconditions:**
+    -   A lecture recording is currently in progress (initiated by UC_Record_Start).
+-   **Normal Flow:**
+1.  The student taps the “Pause” button in the mobile application UI during an active recording.
+2.  The application pauses the audio capture. Visual feedback indicates the recording is paused (e.g., flashing indicator, “Paused” status).
+3.  The student taps the “Resume” button to continue recording.
+4.  The application resumes audio capture from the point of interruption.
+-   **Postconditions:**
+    -   Recording is paused or resumed based on user action.
+    -   The final audio file will contain the concatenated segments (or effectively skip the paused duration).
+-   **Priority:** High
+-   **Frequency of Use:** Frequent (during breaks in lectures)
+
+##### Use Case Description: Cancel/Discard Recording
+
+-   **Use Case ID:** UC_Record_Cancel
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To cancel an active recording and discard the captured audio without saving.
+-   **Preconditions:**
+    -   A lecture recording is currently in progress or paused.
+-   **Normal Flow:**
+1.  The student taps the “Cancel” or “Discard” button in the mobile application UI.
+2.  The application displays a confirmation dialog asking if the user is sure they want to discard the recording.
+3.  The student confirms the action.
+4.  The application stops the audio capture (if active) and deletes any temporary audio data captured for this session.
+5.  The application returns to the initial recording state or library view.
+-   **Postconditions:**
+    -   Recording is stopped.
+    -   No audio file is saved.
+-   **Priority:** Medium
+-   **Frequency of Use:** Occasional (accidental starts, bad recordings)
+
 ##### Activity Diagram: Record Lecture (Start/Stop)
 
 ![https://cdn.discordapp.com/attachments/1327114434707197974/1418886389700890654/TP71Qjj048Rl-nH_quFbKsd1KEn3uoHD2QIjgPm76AIHF4JQ4REZ1BVqtOiigqvDYa27d_s_sM_dCZcPzsqJNBnXh0kN9_4zReHgetQ97roebRZdmdjZPFbGU9UxTlFmfZEgMu9sBXgnerW-cxXpX5lF8JrAxCYe1KtSNm5Oc-dpjJPgUBjOB09mfLQo_HjHyLYRzh4ynjN7uGl0h.png?ex=68cfc06c&is=68ce6eec&hm=2b054c97efbe7215176c9ea30076c626dee4f9227c56c059bd28a8d812feb4ba&](media/86a9f2be61defc7f44112e9f22dbf0b9.png)*Figure 3.2.1.2: Activity Diagram for Record Lecture (Start/Stop)*
@@ -608,12 +661,56 @@ The following assumptions and dependencies are relevant to the requirements outl
 1.  The student navigates to a recording (in list or details view).
 2.  The student taps the “Favorite” icon (e.g., heart or star).
 3.  The application sends a request to the server to toggle the favorite status.
-4.  The server updates the recording’s favoriteCount and the user’s list of favorite recordings.
+4.  The server updates the recording’s favorite count and the user’s list of favorite recordings.
 5.  The application updates the UI to reflect the new state (e.g., filled icon).
 -   **Postconditions:**
     -   The recording’s favorite status is updated in the database.
     -   The engagement metrics (Module 9) reflect the change.
 -   **Priority:** Medium
+-   **Frequency of Use:** Frequent
+
+#### 1.4 View Library (Mobile)
+
+##### Use Case Description: View Library (Mobile)
+
+-   **Use Case ID:** UC_View_Library_Mobile
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To browse and manage the collection of lecture recordings.
+-   **Preconditions:**
+    -   User is logged into the mobile application.
+-   **Normal Flow:**
+1.  The student navigates to the “Library” screen.
+2.  The application displays the library with two main tabs/sections: **Local** (recordings stored on device) and **Cloud** (recordings synced to server).
+3.  The student views a list of recordings, including details like Title, Date, Duration, and Sync Status.
+4.  The student can sort or filter recordings (e.g., by date, favorites).
+-   **Postconditions:**
+    -   User is presented with their list of recordings.
+-   **Priority:** High
+-   **Frequency of Use:** Frequent
+
+#### 1.5 Playback & Details (Mobile)
+
+##### Use Case Description: Playback & Details (Mobile)
+
+-   **Use Case ID:** UC_Playback_Details_Mobile
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To play back a recording and view its detailed information and insights.
+-   **Preconditions:**
+    -   User selects a recording from the Library.
+-   **Normal Flow:**
+1.  The student taps on a recording in the Library.
+2.  The application opens the **Recording Details Screen**.
+3.  The screen presents a media player with controls (Play/Pause, Seek, Speed Control).
+4.  The screen displays tabs for:
+-   **Insights:** AI-generated summary, key topics, and keywords.
+-   **Resources:** Recommended learning materials (e.g., YouTube videos).
+-   **Notes:** User-created notes (see Module 10).
+-   **Transcript:** Full text transcript of the recording.
+1.  The student interacts with the player or tabs to review the lecture content.
+-   **Postconditions:**
+    -   Recording audio is played.
+    -   Details and insights are displayed.
+-   **Priority:** High
 -   **Frequency of Use:** Frequent
 
 ### Module 2: Audio Processing & Summarization
@@ -635,10 +732,10 @@ The following assumptions and dependencies are relevant to the requirements outl
     -   Audio file has been successfully uploaded from the mobile application or web interface.
     -   The server-side Audio Processing Module is running and ready to receive requests.
 -   **Normal Flow:**
-1.  The Audio Processing Module (AudioProcessingService) receives the uploaded audio file and associated metadata (e.g., user ID, recording title, upload timestamp).
+1.  The Audio Processing Module receives the uploaded audio file and associated metadata (e.g., user ID, recording title, upload timestamp).
 2.  The module validates the received audio file (e.g., checks file format, size - server-side limits) and saves it to a temporary local directory.
-3.  The module queues the audio file for upload and processing by sending a message to the RabbitMQ exchange (e.g., with routing key \\\`upload.audio\\\`).
-4.  The \`NhostUploadListenerService\` consumes the message, uploads the file to Nhost Storage, and triggers subsequent processing steps.
+3.  The module queues the audio file for upload and processing by sending a message to the message broker.
+4.  The Upload Listener consumes the message, uploads the file to Nhost Storage, and triggers subsequent processing steps.
 5.  The module logs the receipt of the audio file and updates its processing status in the database.
 -   **Alternative Flows:**
     -   **A1. File validation failed:** If the received audio file fails validation (e.g., unsupported format, exceeds server-side size limit, corrupted file), the module logs an error, rejects the file, and may notify the user (via mobile app/web interface feedback) about the upload failure and reason.
@@ -670,16 +767,16 @@ The following assumptions and dependencies are relevant to the requirements outl
 ##### Use Case Description: Process Audio using AI API (Server-side)
 
 -   **Use Case ID:** UC_Process_AudioAI_Server
--   **Primary Actor:** Server-side System (AudioTranscriptionListenerService)
+-   **Primary Actor:** Server-side System
 -   **Goal:** To process queued audio files using the Google Gemini AI API to generate a text transcript.
 -   **Preconditions:**
     -   Audio files are uploaded to Nhost Storage and queued for transcription (from UC_Process_ReceiveAudio_Server).
-    -   The server-side AudioTranscriptionListenerService is running and has access to the Google Gemini AI API (API key configured).
+    -   The server-side Audio Transcription Module is running and has access to the Google Gemini AI API (API key configured).
     -   Internet connectivity is available for API communication.
 -   **Normal Flow:**
-1.  The AudioTranscriptionListenerService consumes the transcription message from the RabbitMQ queue.
+1.  The Server consumes the transcription message from the processing queue.
 2.  The service downloads the audio file from Nhost Storage.
-3.  The service calls the GeminiService to transcribe the audio using the Google Gemini AI API (handling API key rotation and retries).
+3.  The service calls the AI Processing Module to transcribe the audio using the Google Gemini AI API (handling API key rotation and retries).
 4.  The service receives the transcription text from the API.
 5.  The service saves the transcript to the database and triggers the summarization process (handled in Transaction 2.3).
 -   **Alternative Flows:**
@@ -715,16 +812,16 @@ The following assumptions and dependencies are relevant to the requirements outl
 ##### Use Case Description: Generate Lecture Summary (Server-side)
 
 -   **Use Case ID:** UC_Generate_Summary_Server
--   **Primary Actor:** Server-side System (SummarizationListenerService)
+-   **Primary Actor:** Server-side System
 -   **Goal:** To generate a structured lecture summary from the transcript and optional PowerPoint context using the Google Gemini AI API.
 -   **Preconditions:**
     -   Audio transcription has been successfully completed (UC_Transcription_Server).
     -   Transcript is available in the database.
     -   (Optional) PowerPoint conversion is complete if a PPTX was uploaded.
 -   **Normal Flow:**
-1.  The SummarizationListenerService consumes the message from the summarization queue.
+1.  The Server consumes the message from the summarization queue.
 2.  The service retrieves the transcript and any associated PDF context (from converted PowerPoint) from the database/storage.
-3.  The service calls the GeminiService to generate a structured summary (including key points, topics, and glossary) using the transcript and PDF context.
+3.  The service calls the AI Processing Module to generate a structured summary (including key points, topics, and glossary) using the transcript and PDF context.
 4.  The service stores the structured and formatted lecture summary in the database, associated with the original audio recording and user.
 5.  The service triggers the Learning Material Recommendation process (Module 3).
 -   **Alternative Flows:**
@@ -767,7 +864,7 @@ The following assumptions and dependencies are relevant to the requirements outl
     -   The Recommendation Module is running and ready to perform content analysis.
     -   The ID of the lecture recording (or summary) to be analyzed is available.
 -   **Normal Flow:**
-1.  The LearningMaterialRecommenderService initiates the analysis, receiving the lecture recording (or summary) ID as input.
+1.  The Recommendation Module initiates the analysis, receiving the lecture recording (or summary) ID as input.
 2.  The module retrieves the lecture summary from the database using the provided ID.
 3.  The module extracts the topics and keywords that were already generated and stored within the Summary object during the summarization process (Module 2.3).
 4.  The module prepares these keywords and topics to be used for formulating search queries for the learning material recommendations.
@@ -1162,7 +1259,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 2.  The application displays the change password screen, prompting for "Current Password," "New Password," and "Confirm New Password."
 3.  The student enters their current password, new password, and confirms the new password.
 4.  The application performs client-side validation on the entered passwords (e.g., password strength for new password, confirmation match).
-5.  The application sends a request to the AudioScholar server (AuthController) to change the password, including the current password and the new password.
+5.  The application sends a request to the AudioScholar server to change the password, including the current password and the new password.
 6.  The server interacts with Firebase Authentication to verify the current password and update it to the new password.
 7.  Upon successful password change, the application displays a confirmation message indicating that the password has been changed successfully.
 8.  The application may optionally log the user out after password change for security reasons, requiring them to log in again with the new password.
@@ -1201,14 +1298,39 @@ The following assumptions and dependencies are relevant to the requirements outl
     -   The student is logged into the application.
 -   **Normal Flow:**
 1.  The student selects the “Logout” option from the settings or profile menu.
-2.  The application sends a logout request to the server (TokenRevocationService).
-3.  The server adds the user’s current JWT to the denylist (JwtDenylistFilter).
+2.  The application sends a logout request to the server.
+3.  The server adds the user’s current token to the denylist.
 4.  The application clears the stored authentication tokens from the device’s local storage.
 5.  The application redirects the user to the login screen.
 -   **Postconditions:**
     -   The user is logged out of the application.
     -   The authentication token is invalidated on the server.
     -   The application UI shows the login screen.
+
+#### 4.5 Forgot Password / Password Recovery (Mobile)
+
+##### Use Case Description: Forgot Password (Mobile)
+
+-   **Use Case ID:** UC_Forgot_Password_Mobile
+-   **Primary Actor:** Logged-in Free User
+-   **Goal:** To reset a forgotten password for an email/password account.
+-   **Preconditions:**
+    -   User has a registered email account.
+    -   User is at the Login Screen.
+-   **Normal Flow:**
+1.  The student taps “Forgot Password?” on the login screen.
+2.  The application prompts for the registered email address.
+3.  The student enters the email and taps “Send Reset Link”.
+4.  The application sends the request to Firebase Authentication.
+5.  Firebase sends a password reset email to the user.
+6.  The user receives the email containing a reset link or code.
+7.  The user follows the link to resetting the password (or enters the code in the app if supported).
+8.  The user enters a new password and confirms it.
+9.  The password is updated, and the user can now log in with the new credentials.
+-   **Postconditions:**
+    -   User password is updated.
+-   **Priority:** High
+-   **Frequency of Use:** Occasional
 
 ### Module 5: Cloud Synchronization
 
@@ -1231,12 +1353,18 @@ The following assumptions and dependencies are relevant to the requirements outl
     1.  The student navigates to the "Sync Settings" screen within the mobile application's settings or profile section.
     2.  The application displays the cloud synchronization settings screen, showing options to configure sync behavior.
     3.  The student interacts with the settings to:
-        -   **Enable/Disable Cloud Sync**: Toggles a switch or checkbox to turn cloud synchronization ON or OFF.
-        -   **Set Sync Frequency**: Selects a desired synchronization frequency from a predefined list (e.g., "Manual Only," "Daily," "Weekly"). If "Manual Only" is selected, automatic sync is disabled, and sync is only initiated manually.
-        -   **Choose Sync Data**: Selects which data types to synchronize to the cloud (e.g., "Recordings," "Summaries," or both). Options may be presented as checkboxes.
-    4.  As the student modifies the settings, the application updates the user's preferences locally on the device.
-    5.  The application may provide visual feedback indicating that the settings have been saved.
-    6.  The student may navigate away from the sync settings screen.
+-   **Sync Mode**: Selects the synchronization behavior. Options include:
+    -   **Automatic**: Syncs whenever changes occur (background).
+    -   **Manual**: Syncs only when explicitly requested by the user.
+    -   **WifiOnly**: Syncs only when connected to a Wi-Fi network to save mobile data.
+-   **Sync Frequency**: Selects how often sync occurs (if Automatic). Options include:
+    -   **Daily**: Syncs once every 24 hours.
+    -   **Weekly**: Syncs once every 7 days.
+    -   **Monthly**: Syncs once every 30 days.
+-   **Choose Sync Data**: Selects which data types to synchronize to the cloud (e.g., “Recordings,” “Summaries,” or both).
+    1.  As the student modifies the settings, the application updates the user's preferences locally on the device.
+    2.  The application may provide visual feedback indicating that the settings have been saved.
+    3.  The student may navigate away from the sync settings screen.
 -   **Alternative Flows:**
     -   **A1. Invalid frequency selection**: If the selected sync frequency is invalid or outside the allowed range (though this is unlikely with predefined options), the application may display an error message or revert to a default frequency.
     -   **A2. Settings save failure (local storage error):** If saving the sync settings to local device storage fails due to storage errors, the application may display an error message and prompt the user to try again or indicate that settings were not saved.
@@ -1331,13 +1459,13 @@ The following assumptions and dependencies are relevant to the requirements outl
     -   The PowerPoint presentation file is stored on the mobile device's local storage.
     -   The student has navigated to the PowerPoint upload section within the application.
 -   **Normal Flow:**
-1.  The student navigates to the "Upload PowerPoint" section within the mobile application (e.g., from a menu or recording details screen).
-2.  The application presents a file selection interface, allowing the student to browse the device's local storage.
-3.  The student selects the PowerPoint presentation file (e.g., .pptx) to be uploaded.
-4.  The application uploads the file to the AudioScholar server (AudioController).
-5.  The server (AudioProcessingService) saves the file to a temporary local directory and queues it for asynchronous upload via RabbitMQ (routing key \`upload.pptx\`).
-6.  The \`NhostUploadListenerService\` uploads the file to Nhost Storage and subsequently triggers the \`PptxConversionListenerService\` to convert the PowerPoint to PDF using ConvertAPI.
-7.  The application displays a confirmation message indicating that the PowerPoint file has been uploaded and is being processed.
+    1.  The student navigates to the "Upload PowerPoint" section within the mobile application (e.g., from a menu or recording details screen).
+    2.  The application presents a file selection interface, allowing the student to browse the device's local storage.
+    3.  The student selects the PowerPoint presentation file (e.g., .pptx) to be uploaded.
+    4.  The application uploads the file to the AudioScholar server.
+    5.  The server saves the file to a temporary local directory and queues it for asynchronous upload via the message broker.
+    6.  The Upload Listener uploads the file to Nhost Storage and subsequently triggers the Conversion Service to convert the PowerPoint to PDF using ConvertAPI.
+    7.  The application displays a confirmation message indicating that the PowerPoint file has been uploaded and is being processed.
 -   **Alternative Flows:**
     -   **A1. No file selected:** If the student attempts to initiate upload without selecting a PowerPoint file, the application displays an error message prompting file selection.
     -   **A2. File format not supported:** If the selected file is not in a supported PowerPoint format (e.g., only .pptx supported initially), the application displays an error message indicating the unsupported format and prompts the user to select a valid file.
@@ -1586,7 +1714,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 1.  The user views a recording in the web interface.
 2.  The user clicks the “Favorite” button/icon.
 3.  The web interface sends a request to the server.
-4.  The server updates the recording’s favoriteCount and user’s favorites.
+4.  The server updates the recording’s favorite count and user’s favorites.
 5.  The web interface updates the UI to show the recording is favorited.
 -   **Postconditions:**
     -   The recording’s favorite status is updated.
@@ -1857,12 +1985,54 @@ The following assumptions and dependencies are relevant to the requirements outl
     -   User is logged in.
     -   A lecture recording exists.
 -   **Normal Flow:**
-1.  **Create Note:** User selects “Add Note” on a recording. App sends content/tags to UserNoteController. System saves note linked to recording.
-2.  **View Notes:** User views recording details. System retrieves and displays user’s notes for that recording.
-3.  **Update Note:** User edits a note. System updates the note content.
-4.  **Delete Note:** User deletes a note. System removes the note.
+1.  **Access Notes Tab**: The student opens a recording and navigates to the "Notes" tab within the Recording Details Screen (as described in Module 1.5).
+2.  **Create Note**: User taps the floating action button (+) or "Add Note" button. App prompts for note content and optional tags. App sends data to the Server. System saves note.
+3.  **View Notes**: User views the list of notes in the Notes tab. System retrieves notes associated with the recording.
+4.  **Update Note:** User taps on an existing note to edit. User modifies content and saves. System updates the note.
+5.  **Delete Note:** User swipes or long-presses a note to delete. System removes the note.
 -   **Postconditions:**
     -   User notes are stored/updated/deleted in the database.
+
+### Module 11: App Preferences & Settings
+
+#### 11.1 App Preferences (Mobile)
+
+##### Use Case Description: App Preferences
+
+-   **Use Case ID:** UC_App_Preferences
+-   **Primary Actor:** Logged-in User
+-   **Goal:** To customize the application appearance and behavior.
+-   **Preconditions:**
+    -   User is logged in.
+-   **Normal Flow:**
+1.  The student navigates to **Settings**.
+2.  The application displays the following preference sections:
+-   **Theme:** User selects Light, Dark, or System Default.
+-   **Theme Style:** User selects a visual style (e.g., Classic, Quantum, Zen).
+-   **Recording Quality:** User selects desired audio quality (Low, Medium, High).
+1.  The student changes a setting.
+2.  The application immediately applies the change (e.g., theme update) and saves the preference locally.
+-   **Postconditions:**
+    -   App preferences are updated and persisted.
+
+#### 11.2 Legal & Help Access (Mobile)
+
+##### Use Case Description: Legal & Help Access
+
+-   **Use Case ID:** UC_Legal_Help_Access
+-   **Primary Actor:** Logged-in User
+-   **Goal:** To access legal documents and support resources.
+-   **Preconditions:**
+    -   App is open.
+-   **Normal Flow:**
+1.  The student navigates to **Settings \> Support**.
+2.  The application lists options:
+-   **Help Center:** Opens FAQ or help documentation.
+-   **Privacy Policy:** Opens the privacy policy document.
+-   **Terms of Service:** Opens the terms of service document.
+1.  The student taps an option to view the content.
+-   **Postconditions:**
+    -   User views the requested information.
 
 ## 3.3 Non-functional requirements
 
