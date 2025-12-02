@@ -59,105 +59,105 @@ Change History
 | 2.1     | 2025-20-09 | ORLANES, DUTERTE, ALPEZ, BARRIENTOS, BIACOLO | Requirements Refactoring                                                                   |
 | 2.2     | 2025-28-10 | ORLANES, DUTERTE & ALPEZ                     | Requirements Refactoring                                                                   |
 | 2.3     | 2025-01-12 | BIACOLO                                      | Fixing Inconsistencies                                                                     |
-| 2.4     | 2025-02-12 | BIACOLO                                      | Fixing Inconsistencies                                                                     |
+| 2.4     | 2025-02-12 | BIACOLO & ORLANES                            | Fixing Inconsistencies                                                                     |
 
 Table of Contents
 
-Change History
+[Change History](#_Toc215557559)
 
-Table of Contents
+[Table of Contents](#_Toc215557560)
 
-1\. Introduction
+[1. Introduction](#introduction)
 
-1.1. Purpose
+[1.1. Purpose](#purpose)
 
-1.2. Scope
+[1.2. Scope](#scope)
 
-1.3. Definitions, Acronyms and Abbreviations
+[1.3. Definitions, Acronyms and Abbreviations](#definitions-acronyms-and-abbreviations)
 
-1.4. References
+[1.4. References](#references)
 
-2\. Overall Description
+[2. Overall Description](#overall-description)
 
-2.1. Product perspective
+[2.1. Product perspective](#product-perspective)
 
-Module 1: Lecture Recording & Upload (Mobile & Web)
+[Module 1: Lecture Recording & Upload (Mobile & Web)](#module-1-lecture-recording--upload-mobile--web)
 
-Module 2: Audio Processing & Summarization (Server-side)
+[Module 2: Audio Processing & Summarization (Server-side)](#module-2-audio-processing--summarization-server-side)
 
-Module 3: Learning Material Recommendation (Server-side)
+[Module 3: Learning Material Recommendation (Server-side)](#module-3-learning-material-recommendation-server-side)
 
-Module 4: User Authentication & Account Management (Mobile & Server-side)
+[Module 4: User Authentication & Account Management (Mobile & Server-side)](#module-4-user-authentication--account-management-mobile--server-side)
 
-Module 5: Cloud Synchronization (Mobile & Server-side)
+[Module 5: Cloud Synchronization (Mobile & Server-side)](#module-5-cloud-synchronization-mobile--server-side)
 
-Module 6: PowerPoint Integration (Mobile & Server-side)
+[Module 6: PowerPoint Integration (Mobile & Server-side)](#module-6-powerpoint-integration-mobile--server-side)
 
-Module 7: Web Interface (Web)
+[Module 7: Web Interface (Web)](#module-7-web-interface-web)
 
-Module 8: Freemium Model (Mobile, Web, and Server-side)
+[Module 8: Freemium Model (Mobile, Web, and Server-side)](#module-8-freemium-model-mobile-web-and-server-side)
 
-Module 9: Admin Dashboard (Mobile & Web)
+[Module 9: Admin Dashboard (Mobile & Web)](#module-9-admin-dashboard-mobile--web)
 
-Module 10: User Notes (Mobile & Web)
+[Module 10: User Notes (Mobile & Web)](#module-10-user-notes-mobile--web)
 
-Module 11: App Preferences & Settings (Mobile)
+[Module 11: App Preferences & Settings (Mobile)](#module-11-app-preferences--settings-mobile)
 
-2.2. User characteristics
+[2.2. User characteristics](#user-characteristics)
 
-2.4. Constraints
+[2.4. Constraints](#24-constraints)
 
-2.5. Assumptions and dependencies
+[2.5. Assumptions and dependencies](#25-assumptions-and-dependencies)
 
-3\. Specific Requirements
+[3. Specific Requirements](#specific-requirements)
 
-3.1. External interface requirements
+[3.1. External interface requirements](#external-interface-requirements)
 
-3.1.1. Hardware interfaces
+[3.1.1. Hardware interfaces](#311-hardware-interfaces)
 
-3.1.2. Software interfaces
+[3.1.2. Software interfaces](#312-software-interfaces)
 
-3.1.3. Communications interfaces
+[3.1.3. Communications interfaces](#313-communications-interfaces)
 
-3.2. Functional requirements
+[3.2. Functional requirements](#functional-requirements)
 
-Module 1: Lecture Recording & Upload
+[Module 1: Lecture Recording & Upload](#module-1-lecture-recording--upload)
 
-Module 2: Audio Processing & Summarization
+[Module 2: Audio Processing & Summarization](#module-2-audio-processing--summarization)
 
-Module 3: Learning Material Recommendation
+[Module 3: Learning Material Recommendation](#module-3-learning-material-recommendation)
 
-Module 4: User Authentication & Account Management
+[Module 4: User Authentication & Account Management](#_Toc215557591)
 
-Module 5: Cloud Synchronization
+[Module 5: Cloud Synchronization](#module-5-cloud-synchronization)
 
-Module 6: PowerPoint Integration
+[Module 6: PowerPoint Integration](#module-6-powerpoint-integration)
 
-Module 7: Web Interface
+[Module 7: Web Interface](#module-7-web-interface)
 
-Module 8: Freemium Model
+[Module 8: Freemium Model](#module-8-freemium-model)
 
-Module 9: Admin Dashboard
+[Module 9: Admin Dashboard](#module-9-admin-dashboard)
 
-Module 10: User Notes
+[Module 10: User Notes](#module-10-user-notes)
 
-Module 11: App Preferences & Settings
+[Module 11: App Preferences & Settings](#module-11-app-preferences--settings)
 
-3.3 Non-functional requirements
+[3.3 Non-functional requirements](#_Toc215557599)
 
-Performance
+[Performance](#_Toc215557600)
 
-Security
+[Security](#_Toc215557601)
 
-Reliability
+[Reliability](#_Toc215557602)
 
-Usability
+[Usability](#_Toc215557603)
 
-Efficiency
+[Efficiency](#_Toc215557604)
 
-Scalability
+[Scalability](#_Toc215557605)
 
-Offline Capability
+[Offline Capability](#_Toc215557606)
 
 # Introduction
 
@@ -373,13 +373,19 @@ The primary users of AudioScholar are college and university students. These use
 **User Roles and Privileges:**
 
 -   **Logged-in Free User (Authenticated):**
-    -   Access to core features including cloud synchronization (optional), learning material recommendations (basic), and web interface access (limited features, details in Freemium Model section).
+    -   Access to core features including learning material recommendations (basic) and web interface access (limited features, details in Freemium Model section).
     -   May have limitations on usage quotas or feature sets compared to premium users.
 -   **Premium User (Subscribed):**
-    -   Full access to all features, including advanced summarization, expanded recommendation sources, priority processing, and potentially other premium features.
-    -   No usage limitations (or higher quotas) compared to free users.![https://cdn.discordapp.com/attachments/1327114434707197974/1418670162059464744/XPBDZXCn48JlVefMBWk7l40EQ8T0KAGWHcG3HzJOlREM_1ErRPRmy-xOa_NAcPs8IoHNVUrqZUisHEIOh14ty4xZm6XNiFRC92CfE0HYk3iTAG0w1Hl2c9YWav92o2CRpnRZ2dg3BXu-xeGmT1yXUc0zF4HGkboalHC2PVGCYvqV1b9BxM33HECVB033U2g7olLCLYTx1eGerw0R3.png?ex=68cef70c&is=68cda58c&hm=a6748f4fdd38b46d8dd4d61f219fb5657ae2f607f6c12717c57b4fe299ebbea1&](media/cf64b45b85b23b54f2ad8802e4e9cd29.png)
+    -   Full access to all features, including cloud synchronization, advanced summarization, expanded recommendation sources, priority processing, and potentially other premium features.
+    -   No usage limitations (or higher quotas) compared to free users.
 
-*Figure 2.2.1: Use Case Diagram for AudioScholar User Types and Feature Access*
+        ![PlantUML diagram](media/bd2b177c0bf2a6c9d8b081ae9c217f83.png)
+
+*Figure 2.2.1: Use Case Diagram for AudioScholar User Types and Feature Access Mobile*
+
+![PlantUML diagram](media/464207c422e683d7f38d6bce696b98a1.png)
+
+*Figure 2.2.2: Use Case Diagram for AudioScholar User Types and Feature Access Web*
 
 ## 2.4. Constraints
 
@@ -390,7 +396,7 @@ The development of AudioScholar is subject to the following constraints:
 -   **Platform Focus:** Initial mobile application development is restricted to the Android platform. iOS development is out of scope for version 1.0.
 -   **AI API Dependency:** The system’s core functionality relies on the Google Gemini AI API. Changes to the API’s availability, pricing, or functionality could impact the project.
 -   **Language Constraint:** The system will initially support English language lectures only.
--   **Freemium Model Constraints:** Feature limitations for free users, such as disabled background recording and limited recommendation sources, are part of the planned freemium model.
+-   **Freemium Model Constraints:** Feature limitations for free users, such as unavailable cloud synchronization (Premium only), disabled background recording, and limited recommendation sources, are part of the planned freemium model.
 -   **No Real-time Transcription:** Real-time transcription is not a planned feature for this version.
 -   **Web Interface Limitations:** Web interface will not support direct recording.
 
@@ -463,7 +469,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418670228061294693/TLAnZjjA3Epv5GCtxwMGWrmwLsSuS6K3GPoh0zwAaXPOBmKkTGSZoBz7Qzc8KwJIWZFa34TyBixcqpdHV_WIkJS-Rx1JCmakBKuL_NXo7V5DWbeRSu-N8jXnaRbbhtPct-1hukmlnmDHaixX2elzu6XZ7HGr4t5mDQmEslVIDZ5ZRo9rbgt0vVeWgcpEVHAijbCRzHG6JMmuwcjCW.png?ex=68cef71b&is=68cda59b&hm=73c63850cf029fba8e15871d2c029d488521e06d4773b0882d1f6e01e5aaa7eb&](media/9a688dfcc13bc52ebb613a25d462925e.png)
+![PlantUML diagram](media/e99725f4cede29a8a40344df241c17d8.png)
 
 *Figure 3.2.1.1: Use Case Diagram for Start/Stop Recording*
 
@@ -563,7 +569,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/eb00360022dd73ca47d33eb22e1efae1.png)
+![A diagram of a product AI-generated content may be incorrect.](media/21fec4967781715222b9507c3958694c.png)
 
 *Figure 3.2.1.4: Use Case Diagram for Upload Audio File*
 
@@ -700,7 +706,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 -   **Normal Flow:**
 1.  The student taps on a recording in the Library.
 2.  The application opens the **Recording Details Screen**.
-3.  The screen presents a media player with controls (Play/Pause, Seek, Speed Control).
+3.  The screen presents a media player with controls (Play/Pause, Seek, Speed Control) and Download options (Audio, PDF Summary, PPTX).
 4.  The screen displays tabs for:
 -   **Insights:** AI-generated summary, key topics, and keywords.
 -   **Resources:** Recommended learning materials (e.g., YouTube videos).
@@ -719,7 +725,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram (Internal Server-side Use Case, not directly initiated by user)
 
-![](media/c6f8af84df5eee365aef379fd18d1cd7.png)
+![A diagram of a system AI-generated content may be incorrect.](media/1ad29c173e5bd33308fe454c197d373f.png)
 
 *Figure 3.2.2.1: Use Case Diagram for Receive Audio for Processing (Server-side)*
 
@@ -760,7 +766,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram: (Internal Server-side Use Case)
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418873282505211914/RP11Yzj038Nlyoj4UcXxs4iXbnxAfhiqBFImOFPSbB4SYundWYHtQzhzxvtn69EQaaiyd_JqthjNGx5n2EuzD1UES4N1WOn4eKi29p8Z0I5iySI1RNAQn-OfG6z96fi20RwIfe5kuAZaKGb-Em20h-WlPqbZR1zII0BlllEvjwCGnSgJj2GBUqIvLFHs8oZa3UCvLCdDodw___-TR.png?ex=68cfb437&is=68ce62b7&hm=09ca1135186511ea8340a26ff700656b0192ba86207457005ae50ff7c47bbb50&](media/710a9e81534ccf4f89e3268a63d47525.png)
+![PlantUML diagram](media/2dc123236d8b39e83e0d28ace37fe800.png)
 
 *Figure 3.2.2.3: Use Case Diagram for Process Audio using AI API (Server-side)*
 
@@ -805,7 +811,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram: (Internal Server-side Use Case)
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418873336804671508/RP1DIyD048Rl-ok6UF1KA49xy22r4KNeBNYMIJ9Dbkv7c9r5WlhVtNnKecq2op3lp3lFp2u8iaHhr2qK9-sWGqPBGXpWw1bAaXG34zPOQgEbLo6LZLM0bNWkf3S4-471Mrg8CL25WU1JGVhsM9qQzj7LkJUUuUQWcrRs9j8aUww9PscztcxpN7qlp9WgGTUOP7TPlzbihizulXl-P.png?ex=68cfb444&is=68ce62c4&hm=bfd99239f3a183c18cf72de2181a3a3d4d669f23d60b20eb33238abc636dfcc1&](media/fd2a9abd91661452e769cf2b501e9e65.png)
+![PlantUML diagram](media/cc24b5a5cb8728fc700e593cfd8c8741.png)
 
 *Figure 3.2.2.5: Use Case Diagram for Generate Lecture Summary (Server-side)*
 
@@ -850,7 +856,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram: (Internal Server-side Use Case)
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418873597258235905/RP1FQyCm3CNl_XIYEsmx5CgWFUmmkcOC1hs5dOUQg8sfOnT9PcH_llkSnB1sMN8nUay_FMajYgonTUOQogFrS4B6bfHOO1yOTgJf3KnOuyuwgvsHP1jSW9K6BhLp1FXE4bew4wDGXKBmQI1z6woE1mxHrqLmYNkrjOT6DoxIA0UkYREqMAnMHM6-ps1CbQ8_k8IR-fVBvVypdk_wF.png?ex=68cfb482&is=68ce6302&hm=068d1ce83c8062c7990aee4a3335ab3e9af2cdc78b34c6aee4a3f2545fa86f0b&](media/c79d166e3c3668783fed9961c5cf0c6e.png)
+![PlantUML diagram](media/6aa28c4c37068caa09b6948d512cb353.png)
 
 *Figure 3.2.3.1: Use Case Diagram for Analyze Lecture Content (Server-side)*
 
@@ -894,7 +900,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/9316e96d3d7251405685c62f66a123ec.png)
+![PlantUML diagram](media/0a014668dc5028615e61e9b8fcf04d14.png)
 
 *Figure 3.2.3.3: Use Case Diagram for Generate Learning Material Recommendations (Server-side)*
 
@@ -943,7 +949,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/cbedad31266f9177fdbf4a3a621cfe11.png)
+![A diagram of an email service AI-generated content may be incorrect.](media/6d72b0f6b8df5a208ed3d0e330a3e6e7.png)
 
 *Figure 3.2.4.1: Use Case Diagram for User Registration (Mobile)*
 
@@ -963,15 +969,15 @@ The following assumptions and dependencies are relevant to the requirements outl
 4.  The application validates the input data (e.g., email format, password strength).
 5.  The application sends a registration request to the server (Firebase Authentication).
 6.  Firebase Authentication creates a new user account.
-7.  (Optional) Firebase Authentication sends a verification email to the provided email address.
+7.  Firebase Authentication sends a verification email to the provided email address.
 8.  The application creates a user profile in the database, storing user details.
-9.  The application logs the user in automatically after successful registration.
-10. The application displays a registration success message and redirects the user to the main application interface.
+9.  The application redirects the user to an Email Verification Notice screen.
+10. Upon successful email verification, the user can log in and access the main application interface.
 -   **Alternative Flows:**
     -   **A1. Invalid input data:** If the student enters invalid data in the registration form (e.g., invalid email format, weak password, missing required fields), the application displays appropriate error messages next to the invalid fields and prompts the student to correct the input.
     -   **A2. Email already registered:** If the entered email address is already registered with an existing account, the application displays an error message indicating that the email is already in use and prompts the user to use a different email or log in.
     -   **A3. Registration failure (server error, network error):** If the registration request to Firebase Authentication fails due to server errors or network connectivity issues, the application displays a generic error message and prompts the user to try again later.
-    -   **A4. Email verification failure (if implemented):** If email verification is implemented and the verification email fails to send or the user does not verify their email, the account may be created but may have limited functionality until verification is completed. *(Email verification may be considered for future enhancement)*
+    -   **A4. Email verification failure:** If the verification email fails to send or the user does not verify their email, the account will be created but access to full features will be restricted until the email is verified.
 -   **Postconditions:**
     -   A new user account is created in Firebase Authentication.
     -   A user profile is created in the database.
@@ -998,7 +1004,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/972bb23209fb95cbf4f89abaa214157f.png)
+![PlantUML diagram](media/360f637ffb2e69f1f7b81357997e1a0a.png)
 
 *Figure 3.2.4.4: Use Case Diagram for User Login with Google OAuth 2.0 (Mobile)*
 
@@ -1050,7 +1056,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/972bb23209fb95cbf4f89abaa214157f.png)
+![PlantUML diagram](media/e655fd8bedeff21e1124765d22a07658.png)
 
 *Figure 3.2.4.7: Use Case Diagram for User Login with GitHub OAuth 2.0 (Mobile)*
 
@@ -1102,7 +1108,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/c13b8a03cee2d6846fe13caa05e6abe4.png)
+![PlantUML diagram](media/1c324c78f856b5da663b0abe4996315d.png)
 
 *Figure 3.2.4.10: Use Case Diagram for User Login with Email/Password (Mobile)*
 
@@ -1153,7 +1159,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/578b5b8737dfdbd44c9059fb938af0b4.png)
+![PlantUML diagram](media/24de50a11d2816cf556f963000de8a6a.png)
 
 *Figure 3.2.4.13: Use Case Diagram for View User Profile (Mobile)*
 
@@ -1193,7 +1199,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/c85da5ca64796564be65d0ed87a7390d.png)
+![PlantUML diagram](media/eac56ae930b56873f01f0fac1fb37d9f.png)
 
 *Figure 3.2.4.16: Use Case Diagram for Edit User Profile (Mobile)*
 
@@ -1209,8 +1215,8 @@ The following assumptions and dependencies are relevant to the requirements outl
 -   **Normal Flow:**
 1.  The student navigates to the "Edit Profile" option from their profile viewing screen or settings.
 2.  The application displays the profile edit screen, pre-populated with the user's current profile information (e.g., name).
-3.  The student modifies the editable profile fields (e.g., changes their name).
-4.  The application performs client-side validation on the modified input data (e.g., name format).
+3.  The student modifies the editable profile fields (e.g., changes their name) or uploads a new Avatar image.
+4.  The application performs client-side validation on the modified input data (e.g., name format, image size).
 5.  The student taps the "Save" or "Update" button.
 6.  The application sends a request to the server to update the user's profile in the database with the modified information.
 7.  Upon successful update, the application displays a confirmation message indicating that the profile has been updated successfully.
@@ -1241,7 +1247,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/09f1e9c03ead4d85a690ce159da7c000.png)
+![PlantUML diagram](media/e18adf5facbfd0f2ed43d042aefdeece.png)
 
 *Figure 3.2.4.19: Use Case Diagram for Change Password (Mobile)*
 
@@ -1336,14 +1342,16 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 #### 5.1 Configure Cloud Sync Settings (Mobile)
 
-##### Use Case Diagram ![https://cdn.discordapp.com/attachments/1327114434707197974/1418672669808787617/VP8nZzH038Lx_ugdRO1YjpX4izMj0blTIKZBrSYNSPAH9kDbnW55YFzEdEpId4Jdw3q_VtRciHeNcyP4x_0vSbzuFABHKgGr2KkLkzXFHT0adG8kSsvn4REO-ugNAcYuoj9xrZAo7V4rSRQNvoUY99t152NsWo54JuoQYRWrBTWzQTzBsCUCSn7nhB83rxKWSZVdFWbsfob4lRI39.png?ex=68cef962&is=68cda7e2&hm=5ca84fd0b041ace90e5ec81230f970e98d5645a7901f3e389c2bedb24682a919&](media/19fb592079ed93e5655ea827441ead35.png)
+##### Use Case Diagram
+
+![PlantUML diagram](media/14d32195f7a1b585bc6c6298bd2774c6.png)
 
 *Figure 3.2.5.1: Use Case Diagram for Configure Cloud Sync Settings (Mobile)*
 
 ##### Use Case Description: Configure Cloud Sync Settings (Mobile)
 
 -   **Use Case ID**: UC_Configure_SyncSettings_Mobile
--   **Primary Actor**: Logged-in Free User
+-   **Primary Actor**: Premium User
 -   **Goal**: To configure the cloud synchronization settings for their AudioScholar account within the mobile application. This includes enabling/disabling cloud sync, setting the sync frequency, and choosing which data types to synchronize.
 -   **Preconditions**:
     -   The AudioScholar mobile application is installed and running.
@@ -1391,14 +1399,14 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418672746799300638/NL9DQnin4BthLmo-f8Lw2osvX10I77nAeE3cNARIU5UWbHRDh9DjwN_lZDQ6Dk33M7hpFjxgdWMhp6DoL_0OiQyuti2kr4fUAC0pvXaJx5AP0noMx8TQSlo54ak65oRO8PEkxaiTKMxWMy8iByzFpYKw2aY16lj184Gbj2Ndq4kfi7agVKzX6pFiAv5nrGqWj-62ESlgZ3t1WUefU.png?ex=68cef974&is=68cda7f4&hm=efd3c4d7d33e0cd04ac1b90e3b60a20d02d6638f32f7759fdcba124466fb16fe&](media/c2a3b24b3072d36c01eb0226f125667d.png)
+![PlantUML diagram](media/de5c18404415df2a1860d5899c2cf2bb.png)
 
 *Figure 3.2.5.4: Use Case Diagram for Manual Cloud Synchronization (Mobile)*
 
 ##### Use Case Description: Manual Cloud Synchronization (Mobile)
 
 -   **Use Case ID**: UC_Manual_CloudSync_Mobile
--   **Primary Actor**: Logged-in Free User
+-   **Primary Actor**: Premium User
 -   **Goal**: To manually initiate cloud synchronization of their AudioScholar data (recordings, summaries) from the mobile application to Nhost Cloud Storage and vice versa.
 -   **Preconditions:**
     -   The AudioScholar mobile application is installed and running.
@@ -1444,7 +1452,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418673277693464637/TP91Qzj048Nl-oiUlZW1MxsRO19S0WK7H1FV2cMo6ajBLpjYPzGubFxtMb83icblWsRUq_UUTAz6sVeskYK-1wepjHli96VsnXLAUUDSIaY6BydulBOW2GTbx4ZvB7gKt99jK4PATdZQEnVvQ3113dLZg49cFuYS8s-IiTXBNNEr3WcFcNdmoWkGZeDpmpMbEZ8M3tqLvDat4YdZ-.png?ex=68cef9f3&is=68cda873&hm=399fe05d1ec76a703555ab8ea58f4c536033d31aac506fb847313049074fdc3e&](media/3271f3b5ff87487bf78ace01359e5d30.png)
+![PlantUML diagram](media/64174eaa726746ce015774700dd0d6d6.png)
 
 *Figure 3.2.6.1: Use Case Diagram for Associate PowerPoint with Recording (Mobile)*
 
@@ -1494,7 +1502,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/3271f3b5ff87487bf78ace01359e5d30.png)
+![PlantUML diagram](media/64174eaa726746ce015774700dd0d6d6.png)
 
 *Figure 3.2.6.4: Use Case Diagram for Upload PowerPoint (Mobile)*
 
@@ -1547,7 +1555,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/6a140b428fd5817493f38e98fcf3e2c1.png)
+![PlantUML diagram](media/e0a7c0e479de8c4ea3819a0da5f307b2.png)
 
 *Figure 3.2.7.1: Use Case Diagram for View Recordings and Summaries (Web)*
 
@@ -1569,7 +1577,7 @@ The following assumptions and dependencies are relevant to the requirements outl
     5.  The web interface retrieves the summary associated with the selected recording from the server.
     6.  The web interface displays the lecture summary in a readable format below or alongside the recording information.
     7.  The user can review the summary text.
-    8.  Optionally, the user may also have the option to play back the audio recording directly from the web interface (see 7.1.5 Play Recording (Web).
+    8.  Optionally, the user may download the recording assets (Audio, Summary PDF, PowerPoint) or play back the audio recording directly from the web interface.
 -   **Alternative Flows:**
     -   **A1. User not logged in:** If the user attempts to access the recordings and summaries view without being logged in, the web interface redirects them to the login page.
     -   **A2. No recordings available:** If the user is logged in but has no lecture recordings associated with their account, the web interface displays a message indicating that no recordings are currently available.
@@ -1600,7 +1608,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/d19d63a3ac0e9b605989c0f12eb14d29.png)
+![PlantUML diagram](media/d3883fecd82dddd28703631d2ca9d320.png)
 
 *Figure 3.2.7.4: Use Case Diagram for Upload Audio Files (Web)*
 
@@ -1654,7 +1662,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![](media/2d6750e954bef5597d8ff7a21748baeb.png)
+![PlantUML diagram](media/0fea4c08f2301687f256b9338de83291.png)
 
 *Figure 3.2.7.7: Use Case Diagram for View Recommendations (Web)*
 
@@ -1727,7 +1735,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-##### ![](media/b1f8f1c6b6ea370ee6a36994430f74f3.png)
+![PlantUML diagram](media/7c850118ab04bce712a65bdc3412ae7f.png)
 
 *Figure 3.2.8.1: Use Case Diagram for Feature Access Control based on User Status (Mobile & Web)*
 
@@ -1747,7 +1755,7 @@ The following assumptions and dependencies are relevant to the requirements outl
         -   **Logged-in User:** If the user is logged in, the module proceeds to check their subscription status (in the future). For now, all logged-in users are considered logged-in free users.
         -   **Premium User (Future):** In the future, if premium subscriptions are implemented, the module will also check if the logged-in user has an active premium subscription.
     4.  Based on the user's status, the feature access control module determines if the requested feature is accessible:
-        -   **Logged-in Free Users:** Access to core features including online recording (foreground only, background recording is disabled for this tier), basic AI summarization, learning material recommendations (basic YouTube only), optional cloud synchronization, and limited web interface access (viewing recordings/summaries, audio upload). Some features may have usage quotas or limitations.
+        -   **Logged-in Free Users:** Access to core features including online recording (foreground only, background recording is disabled for this tier), basic AI summarization, learning material recommendations (basic YouTube only), and limited web interface access (viewing recordings/summaries, audio upload). Some features may have usage quotas or limitations.
         -   **Premium Users (Future):** Full access to all features, including advanced AI summarization, expanded recommendation sources, priority processing, potentially background recording, and full web interface functionality. No (or higher) usage limitations.
     5.  The application either grants access to the requested feature if authorized or denies access and provides appropriate feedback to the user:
         -   **Feature Granted:** The application proceeds with the requested functionality.
@@ -1836,7 +1844,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418673490948522135/RL3HQXin47pNLmn-oPFp0IQ459Vq9G63wxwMZMvz5jL9PdVFhYdzz-fqChr2tvRPdTcPUL4ZiN68xW6V0_L2mmRRBCBUkCDEU0ZZWFtueLx2sK9EUAT4FG-S30TbR4cvi5-p36GRx28bExo_EHVvQB0C2Vt9q8MYEV6T8szPi7hBVS_TEYIy2lEa9IkGrk5-iwDRVVI5ZAzqg_k6x.png?ex=68cefa25&is=68cda8a5&hm=e459b9784c311b840d542ad0e50f47453a4a775055072df575a069df036a9733&](media/bfb96cdb26c48d2be9d8ce52f11225bb.png)
+![PlantUML diagram](media/2c7cd1503aa5e069aaa7411660278451.png)
 
 *Figure 3.2.8.5: Use Case Diagram for Premium Subscription Management (Web)*
 
@@ -1885,7 +1893,7 @@ The following assumptions and dependencies are relevant to the requirements outl
 
 ##### Use Case Diagram
 
-![https://cdn.discordapp.com/attachments/1327114434707197974/1418673490948522135/RL3HQXin47pNLmn-oPFp0IQ459Vq9G63wxwMZMvz5jL9PdVFhYdzz-fqChr2tvRPdTcPUL4ZiN68xW6V0_L2mmRRBCBUkCDEU0ZZWFtueLx2sK9EUAT4FG-S30TbR4cvi5-p36GRx28bExo_EHVvQB0C2Vt9q8MYEV6T8szPi7hBVS_TEYIy2lEa9IkGrk5-iwDRVVI5ZAzqg_k6x.png?ex=68cefa25&is=68cda8a5&hm=e459b9784c311b840d542ad0e50f47453a4a775055072df575a069df036a9733&](media/bfb96cdb26c48d2be9d8ce52f11225bb.png)
+![PlantUML diagram](media/2c7cd1503aa5e069aaa7411660278451.png)
 
 *Figure 3.2.8.6: Use Case Diagram for Update User Status to Premium*
 
