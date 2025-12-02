@@ -323,12 +323,13 @@ const RecordingData = () => {
     setLoading(true);
     setError(null);
     try {
-      const cachedData = localStorage.getItem(`recording_metadata_${id}`);
-      if (cachedData) {
-        setRecordingData(JSON.parse(cachedData));
-        setLoading(false);
-        return;
-      }
+      // Force fresh fetch to ensure isFavorite status is current
+      // const cachedData = localStorage.getItem(`recording_metadata_${id}`);
+      // if (cachedData) {
+      //   setRecordingData(JSON.parse(cachedData));
+      //   setLoading(false);
+      //   return;
+      // }
 
       const token = localStorage.getItem('AuthToken');
       if (!token) {
@@ -346,6 +347,9 @@ const RecordingData = () => {
       const foundRecording = allRecordings.find(rec => rec.id === id);
 
       if (foundRecording) {
+        // Normalize favorite status
+        foundRecording.isFavorite = foundRecording.isFavorite !== undefined ? foundRecording.isFavorite : (foundRecording.favorite !== undefined ? foundRecording.favorite : false);
+        
         localStorage.setItem(`recording_metadata_${id}`, JSON.stringify(foundRecording));
         setRecordingData(foundRecording);
         console.log("Found recording metadata:", foundRecording);
