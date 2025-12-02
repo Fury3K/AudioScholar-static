@@ -127,8 +127,9 @@ const AdminUserList = () => {
                   </button>
                   <button
                     onClick={() => handleToggleStatus(user.uid, user.disabled)}
-                    disabled={!!actionLoading}
-                    className={`${user.disabled ? 'text-green-600 hover:text-green-900' : 'text-red-600 hover:text-red-900'} disabled:opacity-50`}
+                    disabled={!!actionLoading || user.roles.includes('ROLE_ADMIN')}
+                    title={user.roles.includes('ROLE_ADMIN') ? "Admins cannot be disabled" : ""}
+                    className={`${user.disabled ? 'text-green-600 hover:text-green-900' : 'text-red-600 hover:text-red-900'} disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {user.disabled ? 'Enable' : 'Disable'}
                   </button>

@@ -2,9 +2,11 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FiExternalLink, FiCopy, FiCheck, FiEdit, FiSave, FiX, FiLoader, FiAlertTriangle, FiCheckCircle, FiUploadCloud, FiClock, FiHeadphones, FiDownload, FiEye, FiEdit2 } from 'react-icons/fi';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import { API_BASE_URL } from '../../services/authService';
 import { noteService } from '../../services/noteService';
+import { recordingService } from '../../services/recordingService';
 import { Header } from '../Home/HomePage';
 
 const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
@@ -288,6 +290,32 @@ const RecordingData = () => {
       alert('Failed to save note. Please try again.');
     } finally {
       setIsSavingNotes(false);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!recordingData) return;
+
+    const originalIsFavorite = recordingData.isFavorite;
+    const newIsFavorite = !originalIsFavorite;
+
+    // Optimistic update
+    setRecordingData(prev => ({
+      ...prev,
+      isFavorite: newIsFavorite,
+      favoriteCount: (prev.favoriteCount || 0) + (newIsFavorite ? 1 : -1)
+    }));
+
+    try {
+      await recordingService.toggleFavorite(recordingData.id);
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+      // Revert
+      setRecordingData(prev => ({
+        ...prev,
+        isFavorite: originalIsFavorite,
+        favoriteCount: (prev.favoriteCount || 0)
+      }));
     }
   };
 
@@ -665,6 +693,13 @@ const RecordingData = () => {
               </div>
 
               <div className="flex space-x-3 mt-4 md:mt-0 flex-shrink-0">
+                <button
+                    onClick={handleToggleFavorite}
+                    className={`inline-flex items-center font-medium py-2 px-4 rounded-md text-sm transition-all duration-200 ease-in-out shadow hover:shadow-md transform hover:-translate-y-0.5 ${recordingData.isFavorite ? 'bg-white text-red-600' : 'bg-white text-teal-700 hover:bg-gray-50'}`}
+                >
+                    {recordingData.isFavorite ? <FaHeart className="mr-2 h-4 w-4" /> : <FaRegHeart className="mr-2 h-4 w-4" />}
+                    {recordingData.isFavorite ? 'Favorited' : 'Favorite'}
+                </button>
                 {audioSrcToPlay && (
                   <a
                     href={audioSrcToPlay}
