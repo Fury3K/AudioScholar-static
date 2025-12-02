@@ -1,8 +1,10 @@
 import axios from 'axios';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiAlertTriangle, FiCheckCircle, FiClock, FiExternalLink, FiFile, FiLoader, FiTrash2, FiUploadCloud, FiSearch, FiRefreshCw, FiWifiOff } from 'react-icons/fi';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../services/authService';
+import { recordingService } from '../../services/recordingService';
 import { Header } from '../Home/HomePage';
 
 const TERMINAL_STATUSES = ['COMPLETE', 'COMPLETED', 'FAILED', 'PROCESSING_HALTED_UNSUITABLE_CONTENT', 'PROCESSING_HALTED_NO_SPEECH', 'SUMMARY_FAILED', 'COMPLETED_WITH_WARNINGS'];
@@ -199,6 +201,34 @@ const RecordingList = () => {
         );
         setFilteredRecordings(filtered);
     }, [searchQuery, recordings]);
+
+    const handleToggleFavorite = async (recording) => {
+        const originalIsFavorite = recording.isFavorite;
+        const newIsFavorite = !originalIsFavorite;
+
+        // Optimistic Update
+        const updateRecording = (rec) => {
+            if (rec.id === recording.id) {
+                return { ...rec, isFavorite: newIsFavorite, favoriteCount: (rec.favoriteCount || 0) + (newIsFavorite ? 1 : -1) };
+            }
+            return rec;
+        };
+
+        setRecordings(prev => prev.map(updateRecording));
+
+        try {
+            await recordingService.toggleFavorite(recording.id);
+        } catch (err) {
+            console.error("Failed to toggle favorite", err);
+            // Revert
+             setRecordings(prev => prev.map(rec => {
+                if (rec.id === recording.id) {
+                    return { ...rec, isFavorite: originalIsFavorite, favoriteCount: (rec.favoriteCount || 0) };
+                }
+                return rec;
+            }));
+        }
+    };
 
 
     const handleDelete = async (idToDelete) => {
@@ -527,6 +557,14 @@ const RecordingList = () => {
                                                             </div>
                                                             <div className="flex items-center space-x-4 flex-shrink-0">
                                                                 {getStatusBadge(recording)}
+                                                                <button
+                                                                    onClick={() => handleToggleFavorite(recording)}
+                                                                    className={`p-1 rounded-md transition flex items-center gap-1 ${recording.isFavorite ? 'text-red-500 hover:bg-red-50' : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                                                                    title={recording.isFavorite ? "Unfavorite" : "Favorite"}
+                                                                >
+                                                                    {recording.isFavorite ? <FaHeart className="h-4 w-4" /> : <FaRegHeart className="h-4 w-4" />}
+                                                                    {recording.favoriteCount > 0 && <span className="text-xs font-medium">{recording.favoriteCount}</span>}
+                                                                </button>
                                                                 <Link to={`/recordings/${recording.id}`} className="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium inline-flex items-center" title="View Details">
                                                                     View Details <FiExternalLink className="ml-1 h-3 w-3" />
                                                                 </Link>
