@@ -107,6 +107,7 @@ const Dashboard = () => {
                   <p className="text-gray-600 dark:text-gray-300">Access administrative tools and user management.</p>
                 </Link>
               )}
+            </div>
           </div>
         </div>
       </main>
