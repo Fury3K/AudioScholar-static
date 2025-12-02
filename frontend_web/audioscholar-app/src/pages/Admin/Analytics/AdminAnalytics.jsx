@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { adminService } from '../../../services/adminService';
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+
 const SimpleBarChart = ({ data, title, colorClass }) => {
   if (!data || Object.keys(data).length === 0) return <div className="text-gray-500 italic">No data available</div>;
 
@@ -28,6 +30,91 @@ const SimpleBarChart = ({ data, title, colorClass }) => {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+};
+
+const PieChart = ({ data, title }) => {
+  if (!data || Object.keys(data).length === 0) return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full">
+      <h3 className="text-lg font-bold text-gray-800 mb-4">{title}</h3>
+      <div className="text-gray-500 italic">No data available</div>
+    </div>
+  );
+
+  const total = Object.values(data).reduce((acc, curr) => acc + curr, 0);
+  let currentAngle = 0;
+  
+  const slices = Object.entries(data).map(([label, value], index) => {
+    const percentage = value / total;
+    const angle = percentage * 360;
+    
+    const x1 = 50 + 40 * Math.cos(Math.PI * currentAngle / 180);
+    const y1 = 50 + 40 * Math.sin(Math.PI * currentAngle / 180);
+    
+    const endAngle = currentAngle + angle;
+    
+    const x2 = 50 + 40 * Math.cos(Math.PI * endAngle / 180);
+    const y2 = 50 + 40 * Math.sin(Math.PI * endAngle / 180);
+    
+    const largeArcFlag = angle > 180 ? 1 : 0;
+    
+    const pathData = `M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+    
+    const slice = {
+      path: pathData,
+      color: COLORS[index % COLORS.length],
+      label,
+      value,
+      percentage: (percentage * 100).toFixed(1)
+    };
+    
+    currentAngle += angle;
+    return slice;
+  });
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex flex-col">
+      <h3 className="text-lg font-bold text-gray-800 mb-4">{title}</h3>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-8 flex-grow">
+        <div className="w-48 h-48 flex-shrink-0">
+          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+            {total === 0 && (
+               <circle cx="50" cy="50" r="40" fill="#f3f4f6" />
+            )}
+            {slices.map((slice, i) => (
+              <path 
+                key={i} 
+                d={slice.path} 
+                fill={slice.color} 
+                className="hover:opacity-80 transition-opacity duration-200"
+              >
+                <title>{`${slice.label}: ${slice.value} (${slice.percentage}%)`}</title>
+              </path>
+            ))}
+             {slices.length === 1 && (
+                 <circle cx="50" cy="50" r="40" fill={slices[0].color} />
+             )}
+          </svg>
+        </div>
+        
+        <ul className="space-y-2 w-full max-w-xs">
+          {slices.map((slice, i) => (
+            <li key={i} className="flex items-center justify-between text-sm">
+              <div className="flex items-center">
+                <span 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: slice.color }}
+                ></span>
+                <span className="text-gray-600 truncate max-w-[120px]" title={slice.label}>
+                  {slice.label.replace('ROLE_', '').replace(/^./, str => str.toUpperCase())}
+                </span>
+              </div>
+              <span className="font-bold text-gray-800">{slice.value} ({slice.percentage}%)</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
@@ -86,28 +173,14 @@ const AdminAnalytics = () => {
 
       {/* Distribution Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">User Roles</h3>
-          <ul className="divide-y divide-gray-100">
-            {distribution?.usersByRole && Object.entries(distribution.usersByRole).map(([role, count]) => (
-              <li key={role} className="py-2 flex justify-between items-center">
-                <span className="text-gray-600">{role.replace('ROLE_', '')}</span>
-                <span className="font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded-full text-xs">{count}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Login Providers</h3>
-          <ul className="divide-y divide-gray-100">
-            {distribution?.usersByProvider && Object.entries(distribution.usersByProvider).map(([provider, count]) => (
-              <li key={provider} className="py-2 flex justify-between items-center">
-                <span className="text-gray-600 capitalize">{provider}</span>
-                <span className="font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded-full text-xs">{count}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <PieChart 
+          title="User Roles" 
+          data={distribution?.usersByRole} 
+        />
+        <PieChart 
+          title="Login Providers" 
+          data={distribution?.usersByProvider} 
+        />
       </div>
 
       {/* Engagement Section */}
