@@ -177,10 +177,10 @@ const SignIn = () => {
         };
 
         const handleGithubSignIn = () => {
-                setGithubLoading(true);
-                const githubClientId = 'Iv23liMzUNGL8JuXu40i';
-
-                // Use the Frontend Callback URL.
+        	setGithubLoading(true);
+        	const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+       
+        	// Use the Frontend Callback URL.
                 // The frontend (GithubAuthCallback.jsx) will receive the code and then send it to the backend.
                 // Dynamically determine the redirect base to handle localhost and production (and any custom domains)
                 const redirectBase = window.location.origin;
