@@ -24,12 +24,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.cit.audioscholar.dto.FavoriteStatusDto;
 import edu.cit.audioscholar.dto.UpdateRecordingRequest;
 import edu.cit.audioscholar.model.AudioMetadata;
 import edu.cit.audioscholar.model.Recording;
+import edu.cit.audioscholar.model.User;
 import edu.cit.audioscholar.service.AudioProcessingService;
 import edu.cit.audioscholar.service.FirebaseService;
 import edu.cit.audioscholar.service.RecordingService;
+import edu.cit.audioscholar.service.UserService;
 
 @RestController
 @RequestMapping("/api/audio")
@@ -39,6 +42,7 @@ public class AudioController {
 	private final AudioProcessingService audioProcessingService;
 	private final RecordingService recordingService;
 	private final FirebaseService firebaseService;
+	private final UserService userService;
 
 	private static final Set<String> ALLOWED_AUDIO_TYPES = Set.of("audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav",
 			"audio/aac", "audio/x-aac", "audio/ogg", "audio/flac", "audio/x-flac", "audio/aiff", "audio/x-aiff",
@@ -49,10 +53,11 @@ public class AudioController {
 	private static final int DEFAULT_PAGE_SIZE = 20;
 
 	public AudioController(AudioProcessingService audioProcessingService, RecordingService recordingService,
-			FirebaseService firebaseService) {
+			FirebaseService firebaseService, UserService userService) {
 		this.audioProcessingService = audioProcessingService;
 		this.recordingService = recordingService;
 		this.firebaseService = firebaseService;
+		this.userService = userService;
 	}
 
 	@PostMapping("/upload")
@@ -138,8 +143,18 @@ public class AudioController {
 
 		List<AudioMetadata> metadataList = audioProcessingService.getAudioMetadataListForUser(userId, effectivePageSize,
 				lastDocumentId);
-		log.info("Successfully retrieved {} metadata records for user {} (page)", metadataList.size(), userId);
-		return ResponseEntity.ok(metadataList);
+
+		// Populate isFavorite flag
+		User user = userService.getUserById(userId);
+		List<String> favorites = user != null ? user.getFavoriteRecordingIds() : java.util.Collections.emptyList();
+		List<AudioMetadata> enrichedList = metadataList.stream().map(m -> {
+			AudioMetadata copy = AudioMetadata.fromMap(m.toMap());
+			copy.setFavorite(favorites.contains(m.getRecordingId()));
+			return copy;
+		}).collect(java.util.stream.Collectors.toList());
+
+		log.info("Successfully retrieved {} metadata records for user {} (page)", enrichedList.size(), userId);
+		return ResponseEntity.ok(enrichedList);
 	}
 
 	@DeleteMapping("/metadata/{id}")
@@ -195,7 +210,32 @@ public class AudioController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
-		return ResponseEntity.ok(metadata);
+		// Populate isFavorite flag
+		User user = userService.getUserById(userId);
+		List<String> favorites = user != null ? user.getFavoriteRecordingIds() : java.util.Collections.emptyList();
+		AudioMetadata copy = AudioMetadata.fromMap(metadata.toMap());
+		copy.setFavorite(favorites.contains(metadata.getRecordingId()));
+
+		return ResponseEntity.ok(copy);
+	}
+
+	@PostMapping("/recordings/{id}/favorite")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<?> toggleFavorite(@PathVariable String id) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userId = authentication.getName();
+		log.info("Received request to toggle favorite for recording {} by user {}", id, userId);
+
+		try {
+			FavoriteStatusDto status = recordingService.toggleFavorite(userId, id);
+			return ResponseEntity.ok(status);
+		} catch (IllegalArgumentException e) {
+			log.warn("Invalid request to toggle favorite: {}", e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		} catch (Exception e) {
+			log.error("Error toggling favorite for recording {}: {}", id, e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to toggle favorite.");
+		}
 	}
 
 	@PatchMapping("/recordings/{recordingId}")

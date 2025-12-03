@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.data.remote.dto.*
 import edu.cit.audioscholar.data.remote.service.ApiService
+import edu.cit.audioscholar.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
@@ -407,6 +408,22 @@ class RemoteAudioRepositoryImpl @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
+    override fun toggleFavorite(recordingId: String): Flow<Resource<FavoriteStatusDto>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = apiService.toggleFavorite(recordingId)
+            if (response.isSuccessful && response.body() != null) {
+                emit(Resource.Success(response.body()!!))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = if (errorBody.isNullOrEmpty()) "Unknown error" else errorBody
+                emit(Resource.Error(errorMessage))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An unexpected error occurred"))
+        }
+    }.flowOn(Dispatchers.IO)
+
     override fun updateSummary(
         summaryId: String,
         newContent: String,
@@ -496,6 +513,125 @@ class RemoteAudioRepositoryImpl @Inject constructor(
             emit(Result.failure(exception))
         } catch (e: Exception) {
             Log.e(TAG_REMOTE_REPO, "Unexpected exception during cloud recording deletion: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.error_delete_failed_generic), e)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun createNote(
+        recordingId: String,
+        content: String,
+        tags: List<String>?
+    ): Flow<Result<UserNoteDto>> = flow {
+        try {
+            Log.d(TAG_REMOTE_REPO, "Creating note for recordingId: $recordingId")
+            val request = CreateUserNoteRequest(recordingId, content, tags)
+            val response = apiService.createNote(request)
+
+            if (response.isSuccessful && response.body() != null) {
+                Log.i(TAG_REMOTE_REPO, "Successfully created note for recordingId: $recordingId")
+                emit(Result.success(response.body()!!))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: application.getString(R.string.upload_error_server_generic)
+                Log.e(TAG_REMOTE_REPO, "Failed to create note: ${response.code()} - $errorBody")
+                val exception = mapHttpException("create note", response.code(), errorBody, HttpException(response))
+                emit(Result.failure(exception))
+            }
+        } catch (e: IOException) {
+            Log.e(TAG_REMOTE_REPO, "Network/IO exception creating note: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.upload_error_network_connection), e)))
+        } catch (e: HttpException) {
+            Log.e(TAG_REMOTE_REPO, "HTTP exception creating note: ${e.code()} - ${e.message()}", e)
+            val exception = mapHttpException("create note", e.code(), e.message(), e)
+            emit(Result.failure(exception))
+        } catch (e: Exception) {
+            Log.e(TAG_REMOTE_REPO, "Unexpected exception creating note: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.upload_error_unexpected, e.message ?: "Unknown error"), e)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun getNotes(recordingId: String): Flow<Result<List<UserNoteDto>>> = flow {
+        try {
+            Log.d(TAG_REMOTE_REPO, "Fetching notes for recordingId: $recordingId")
+            val response = apiService.getNotes(recordingId)
+
+            if (response.isSuccessful) {
+                val notes = response.body() ?: emptyList()
+                Log.i(TAG_REMOTE_REPO, "Successfully fetched ${notes.size} notes for recordingId: $recordingId")
+                emit(Result.success(notes))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: application.getString(R.string.upload_error_server_generic)
+                Log.e(TAG_REMOTE_REPO, "Failed to fetch notes: ${response.code()} - $errorBody")
+                val exception = mapHttpException("fetch notes", response.code(), errorBody, HttpException(response))
+                emit(Result.failure(exception))
+            }
+        } catch (e: IOException) {
+            Log.e(TAG_REMOTE_REPO, "Network/IO exception fetching notes: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.upload_error_network_connection), e)))
+        } catch (e: HttpException) {
+            Log.e(TAG_REMOTE_REPO, "HTTP exception fetching notes: ${e.code()} - ${e.message()}", e)
+            val exception = mapHttpException("fetch notes", e.code(), e.message(), e)
+            emit(Result.failure(exception))
+        } catch (e: Exception) {
+            Log.e(TAG_REMOTE_REPO, "Unexpected exception fetching notes: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.upload_error_unexpected, e.message ?: "Unknown error"), e)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun updateNote(
+        noteId: String,
+        content: String?,
+        tags: List<String>?
+    ): Flow<Result<UserNoteDto>> = flow {
+        try {
+            Log.d(TAG_REMOTE_REPO, "Updating note with ID: $noteId")
+            val request = UpdateUserNoteRequest(content, tags)
+            val response = apiService.updateNote(noteId, request)
+
+            if (response.isSuccessful && response.body() != null) {
+                Log.i(TAG_REMOTE_REPO, "Successfully updated note ID: $noteId")
+                emit(Result.success(response.body()!!))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: application.getString(R.string.upload_error_server_generic)
+                Log.e(TAG_REMOTE_REPO, "Failed to update note: ${response.code()} - $errorBody")
+                val exception = mapHttpException("update note", response.code(), errorBody, HttpException(response))
+                emit(Result.failure(exception))
+            }
+        } catch (e: IOException) {
+            Log.e(TAG_REMOTE_REPO, "Network/IO exception updating note: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.upload_error_network_connection), e)))
+        } catch (e: HttpException) {
+            Log.e(TAG_REMOTE_REPO, "HTTP exception updating note: ${e.code()} - ${e.message()}", e)
+            val exception = mapHttpException("update note", e.code(), e.message(), e)
+            emit(Result.failure(exception))
+        } catch (e: Exception) {
+            Log.e(TAG_REMOTE_REPO, "Unexpected exception updating note: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.upload_error_unexpected, e.message ?: "Unknown error"), e)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun deleteNote(noteId: String): Flow<Result<Unit>> = flow {
+        try {
+            Log.d(TAG_REMOTE_REPO, "Deleting note with ID: $noteId")
+            val response = apiService.deleteNote(noteId)
+
+            if (response.isSuccessful) {
+                Log.i(TAG_REMOTE_REPO, "Successfully deleted note ID: $noteId")
+                emit(Result.success(Unit))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: application.getString(R.string.error_delete_failed_generic)
+                Log.e(TAG_REMOTE_REPO, "Failed to delete note: ${response.code()} - $errorBody")
+                val exception = mapHttpException("delete note", response.code(), errorBody, HttpException(response))
+                emit(Result.failure(exception))
+            }
+        } catch (e: IOException) {
+            Log.e(TAG_REMOTE_REPO, "Network/IO exception deleting note: ${e.message}", e)
+            emit(Result.failure(IOException(application.getString(R.string.error_network_connection_generic), e)))
+        } catch (e: HttpException) {
+            Log.e(TAG_REMOTE_REPO, "HTTP exception deleting note: ${e.code()} - ${e.message()}", e)
+            val exception = mapHttpException("delete note", e.code(), e.message(), e)
+            emit(Result.failure(exception))
+        } catch (e: Exception) {
+            Log.e(TAG_REMOTE_REPO, "Unexpected exception deleting note: ${e.message}", e)
             emit(Result.failure(IOException(application.getString(R.string.error_delete_failed_generic), e)))
         }
     }.flowOn(Dispatchers.IO)

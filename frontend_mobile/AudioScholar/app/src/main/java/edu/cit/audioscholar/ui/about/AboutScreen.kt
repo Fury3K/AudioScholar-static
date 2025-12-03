@@ -58,6 +58,8 @@ import androidx.navigation.NavController
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.ui.auth.LegalContent
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -271,7 +273,7 @@ fun AboutScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            Button(
+            ModernButton(
                 onClick = { launchEmailIntent(context) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -288,27 +290,23 @@ fun AboutScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                TextButton(
+                ModernOutlinedButton(
                     onClick = {
                         legalSheetTitle = context.getString(R.string.settings_item_privacy_policy)
                         legalSheetContent = LegalContent.PRIVACY_POLICY
                         showLegalSheet = true
                     },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
+                    modifier = Modifier.weight(1f).padding(end = 8.dp)
                 ) {
                     Text(stringResource(id = R.string.about_link_privacy_policy))
                 }
-                TextButton(
+                ModernOutlinedButton(
                     onClick = {
                         legalSheetTitle = context.getString(R.string.settings_item_terms_service)
                         legalSheetContent = LegalContent.TERMS_OF_SERVICE
                         showLegalSheet = true
                     },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
+                    modifier = Modifier.weight(1f).padding(start = 8.dp)
                 ) {
                     Text(stringResource(id = R.string.about_link_terms_of_use))
                 }

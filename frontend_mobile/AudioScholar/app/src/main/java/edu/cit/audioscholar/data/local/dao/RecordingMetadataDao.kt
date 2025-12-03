@@ -36,4 +36,7 @@ interface RecordingMetadataDao {
 
     @Query("UPDATE recording_metadata SET cachedRecommendations = :recommendationsJson, cacheTimestampMillis = :timestamp WHERE remoteRecordingId = :remoteId")
     suspend fun updateCachedRecommendations(remoteId: String, recommendationsJson: String?, timestamp: Long): Int
+
+    @Query("UPDATE recording_metadata SET isFavorite = :isFavorite WHERE filePath = :filePath")
+    suspend fun updateFavoriteStatus(filePath: String, isFavorite: Boolean): Int
 }

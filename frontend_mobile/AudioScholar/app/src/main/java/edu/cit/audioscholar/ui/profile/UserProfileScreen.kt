@@ -18,6 +18,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernDialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -41,7 +44,6 @@ fun UserProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
 
     LaunchedEffect(uiState.navigateToLogin) {
         if (uiState.navigateToLogin) {
@@ -115,12 +117,12 @@ fun UserProfileScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(16.dp)
                     )
-                    Button(onClick = { viewModel.loadUserProfile() }) {
+                    ModernButton(onClick = { viewModel.loadUserProfile() }) {
                         Text("Retry")
                     }
                     Spacer(Modifier.height(16.dp))
                     // Allow logout even in error state
-                    Button(
+                    ModernButton(
                         onClick = { showLogoutDialog = true },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
@@ -221,9 +223,25 @@ fun UserProfileScreen(
                         }
                     }
 
+                    if (content.isAdmin) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ModernButton(
+                            onClick = { navController.navigate(Screen.AdminDashboard.route) },
+                            modifier = Modifier.fillMaxWidth(0.8f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                contentColor = MaterialTheme.colorScheme.onTertiary
+                            )
+                        ) {
+                            Icon(Icons.Filled.Dashboard, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                            Text(stringResource(R.string.nav_admin_dashboard))
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Button(
+                    ModernButton(
                         onClick = { navController.navigate(Screen.EditProfile.route) },
                         modifier = Modifier.fillMaxWidth(0.8f)
                     ) {
@@ -235,7 +253,7 @@ fun UserProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     if (content.hasPasswordProvider) {
-                        Button(
+                        ModernButton(
                             onClick = { navController.navigate(Screen.ChangePassword.route) },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {
@@ -246,40 +264,40 @@ fun UserProfileScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    Button(
+                    ModernButton(
                         onClick = { navController.navigate(Screen.SubscriptionPricing.route) {
-                            launchSingleTop = true 
+                            launchSingleTop = true
                         }},
                         modifier = Modifier.fillMaxWidth(0.8f),
                         enabled = !content.isPremium,
-                        colors = if (!content.isPremium) 
-                            ButtonDefaults.buttonColors() 
-                        else 
+                        colors = if (!content.isPremium)
+                            ButtonDefaults.buttonColors()
+                        else
                             ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                     ) {
                         Icon(
-                            Icons.Filled.School, 
-                            contentDescription = null, 
+                            Icons.Filled.School,
+                            contentDescription = null,
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                         Text(
-                            if (content.isPremium) 
-                                stringResource(R.string.premium_label) 
-                            else 
+                            if (content.isPremium)
+                                stringResource(R.string.premium_label)
+                            else
                                 stringResource(R.string.premium_upgrade_button)
                         )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
+                    ModernOutlinedButton(
                         onClick = { showLogoutDialog = true },
                         modifier = Modifier.fillMaxWidth(0.8f),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
@@ -293,10 +311,10 @@ fun UserProfileScreen(
     }
 
     if (showLogoutDialog) {
-        AlertDialog(
+        ModernDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text(stringResource(R.string.dialog_logout_title)) },
-            text = { Text(stringResource(R.string.dialog_logout_message)) },
+            title = stringResource(R.string.dialog_logout_title),
+            content = { Text(stringResource(R.string.dialog_logout_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {

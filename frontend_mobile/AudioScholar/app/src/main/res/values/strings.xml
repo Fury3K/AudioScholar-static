@@ -119,6 +119,8 @@
     <string name="cd_powerpoint_section">PowerPoint attachment section</string>
     <string name="cd_youtube_recommendations_section">YouTube recommendations section</string>
     <string name="cd_delete_recording_action">Delete recording</string>
+    <string name="cd_favorite_add">Add to favorites</string>
+    <string name="cd_favorite_remove">Remove from favorites</string>
     <string name="details_playback_title">Playback</string>
     <string name="cd_play_playback">Play recording</string>
     <string name="cd_pause_playback">Pause recording</string>
@@ -215,6 +217,11 @@
     <string name="settings_section_app_prefs">App Preferences</string>
     <string name="settings_item_theme">Theme</string>
     <string name="settings_dialog_title_theme">Select Theme</string>
+    <string name="settings_theme_style">Theme Style</string>
+    <string name="settings_theme_style_classic">Classic</string>
+    <string name="settings_theme_style_quantum">Quantum Indigo</string>
+    <string name="settings_theme_style_zen">Zen Sage</string>
+    <string name="settings_dialog_title_theme_style">Select Theme Style</string>
     <string name="settings_dialog_title_quality">Select Recording Quality</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="settings_section_audio">Audio Recording Settings</string>
@@ -292,7 +299,7 @@
     <string name="about_feature_youtube">Get YouTube video recommendations</string>
     <string name="about_feature_login">Secure login via Email, Google, GitHub</string>
     <string name="about_feature_sync">Optional cloud sync with Nhost</string>
-    <string name="about_developer_credits_title">Crafted by:</string>
+    <string name="about_developer_credits_title">Developed by:</string>
     <string name="about_advisers_title">Advisers:</string>
     <string name="about_developer_adviser">Capstone Adviser / Overall Lead: Ralph P. Laviste</string>
     <string name="about_developer_adviser_group">Group Adviser: Jasmine A. Tulin</string>
@@ -437,7 +444,7 @@
     <string name="login_error_missing_api_token">Login failed: Missing API token from server.</string>
     <string name="login_error_server_validation">Login failed: Server validation error.</string>
     <string name="login_error_invalid_credentials">Invalid email or password.</string>
-    <string name="login_error_account_disabled">This account has been disabled.</string>
+    <string name="login_error_account_disabled">Your account has been suspended. If you believe this is a mistake, please reach out to our support team.</string>
     <string name="login_error_generic">Login failed: %1$s</string>
     <string name="login_error_google_signin">Google Sign-In failed or cancelled.</string>
     <string name="login_error_github_code_missing">GitHub login failed: Authorization code missing.</string>
@@ -468,4 +475,16 @@
     <string name="email_verification_verified">Email verified successfully!</string>
     <string name="email_verification_sent">Verification email sent.</string>
     <string name="email_verification_check_button">I\'ve Verified My Email</string>
+
+    <!-- Admin Dashboard -->
+    <string name="nav_admin_dashboard">Admin Dashboard</string>
+    <string name="nav_admin_user_management">User Management</string>
+    <string name="nav_admin_analytics">Analytics</string>
+    <string name="admin_dashboard_title">Admin Dashboard</string>
+    <string name="admin_stats_total_users">Total Users</string>
+    <string name="admin_stats_total_recordings">Total Recordings</string>
+    <string name="admin_stats_storage_used">Storage Used</string>
+    <string name="admin_stats_total_duration">Total Duration</string>
+    <string name="admin_btn_manage_users">Manage Users</string>
+    <string name="admin_btn_view_analytics">View Analytics</string>
 </resources>

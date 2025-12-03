@@ -36,6 +36,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.domain.repository.AuthRepository
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import edu.cit.audioscholar.ui.theme.AudioScholarTheme
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -359,10 +361,10 @@ fun CardPaymentDetailsScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    OutlinedTextField(
+                    ModernTextField(
                         value = cardNumber,
                         onValueChange = { cardNumber = it.filter { char -> char.isDigit() }.take(19); cardNumberError = null },
-                        label = { Text(stringResource(R.string.payment_card_number_label)) },
+                        label = stringResource(R.string.payment_card_number_label),
                         leadingIcon = { Icon(Icons.Filled.CreditCard, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -371,58 +373,78 @@ fun CardPaymentDetailsScreen(
                         visualTransformation = CreditCardNumberVisualTransformation(),
                         singleLine = true,
                         isError = cardNumberError != null,
-                        supportingText = { cardNumberError?.let { Text(stringResource(id = it)) } },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.fillMaxWidth()
                     )
-
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedTextField(
-                            value = expiryDate,
-                            onValueChange = {
-                                val newText = it.filter { char -> char.isDigit() }
-                                if (newText.length <= 4) {
-                                    expiryDate = newText
-                                }
-                                expiryDateError = null
-                            },
-                            label = { Text(stringResource(R.string.payment_expiry_date_label)) },
-                            placeholder = { Text("MM/YY") },
-                            leadingIcon = { Icon(Icons.Filled.CalendarMonth, contentDescription = null) },
-                            visualTransformation = ExpiryDateVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next
-                            ),
-                            singleLine = true,
-                            isError = expiryDateError != null,
-                            supportingText = { expiryDateError?.let { Text(stringResource(id = it)) } },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        OutlinedTextField(
-                            value = cvv,
-                            onValueChange = { cvv = it.filter { char -> char.isDigit() }.take(4); cvvError = null },
-                            label = { Text(stringResource(R.string.payment_cvv_label)) },
-                            placeholder = { Text("123") },
-                            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next
-                            ),
-                            singleLine = true,
-                            isError = cvvError != null,
-                            supportingText = { cvvError?.let { Text(stringResource(id = it)) } },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp)
+                    if (cardNumberError != null) {
+                        Text(
+                            text = stringResource(id = cardNumberError!!),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                         )
                     }
 
-                    OutlinedTextField(
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ModernTextField(
+                                value = expiryDate,
+                                onValueChange = {
+                                    val newText = it.filter { char -> char.isDigit() }
+                                    if (newText.length <= 4) {
+                                        expiryDate = newText
+                                    }
+                                    expiryDateError = null
+                                },
+                                label = stringResource(R.string.payment_expiry_date_label),
+                                placeholder = "MM/YY",
+                                leadingIcon = { Icon(Icons.Filled.CalendarMonth, contentDescription = null) },
+                                visualTransformation = ExpiryDateVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Next
+                                ),
+                                singleLine = true,
+                                isError = expiryDateError != null
+                            )
+                            if (expiryDateError != null) {
+                                Text(
+                                    text = stringResource(id = expiryDateError!!),
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                )
+                            }
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            ModernTextField(
+                                value = cvv,
+                                onValueChange = { cvv = it.filter { char -> char.isDigit() }.take(4); cvvError = null },
+                                label = stringResource(R.string.payment_cvv_label),
+                                placeholder = "123",
+                                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Next
+                                ),
+                                singleLine = true,
+                                isError = cvvError != null
+                            )
+                            if (cvvError != null) {
+                                Text(
+                                    text = stringResource(id = cvvError!!),
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    ModernTextField(
                         value = cardholderName,
                         onValueChange = { cardholderName = it; cardholderNameError = null },
-                        label = { Text(stringResource(R.string.payment_cardholder_name_label)) },
+                        label = stringResource(R.string.payment_cardholder_name_label),
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
@@ -430,10 +452,16 @@ fun CardPaymentDetailsScreen(
                         ),
                         singleLine = true,
                         isError = cardholderNameError != null,
-                        supportingText = { cardholderNameError?.let { Text(stringResource(id = it)) } },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.fillMaxWidth()
                     )
+                    if (cardholderNameError != null) {
+                        Text(
+                            text = stringResource(id = cardholderNameError!!),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
                 }
             }
 
@@ -511,14 +539,12 @@ fun CardPaymentDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
+            ModernButton(
                 onClick = { handleSubmit() },
                 enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(

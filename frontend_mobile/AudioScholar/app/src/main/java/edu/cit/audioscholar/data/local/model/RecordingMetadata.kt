@@ -27,5 +27,6 @@ data class RecordingMetadata(
     val summaryId: String? = null,
     val cachedRecommendations: List<RecommendationDto>?,
     val cacheTimestampMillis: Long?,
-    val attachmentUri: String? = null
+    val attachmentUri: String? = null,
+    val isFavorite: Boolean = false
 )

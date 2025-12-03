@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,8 +29,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.cloud.firestore.FieldValue;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.ListUsersPage;
 import com.google.firebase.auth.UserRecord;
 
+import edu.cit.audioscholar.dto.AdminUserListItemDto;
 import edu.cit.audioscholar.dto.RegistrationRequest;
 import edu.cit.audioscholar.dto.UpdateUserProfileRequest;
 import edu.cit.audioscholar.exception.FirestoreInteractionException;
@@ -659,5 +663,86 @@ public class UserService {
 		log.info("Changing password for user ID: {}", userId);
 		firebaseService.updateUserPassword(userId, newPassword);
 		log.info("Password successfully changed for user ID: {}", userId);
+	}
+
+	public ListUsersPage getAllUsers(int limit, String pageToken) throws FirebaseAuthException {
+		return firebaseService.listUsers(limit, pageToken);
+	}
+
+	public Map<String, Object> getAllUsersFromFirestore(int limit, String pageToken) {
+		List<Map<String, Object>> usersData = firebaseService.getUsersFromFirestore(limit, pageToken);
+		List<AdminUserListItemDto> users = new ArrayList<>();
+		String nextPageToken = null;
+
+		for (Map<String, Object> data : usersData) {
+			User user = User.fromMap(data);
+			if (user != null) {
+				// Map User to AdminUserListItemDto
+				String uid = user.getUserId();
+				String email = user.getEmail();
+				String displayName = user.getDisplayName();
+				String photoUrl = user.getProfileImageUrl();
+				boolean disabled = user.isDisabled();
+				List<String> roles = user.getRoles();
+				boolean emailVerified = false; // Not stored in Firestore, defaulting to false for list view
+
+				users.add(new AdminUserListItemDto(uid, email, displayName, photoUrl, disabled, emailVerified, roles));
+			}
+		}
+
+		if (!users.isEmpty() && users.size() == limit) {
+			nextPageToken = users.get(users.size() - 1).uid();
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("users", users);
+		result.put("pageToken", nextPageToken);
+		return result;
+	}
+
+	@CacheEvict(value = USER_CACHE, key = "#uid")
+	public void updateUserStatus(String uid, boolean disabled)
+			throws FirebaseAuthException, FirestoreInteractionException {
+		if (!StringUtils.hasText(uid)) {
+			log.error("Cannot update status for blank UID.");
+			throw new IllegalArgumentException("User ID cannot be blank.");
+		}
+		log.info("Updating disabled status to {} for user {}", disabled, uid);
+
+		// 1. Update Firebase Auth
+		firebaseService.setUserDisabled(uid, disabled);
+
+		// 2. Update Firestore (best effort / consistency)
+		try {
+			firebaseService.updateDataWithMap(COLLECTION_NAME, uid, Map.of("disabled", disabled));
+		} catch (Exception e) {
+			log.warn(
+					"Failed to update disabled status in Firestore for user {}, but Auth status was updated. Error: {}",
+					uid, e.getMessage());
+		}
+	}
+
+	@CacheEvict(value = USER_CACHE, key = "#uid")
+	public void updateUserRoles(String uid, List<String> roles)
+			throws FirebaseAuthException, FirestoreInteractionException {
+		if (!StringUtils.hasText(uid)) {
+			log.error("Cannot update roles for blank UID.");
+			throw new IllegalArgumentException("User ID cannot be blank.");
+		}
+		if (roles == null || roles.isEmpty()) {
+			log.error("Cannot update roles with empty list for user {}", uid);
+			throw new IllegalArgumentException("Roles list cannot be empty.");
+		}
+
+		log.info("Updating roles for user {}: {}", uid, roles);
+
+		// 1. Update Firestore
+		firebaseService.updateDataWithMap(COLLECTION_NAME, uid, Map.of("roles", roles));
+
+		// 2. Update Firebase Auth Custom Claims
+		// We wrap roles in a map as setCustomUserClaims expects Map<String, Object>
+		Map<String, Object> claims = Map.of("roles", roles);
+		firebaseService.setCustomUserClaims(uid, claims);
+		log.info("Roles updated in both Firestore and Firebase Auth claims for user {}", uid);
 	}
 }

@@ -20,6 +20,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -98,7 +101,7 @@ fun RegistrationScreen(
                         style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
-                Button(
+                ModernButton(
                     onClick = { scope.launch { sheetState.hide() }.invokeOnCompletion { showLegalSheet = false } },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -220,46 +223,49 @@ fun RegistrationScreen(
                 modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
             )
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.firstName,
                 onValueChange = viewModel::onFirstNameChange,
-                label = { Text(stringResource(R.string.registration_first_name)) },
+                label = stringResource(R.string.registration_first_name),
                 leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 isError = uiState.firstName.isNotBlank() && uiState.errorMessage?.contains("Name fields") == true,
                 enabled = !uiState.isAnyLoading
             )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.lastName,
                 onValueChange = viewModel::onLastNameChange,
-                label = { Text(stringResource(R.string.registration_last_name)) },
+                label = stringResource(R.string.registration_last_name),
                 leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 isError = uiState.lastName.isNotBlank() && uiState.errorMessage?.contains("Name fields") == true,
                 enabled = !uiState.isAnyLoading
             )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChange,
-                label = { Text(stringResource(R.string.registration_email)) },
+                label = stringResource(R.string.registration_email),
                 leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 isError = uiState.email.isNotBlank() && uiState.errorMessage?.contains("email address") == true,
                 enabled = !uiState.isAnyLoading
             )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text(stringResource(R.string.registration_password)) },
+                label = stringResource(R.string.registration_password),
                 leadingIcon = { Icon(Icons.Outlined.Password, contentDescription = null) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -288,18 +294,21 @@ fun RegistrationScreen(
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                PasswordRequirementsIndicator(result = passwordValidation)
+                PasswordRequirementsIndicator(
+                    result = passwordValidation,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
             
             // Add a small spacer if validation is hidden to keep layout breathing, but less than before
             if (!(isPasswordFocused || (uiState.password.isNotEmpty() && !passwordValidation.isValid))) {
-                 Spacer(modifier = Modifier.height(8.dp))
+                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            OutlinedTextField(
+            ModernTextField(
                 value = uiState.confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
-                label = { Text(stringResource(R.string.registration_confirm_password)) },
+                label = stringResource(R.string.registration_confirm_password),
                 leadingIcon = { Icon(Icons.Outlined.Password, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -396,7 +405,7 @@ fun RegistrationScreen(
                 )
             }
 
-            Button(
+            ModernButton(
                 onClick = {
                     focusManager.clearFocus()
                     viewModel.registerUser()
@@ -405,7 +414,6 @@ fun RegistrationScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 16.dp)
-                    .height(48.dp)
             ) {
                 if (uiState.registrationInProgress) {
                     CircularProgressIndicator(
@@ -429,10 +437,9 @@ fun RegistrationScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
+                ModernOutlinedButton(
                     onClick = viewModel::onGoogleRegisterClick,
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     enabled = !uiState.isAnyLoading
                 ) {
                     if (uiState.isGoogleRegistrationLoading) {
@@ -443,10 +450,9 @@ fun RegistrationScreen(
                         Text("Google")
                     }
                 }
-                OutlinedButton(
+                ModernOutlinedButton(
                     onClick = viewModel::onGitHubRegisterClick,
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     enabled = !uiState.isAnyLoading
                 ) {
                     if (uiState.isGitHubRegistrationLoading) {

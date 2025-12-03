@@ -2,8 +2,11 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FiExternalLink, FiCopy, FiCheck, FiEdit, FiSave, FiX, FiLoader, FiAlertTriangle, FiCheckCircle, FiUploadCloud, FiClock, FiHeadphones, FiDownload, FiEye, FiEdit2 } from 'react-icons/fi';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import { API_BASE_URL } from '../../services/authService';
+import { noteService } from '../../services/noteService';
+import { recordingService } from '../../services/recordingService';
 import { Header } from '../Home/HomePage';
 
 const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
@@ -238,24 +241,81 @@ const RecordingData = () => {
 
   // User Notes State
   const [userNotes, setUserNotes] = useState('');
+  const [noteId, setNoteId] = useState(null);
   const [isEditingNotes, setIsEditingNotes] = useState(true);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
-  // Load Notes from LocalStorage
+  // Load Notes from Backend
   useEffect(() => {
-    if (id) {
-      const savedNotes = localStorage.getItem(`user_notes_${id}`);
-      if (savedNotes) {
-        setUserNotes(savedNotes);
-        setIsEditingNotes(false); // Start in preview mode if notes exist
+    const loadNotes = async () => {
+      if (id) {
+        try {
+          const notes = await noteService.getNotes(id);
+          if (notes && notes.length > 0) {
+            // Assuming one note per recording for now, or taking the most recent
+            // If backend returns list, we pick the first one
+            const currentNote = notes[0];
+            setUserNotes(currentNote.content);
+            setNoteId(currentNote.id);
+            setIsEditingNotes(false); // Start in preview mode if notes exist
+          }
+        } catch (err) {
+          console.error('Failed to load notes:', err);
+          // Fallback or silent fail - maybe show a toast notification in a real app
+        }
       }
-    }
+    };
+    loadNotes();
   }, [id]);
 
-  // Save Notes to LocalStorage
-  const handleSaveNotes = () => {
-    if (id) {
-      localStorage.setItem(`user_notes_${id}`, userNotes);
+  // Save Notes to Backend
+  const handleSaveNotes = async () => {
+    if (!id) return;
+
+    setIsSavingNotes(true);
+    try {
+      if (noteId) {
+        // Update existing note
+        const updatedNote = await noteService.updateNote(noteId, userNotes);
+        setUserNotes(updatedNote.content);
+      } else {
+        // Create new note
+        const newNote = await noteService.createNote(id, userNotes);
+        setNoteId(newNote.id);
+        setUserNotes(newNote.content);
+      }
       setIsEditingNotes(false);
+    } catch (err) {
+      console.error('Failed to save note:', err);
+      alert('Failed to save note. Please try again.');
+    } finally {
+      setIsSavingNotes(false);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!recordingData) return;
+
+    const originalIsFavorite = recordingData.isFavorite;
+    const newIsFavorite = !originalIsFavorite;
+
+    // Optimistic update
+    setRecordingData(prev => ({
+      ...prev,
+      isFavorite: newIsFavorite,
+      favoriteCount: (prev.favoriteCount || 0) + (newIsFavorite ? 1 : -1)
+    }));
+
+    try {
+      await recordingService.toggleFavorite(recordingData.id);
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+      // Revert
+      setRecordingData(prev => ({
+        ...prev,
+        isFavorite: originalIsFavorite,
+        favoriteCount: (prev.favoriteCount || 0)
+      }));
     }
   };
 
@@ -263,12 +323,13 @@ const RecordingData = () => {
     setLoading(true);
     setError(null);
     try {
-      const cachedData = localStorage.getItem(`recording_metadata_${id}`);
-      if (cachedData) {
-        setRecordingData(JSON.parse(cachedData));
-        setLoading(false);
-        return;
-      }
+      // Force fresh fetch to ensure isFavorite status is current
+      // const cachedData = localStorage.getItem(`recording_metadata_${id}`);
+      // if (cachedData) {
+      //   setRecordingData(JSON.parse(cachedData));
+      //   setLoading(false);
+      //   return;
+      // }
 
       const token = localStorage.getItem('AuthToken');
       if (!token) {
@@ -286,6 +347,9 @@ const RecordingData = () => {
       const foundRecording = allRecordings.find(rec => rec.id === id);
 
       if (foundRecording) {
+        // Normalize favorite status
+        foundRecording.isFavorite = foundRecording.isFavorite !== undefined ? foundRecording.isFavorite : (foundRecording.favorite !== undefined ? foundRecording.favorite : false);
+        
         localStorage.setItem(`recording_metadata_${id}`, JSON.stringify(foundRecording));
         setRecordingData(foundRecording);
         console.log("Found recording metadata:", foundRecording);
@@ -633,6 +697,13 @@ const RecordingData = () => {
               </div>
 
               <div className="flex space-x-3 mt-4 md:mt-0 flex-shrink-0">
+                <button
+                    onClick={handleToggleFavorite}
+                    className={`inline-flex items-center font-medium py-2 px-4 rounded-md text-sm transition-all duration-200 ease-in-out shadow hover:shadow-md transform hover:-translate-y-0.5 ${recordingData.isFavorite ? 'bg-white text-red-600' : 'bg-white text-teal-700 hover:bg-gray-50'}`}
+                >
+                    {recordingData.isFavorite ? <FaHeart className="mr-2 h-4 w-4" /> : <FaRegHeart className="mr-2 h-4 w-4" />}
+                    {recordingData.isFavorite ? 'Favorited' : 'Favorite'}
+                </button>
                 {audioSrcToPlay && (
                   <a
                     href={audioSrcToPlay}
@@ -911,9 +982,14 @@ const RecordingData = () => {
                          {isEditingNotes && (
                              <button 
                                 onClick={handleSaveNotes}
-                                className="flex items-center px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition"
+                                disabled={isSavingNotes}
+                                className={`flex items-center px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition ${isSavingNotes ? 'opacity-70 cursor-wait' : ''}`}
                              >
-                                 <FiSave className="mr-1.5"/> Save
+                                 {isSavingNotes ? (
+                                    <><FiLoader className="mr-1.5 animate-spin"/> Saving...</>
+                                 ) : (
+                                    <><FiSave className="mr-1.5"/> Save</>
+                                 )}
                              </button>
                          )}
                     </div>

@@ -13,6 +13,10 @@ import edu.cit.audioscholar.data.remote.dto.TimestampDto
 import edu.cit.audioscholar.domain.repository.LocalAudioRepository
 import edu.cit.audioscholar.domain.repository.RemoteAudioRepository
 import edu.cit.audioscholar.util.FileUtils
+import edu.cit.audioscholar.util.ProcessingEventBus
+import edu.cit.audioscholar.util.onSuccess
+import edu.cit.audioscholar.util.onFailure
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -47,7 +51,8 @@ data class LibraryUiState(
 class LibraryViewModel @Inject constructor(
     private val localAudioRepository: LocalAudioRepository,
     private val remoteAudioRepository: RemoteAudioRepository,
-    private val fileUtils: FileUtils
+    private val fileUtils: FileUtils,
+    private val processingEventBus: ProcessingEventBus
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LibraryUiState())
@@ -55,6 +60,8 @@ class LibraryViewModel @Inject constructor(
 
     private val _eventChannel = Channel<LibraryViewEvent>()
     val eventFlow = _eventChannel.receiveAsFlow()
+
+    private var localRecordingsJob: Job? = null
 
     val areAllLocalRecordingsSelected: StateFlow<Boolean> = uiState
         .map { state ->
@@ -68,6 +75,26 @@ class LibraryViewModel @Inject constructor(
 
     init {
         loadLocalRecordings()
+        observeEvents()
+    }
+
+    private fun observeEvents() {
+        viewModelScope.launch {
+            processingEventBus.favoriteToggledEvent.collect { event ->
+                Log.d("LibraryViewModel", "Received FavoriteToggledEvent for ID: ${event.id}, NewStatus: ${event.isFavorite}")
+                _uiState.update { currentState ->
+                    val updatedList = currentState.cloudRecordings.map { dto ->
+                        // Match against either primary ID or recordingId (remote ID)
+                        if (dto.id == event.id || dto.recordingId == event.id) {
+                            dto.copy(isFavorite = event.isFavorite)
+                        } else {
+                            dto
+                        }
+                    }
+                    currentState.copy(cloudRecordings = updatedList)
+                }
+            }
+        }
     }
 
     fun loadLocalRecordingsOnResume() {
@@ -76,7 +103,8 @@ class LibraryViewModel @Inject constructor(
     }
 
     private fun loadLocalRecordings() {
-        viewModelScope.launch {
+        localRecordingsJob?.cancel()
+        localRecordingsJob = viewModelScope.launch {
             localAudioRepository.getLocalRecordings()
                 .onStart {
                     if (!_uiState.value.isImporting) {
@@ -391,6 +419,50 @@ class LibraryViewModel @Inject constructor(
 
     fun consumeError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    fun toggleFavorite(recording: Any) {
+        viewModelScope.launch {
+            when (recording) {
+                is RecordingMetadata -> {
+                    val newStatus = !recording.isFavorite
+                    localAudioRepository.updateFavoriteStatus(recording.filePath, newStatus)
+                    // No need to update UI state manually as we observe the database
+                }
+                is AudioMetadataDto -> {
+                    val id = recording.id ?: recording.recordingId
+                    if (id != null) {
+                        // Optimistic update for cloud list
+                        _uiState.update { currentState ->
+                            val updatedList = currentState.cloudRecordings.map {
+                                if ((it.id == id) || (it.recordingId == id)) {
+                                    it.copy(isFavorite = !(it.isFavorite ?: false))
+                                } else {
+                                    it
+                                }
+                            }
+                            currentState.copy(cloudRecordings = updatedList)
+                        }
+
+                        remoteAudioRepository.toggleFavorite(id).collect { result ->
+                            result.onFailure {
+                                // Revert on failure
+                                _uiState.update { currentState ->
+                                    val revertedList = currentState.cloudRecordings.map {
+                                        if ((it.id == id) || (it.recordingId == id)) {
+                                            it.copy(isFavorite = recording.isFavorite) // Revert to original
+                                        } else {
+                                            it
+                                        }
+                                    }
+                                    currentState.copy(cloudRecordings = revertedList, error = "Failed to update favorite status")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun onRecordingClicked(recording: Any) {

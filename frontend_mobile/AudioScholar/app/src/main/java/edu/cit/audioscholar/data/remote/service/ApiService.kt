@@ -1,6 +1,8 @@
 package edu.cit.audioscholar.data.remote.service
 
 import edu.cit.audioscholar.data.remote.dto.*
+import edu.cit.audioscholar.data.remote.dto.admin.*
+import edu.cit.audioscholar.data.remote.dto.analytics.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -88,6 +90,9 @@ interface ApiService {
         @Path("recordingId") recordingId: String
     ): Response<AudioMetadataDto>
 
+    @POST("/api/audio/recordings/{id}/favorite")
+    suspend fun toggleFavorite(@Path("id") recordingId: String): Response<FavoriteStatusDto>
+
     @PATCH("/api/audio/recordings/{recordingId}")
     suspend fun updateRecordingDetails(
         @Path("recordingId") recordingId: String,
@@ -115,5 +120,58 @@ interface ApiService {
         @Path("userId") userId: String,
         @Body roleRequest: UpdateRoleRequest
     ): Response<Unit>
+
+    @POST("/api/notes")
+    suspend fun createNote(
+        @Body request: CreateUserNoteRequest
+    ): Response<UserNoteDto>
+
+    @GET("/api/notes")
+    suspend fun getNotes(
+        @Query("recordingId") recordingId: String
+    ): Response<List<UserNoteDto>>
+
+    @PATCH("/api/notes/{id}")
+    suspend fun updateNote(
+        @Path("id") noteId: String,
+        @Body request: UpdateUserNoteRequest
+    ): Response<UserNoteDto>
+
+    @DELETE("/api/notes/{id}")
+    suspend fun deleteNote(
+        @Path("id") noteId: String
+    ): Response<Unit>
+
+    // Admin & Analytics Endpoints
+
+    @GET("/api/admin/users")
+    suspend fun getUsers(
+        @Query("limit") limit: Int = 20,
+        @Query("pageToken") pageToken: String? = null
+    ): Response<AdminUserListResponse>
+
+    @PUT("/api/admin/users/{uid}/status")
+    suspend fun updateUserStatus(
+        @Path("uid") uid: String,
+        @Body request: AdminUpdateUserStatusRequest
+    ): Response<Map<String, Any>>
+
+    @PUT("/api/admin/users/{uid}/roles")
+    suspend fun updateUserRoles(
+        @Path("uid") uid: String,
+        @Body request: AdminUpdateUserRolesRequest
+    ): Response<Map<String, Any>>
+
+    @GET("/api/admin/analytics/overview")
+    suspend fun getAnalyticsOverview(): Response<AnalyticsOverviewDto>
+
+    @GET("/api/admin/analytics/activity")
+    suspend fun getActivityStats(): Response<ActivityStatsDto>
+
+    @GET("/api/admin/analytics/users/distribution")
+    suspend fun getUserDistribution(): Response<UserDistributionDto>
+
+    @GET("/api/admin/analytics/content/engagement")
+    suspend fun getContentEngagement(): Response<List<ContentEngagementDto>>
 
 }

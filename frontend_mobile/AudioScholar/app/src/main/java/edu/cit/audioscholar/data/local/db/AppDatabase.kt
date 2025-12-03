@@ -3,18 +3,31 @@ package edu.cit.audioscholar.data.local.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import edu.cit.audioscholar.data.local.dao.RecordingMetadataDao
+import edu.cit.audioscholar.data.local.dao.UserNoteDao
 import edu.cit.audioscholar.data.local.model.RecordingMetadata
+import edu.cit.audioscholar.data.local.model.UserNoteEntity
 
 @Database(
     entities = [
-        RecordingMetadata::class
+        RecordingMetadata::class,
+        UserNoteEntity::class
     ],
-    version = 6,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun recordingMetadataDao(): RecordingMetadataDao
+    abstract fun userNoteDao(): UserNoteDao
 
+    companion object {
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE recording_metadata ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
 }

@@ -2,6 +2,7 @@ package edu.cit.audioscholar.domain.repository
 
 import android.net.Uri
 import edu.cit.audioscholar.data.local.model.RecordingMetadata
+import edu.cit.audioscholar.data.local.model.UserNoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface LocalAudioRepository {
@@ -16,4 +17,12 @@ interface LocalAudioRepository {
 
     suspend fun saveMetadata(metadata: RecordingMetadata): Boolean
     fun getMetadataByRemoteId(remoteId: String): Flow<RecordingMetadata?>
+    suspend fun updateFavoriteStatus(filePath: String, isFavorite: Boolean): Boolean
+
+    // Note Operations
+    fun getNotesForRecording(filePath: String): Flow<List<UserNoteEntity>>
+    suspend fun createLocalNote(filePath: String, content: String, tags: List<String>): UserNoteEntity
+    suspend fun updateLocalNote(note: UserNoteEntity)
+    suspend fun deleteLocalNote(noteId: String)
+    suspend fun syncPendingNotes(filePath: String, remoteRecordingId: String)
 }

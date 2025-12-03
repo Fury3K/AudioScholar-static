@@ -30,6 +30,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "audioscholar_database"
         )
+        .addMigrations(AppDatabase.MIGRATION_7_8)
         .fallbackToDestructiveMigration()
         .build()
     }
@@ -38,5 +39,11 @@ object DatabaseModule {
     @Singleton
     fun provideRecordingMetadataDao(appDatabase: AppDatabase): RecordingMetadataDao {
         return appDatabase.recordingMetadataDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserNoteDao(appDatabase: AppDatabase): edu.cit.audioscholar.data.local.dao.UserNoteDao {
+        return appDatabase.userNoteDao()
     }
 }

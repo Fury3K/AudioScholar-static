@@ -1,12 +1,54 @@
-# React + Vite
+# AudioScholar Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the **AudioScholar** frontend repository. This is a React-based application built with Vite and Tailwind CSS, designed to provide a seamless interface for audio analysis, management, and subscription services.
 
-Currently, two official plugins are available:
+## 📚 Documentation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+We maintain comprehensive documentation to help developers understand, contribute to, and deploy the application.
 
-## Expanding the ESLint configuration
+👉 **[Go to Documentation Index](./docs/README.md)**
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Key Documentation Sections
+
+*   **[Getting Started](./docs/guides/getting-started.md)**: Setup, installation, and running locally.
+*   **[Project Structure](./docs/guides/project-structure.md)**: How the codebase is organized.
+*   **[Style Guide](./docs/guides/style-guide.md)**: Coding standards and UI conventions.
+*   **[Deployment](./docs/guides/deployment.md)**: Build and deployment instructions.
+
+## 🚀 Quick Start
+
+Follow these steps to get the application running on your local machine.
+
+### Prerequisites
+
+*   Node.js (v16 or higher)
+*   npm (usually comes with Node.js)
+
+### Installation
+
+1.  **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+2.  **Start the development server:**
+
+    ```bash
+    npm run dev
+    ```
+
+3.  **Open the application:**
+    Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
+
+## 🛠️ Tech Stack
+
+*   **Core Framework:** [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+*   **Routing:** [React Router](https://reactrouter.com/)
+*   **State Management:** React Context API
+*   **Backend Services:** Firebase (Auth, Firestore)
+
+## 📄 License
+
+[Add License Information Here]

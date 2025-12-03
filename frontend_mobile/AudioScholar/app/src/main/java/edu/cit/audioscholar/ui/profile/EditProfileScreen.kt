@@ -35,6 +35,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.*
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernTextField
 import edu.cit.audioscholar.R
 import kotlinx.coroutines.*
 import java.io.File
@@ -170,7 +172,7 @@ fun EditProfileScreen(
             },
             bottomBar = {
                 Surface(shadowElevation = 4.dp) {
-                    Button(
+                    ModernButton(
                         onClick = {
                             focusManager.clearFocus()
                             keyboardController?.hide()
@@ -277,58 +279,87 @@ fun EditProfileScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                OutlinedTextField(
+                ModernTextField(
                     value = uiState.firstName,
                     onValueChange = viewModel::onFirstNameChange,
-                    label = { Text(stringResource(R.string.edit_profile_firstname_label)) },
-                    placeholder = { Text(stringResource(R.string.edit_profile_firstname_placeholder)) },
+                    label = stringResource(R.string.edit_profile_firstname_label),
+                    placeholder = stringResource(R.string.edit_profile_firstname_placeholder),
                     singleLine = true,
                     isError = uiState.firstNameError != null,
-                    supportingText = { uiState.firstNameError?.let { Text(it) } },
+                    // ModernTextField doesn't have supportingText exposed yet in my reading of the file
+                    // Let me check the file content again.
+                    // app/src/main/java/edu/cit/audioscholar/ui/components/ModernTextField.kt
+                    // It does NOT have supportingText.
+                    // I will add supportingText manually below the text field if needed, or if I can't, I will just omit it for now or implement it.
+                    // But wait, the task is to refactor to use ModernTextField. If ModernTextField lacks features, I should probably update ModernTextField OR use a workaround.
+                    // The instruction implies "replace inputs with ModernTextField".
+                    // I'll check ModernTextField again.
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !uiState.isSaving && !uiState.isUploadingAvatar
                 )
+                if (uiState.firstNameError != null) {
+                    Text(
+                        text = uiState.firstNameError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
+                ModernTextField(
                     value = uiState.lastName,
                     onValueChange = viewModel::onLastNameChange,
-                    label = { Text(stringResource(R.string.edit_profile_lastname_label)) },
-                    placeholder = { Text(stringResource(R.string.edit_profile_lastname_placeholder)) },
+                    label = stringResource(R.string.edit_profile_lastname_label),
+                    placeholder = stringResource(R.string.edit_profile_lastname_placeholder),
                     singleLine = true,
                     isError = uiState.lastNameError != null,
-                    supportingText = { uiState.lastNameError?.let { Text(it) } },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !uiState.isSaving && !uiState.isUploadingAvatar
                 )
+                if (uiState.lastNameError != null) {
+                    Text(
+                        text = uiState.lastNameError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
+                ModernTextField(
                     value = uiState.displayName,
                     onValueChange = viewModel::onDisplayNameChange,
-                    label = { Text(stringResource(R.string.edit_profile_displayname_label)) },
-                    placeholder = { Text(stringResource(R.string.edit_profile_displayname_placeholder)) },
+                    label = stringResource(R.string.edit_profile_displayname_label),
+                    placeholder = stringResource(R.string.edit_profile_displayname_placeholder),
                     singleLine = true,
                     isError = uiState.displayNameError != null,
-                    supportingText = { uiState.displayNameError?.let { Text(it) } },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     leadingIcon = { Icon(Icons.Outlined.Badge, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !uiState.isSaving && !uiState.isUploadingAvatar
                 )
+                if (uiState.displayNameError != null) {
+                    Text(
+                        text = uiState.displayNameError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
+                ModernTextField(
                     value = uiState.email,
                     onValueChange = { },
-                    label = { Text(stringResource(R.string.edit_profile_email_label)) },
+                    label = stringResource(R.string.edit_profile_email_label),
                     readOnly = true,
                     enabled = false,
                     leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
@@ -337,13 +368,7 @@ fun EditProfileScreen(
                         focusManager.clearFocus()
                         keyboardController?.hide()
                     }),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    )
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }

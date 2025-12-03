@@ -29,6 +29,7 @@ public class AudioMetadata {
 	private String tempFilePath;
 	private String failureReason;
 	private Integer durationSeconds;
+	private Integer favoriteCount;
 	private Timestamp lastUpdated;
 	private String tempPptxFilePath;
 
@@ -52,6 +53,8 @@ public class AudioMetadata {
 
 	@JsonProperty("waitingForPdf")
 	private Boolean waitingForPdf;
+
+	private boolean isFavorite = false;
 
 	public AudioMetadata() {
 	}
@@ -216,6 +219,14 @@ public class AudioMetadata {
 		this.durationSeconds = durationSeconds;
 	}
 
+	public Integer getFavoriteCount() {
+		return favoriteCount;
+	}
+
+	public void setFavoriteCount(Integer favoriteCount) {
+		this.favoriteCount = favoriteCount;
+	}
+
 	public Timestamp getLastUpdated() {
 		return lastUpdated;
 	}
@@ -352,6 +363,14 @@ public class AudioMetadata {
 		this.waitingForPdf = waitingForPdf;
 	}
 
+	public boolean isFavorite() {
+		return isFavorite;
+	}
+
+	public void setFavorite(boolean favorite) {
+		isFavorite = favorite;
+	}
+
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = new HashMap<>();
 		if (id != null)
@@ -389,6 +408,8 @@ public class AudioMetadata {
 			map.put("failureReason", failureReason);
 		if (durationSeconds != null)
 			map.put("durationSeconds", durationSeconds);
+		if (favoriteCount != null)
+			map.put("favoriteCount", favoriteCount);
 		if (lastUpdated != null)
 			map.put("lastUpdated", lastUpdated);
 		if (tempPptxFilePath != null)
@@ -459,6 +480,12 @@ public class AudioMetadata {
 		if (durationObj instanceof Number) {
 			meta.setDurationSeconds(((Number) durationObj).intValue());
 		}
+		Object favoriteCountObj = map.get("favoriteCount");
+		if (favoriteCountObj instanceof Number) {
+			meta.setFavoriteCount(((Number) favoriteCountObj).intValue());
+		} else {
+			meta.setFavoriteCount(0);
+		}
 		meta.setLastUpdated((Timestamp) map.get("lastUpdated"));
 		meta.setTempPptxFilePath((String) map.get("tempPptxFilePath"));
 
@@ -521,7 +548,7 @@ public class AudioMetadata {
 				&& Objects.equals(failureReason, that.failureReason) && Objects.equals(recordingId, that.recordingId)
 				&& Objects.equals(summaryId, that.summaryId) && Objects.equals(transcriptText, that.transcriptText)
 				&& Objects.equals(durationSeconds, that.durationSeconds)
-				&& Objects.equals(lastUpdated, that.lastUpdated)
+				&& Objects.equals(favoriteCount, that.favoriteCount) && Objects.equals(lastUpdated, that.lastUpdated)
 				&& Objects.equals(originalPptxFileName, that.originalPptxFileName)
 				&& Objects.equals(pptxContentType, that.pptxContentType)
 				&& Objects.equals(nhostPptxFileId, that.nhostPptxFileId)
@@ -540,10 +567,10 @@ public class AudioMetadata {
 	public int hashCode() {
 		return Objects.hash(id, userId, fileName, fileSize, contentType, title, description, nhostFileId, storageUrl,
 				uploadTimestamp, status, failureReason, recordingId, summaryId, transcriptText, tempFilePath,
-				tempPptxFilePath, durationSeconds, lastUpdated, originalPptxFileName, pptxFileSize, pptxContentType,
-				nhostPptxFileId, pptxNhostUrl, generatedPdfNhostFileId, generatedPdfUrl, googleFilesApiPdfUri,
-				convertApiPdfUrl, transcriptionComplete, pdfConversionComplete, audioOnly, audioUploadComplete,
-				gptSummary, waitingForPdf);
+				tempPptxFilePath, durationSeconds, favoriteCount, lastUpdated, originalPptxFileName, pptxFileSize,
+				pptxContentType, nhostPptxFileId, pptxNhostUrl, generatedPdfNhostFileId, generatedPdfUrl,
+				googleFilesApiPdfUri, convertApiPdfUrl, transcriptionComplete, pdfConversionComplete, audioOnly,
+				audioUploadComplete, gptSummary, waitingForPdf);
 	}
 
 	@Override
@@ -555,13 +582,13 @@ public class AudioMetadata {
 				+ (transcriptText != null
 						? transcriptText.substring(0, Math.min(50, transcriptText.length())) + "..."
 						: null)
-				+ '\'' + ", durationSeconds=" + durationSeconds + ", lastUpdated=" + lastUpdated
-				+ ", originalPptxFileName='" + originalPptxFileName + '\'' + ", pptxFileSize=" + pptxFileSize
-				+ ", pptxContentType='" + pptxContentType + '\'' + ", nhostPptxFileId='" + nhostPptxFileId + '\''
-				+ ", pptxNhostUrl='" + pptxNhostUrl + '\'' + ", generatedPdfNhostFileId='" + generatedPdfNhostFileId
-				+ '\'' + ", generatedPdfUrl='" + generatedPdfUrl + '\'' + ", googleFilesApiPdfUri='"
-				+ googleFilesApiPdfUri + '\'' + ", convertApiPdfUrl='" + convertApiPdfUrl + '\''
-				+ ", transcriptionComplete=" + transcriptionComplete + ", pdfConversionComplete="
+				+ '\'' + ", durationSeconds=" + durationSeconds + ", favoriteCount=" + favoriteCount + ", lastUpdated="
+				+ lastUpdated + ", originalPptxFileName='" + originalPptxFileName + '\'' + ", pptxFileSize="
+				+ pptxFileSize + ", pptxContentType='" + pptxContentType + '\'' + ", nhostPptxFileId='"
+				+ nhostPptxFileId + '\'' + ", pptxNhostUrl='" + pptxNhostUrl + '\'' + ", generatedPdfNhostFileId='"
+				+ generatedPdfNhostFileId + '\'' + ", generatedPdfUrl='" + generatedPdfUrl + '\''
+				+ ", googleFilesApiPdfUri='" + googleFilesApiPdfUri + '\'' + ", convertApiPdfUrl='" + convertApiPdfUrl
+				+ '\'' + ", transcriptionComplete=" + transcriptionComplete + ", pdfConversionComplete="
 				+ pdfConversionComplete + ", audioOnly=" + audioOnly + ", audioUploadComplete=" + audioUploadComplete
 				+ ", gptSummary='" + gptSummary + '\'' + ", waitingForPdf=" + waitingForPdf + '}';
 	}

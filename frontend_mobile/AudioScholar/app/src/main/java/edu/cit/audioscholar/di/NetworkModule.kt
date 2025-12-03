@@ -68,7 +68,7 @@ object NetworkModule {
     @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.HEADERS
+            level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
@@ -141,9 +141,12 @@ object NetworkModule {
         @ApplicationContext context: Context,
         application: Application,
         gson: Gson,
-        recordingFileHandler: RecordingFileHandler
+        recordingFileHandler: RecordingFileHandler,
+        userNoteDao: edu.cit.audioscholar.data.local.dao.UserNoteDao,
+        recordingMetadataDao: edu.cit.audioscholar.data.local.dao.RecordingMetadataDao,
+        remoteAudioRepository: RemoteAudioRepository
     ): LocalAudioRepository {
-        return LocalAudioRepositoryImpl(context, application, gson, recordingFileHandler)
+        return LocalAudioRepositoryImpl(context, application, gson, recordingFileHandler, userNoteDao, recordingMetadataDao, remoteAudioRepository)
     }
 
     @Provides

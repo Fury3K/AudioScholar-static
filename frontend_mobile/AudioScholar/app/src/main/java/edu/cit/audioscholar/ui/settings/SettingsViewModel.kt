@@ -31,6 +31,12 @@ enum class ThemeSetting(@StringRes val labelResId: Int) {
     System(R.string.settings_theme_system)
 }
 
+enum class ThemeStyle(@StringRes val labelResId: Int) {
+    Classic(R.string.settings_theme_style_classic),
+    Quantum(R.string.settings_theme_style_quantum),
+    Zen(R.string.settings_theme_style_zen)
+}
+
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @Named(PreferencesModule.SETTINGS_PREFERENCES) private val prefs: SharedPreferences
@@ -38,12 +44,16 @@ class SettingsViewModel @Inject constructor(
 
     companion object {
         const val PREF_KEY_THEME = "pref_theme"
+        const val PREF_KEY_THEME_STYLE = "pref_theme_style"
         const val PREF_KEY_SYNC_MODE = "pref_sync_mode"
         const val PREF_KEY_SYNC_FREQUENCY = "pref_sync_frequency"
     }
 
     private val _selectedTheme = MutableStateFlow(ThemeSetting.System)
     val selectedTheme: StateFlow<ThemeSetting> = _selectedTheme.asStateFlow()
+
+    private val _selectedThemeStyle = MutableStateFlow(ThemeStyle.Classic)
+    val selectedThemeStyle: StateFlow<ThemeStyle> = _selectedThemeStyle.asStateFlow()
 
     private val _selectedQuality = MutableStateFlow(QualitySetting.Medium)
     val selectedQuality: StateFlow<QualitySetting> = _selectedQuality.asStateFlow()
@@ -64,6 +74,10 @@ class SettingsViewModel @Inject constructor(
         _selectedTheme.value = ThemeSetting.values().firstOrNull { it.name == savedThemeName }
             ?: ThemeSetting.System
 
+        val savedThemeStyleName = prefs.getString(PREF_KEY_THEME_STYLE, ThemeStyle.Classic.name)
+        _selectedThemeStyle.value = ThemeStyle.values().firstOrNull { it.name == savedThemeStyleName }
+            ?: ThemeStyle.Classic
+
         val savedQualityName = prefs.getString(QualitySetting.PREF_KEY, QualitySetting.DEFAULT)
         _selectedQuality.value = QualitySetting.values().firstOrNull { it.name == savedQualityName }
             ?: QualitySetting.Medium
@@ -81,6 +95,14 @@ class SettingsViewModel @Inject constructor(
         _selectedTheme.value = theme
         with(prefs.edit()) {
             putString(PREF_KEY_THEME, theme.name)
+            apply()
+        }
+    }
+
+    fun updateThemeStyle(style: ThemeStyle) {
+        _selectedThemeStyle.value = style
+        with(prefs.edit()) {
+            putString(PREF_KEY_THEME_STYLE, style.name)
             apply()
         }
     }

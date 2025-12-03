@@ -1,8 +1,54 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { FiUpload } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
-import { Header, Footer } from '../Home/HomePage';
+import { Link, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../services/authService';
+import { Header } from '../Home/HomePage';
 
 const Dashboard = () => {
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [errorUser, setErrorUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoadingUser(true);
+      setErrorUser(null);
+      const token = localStorage.getItem('AuthToken');
+
+      if (!token) {
+        // setErrorUser('Not authenticated. Please log in.'); // Don't show error here, just redirect if no token
+        setLoadingUser(false);
+        navigate('/signin');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${API_BASE_URL}api/users/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUser(response.data);
+      } catch (err) {
+        console.error('Error fetching user profile for dashboard:', err);
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          // setErrorUser('Session expired or unauthorized. Please log in again.');
+          localStorage.removeItem('AuthToken');
+          localStorage.removeItem('userId');
+          navigate('/signin');
+        } else {
+          setErrorUser('Failed to load user information.');
+        }
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
 
@@ -45,12 +91,28 @@ const Dashboard = () => {
                 <p className="text-gray-600 dark:text-gray-300">View and manage all your audio recordings.</p>
               </Link>
 
+              {user?.roles?.includes('ROLE_ADMIN') && (
+                <Link
+                  to="/admin"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 cursor-pointer border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="bg-purple-100 p-3 rounded-full mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.125 1.125 0 011.962 1.096v1.455c0 .355.29.645.645.645h1.455c1.756.426 1.756 2.924 0 3.35a1.125 1.125 0 01-1.096 1.962h-1.455a.645.645 0 00-.645.645v1.455c-.426 1.756-2.924 1.756-3.35 0a1.125 1.125 0 01-1.962-1.096v-1.455a.645.645 0 00-.645-.645H4.317c-1.756-.426-1.756-2.924 0-3.35a1.125 1.125 0 011.096-1.962h1.455a.645.645 0 00.645-.645V4.317z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Admin Dashboard</h2>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300">Access administrative tools and user management.</p>
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </main>
 
-      <Footer />
+
 
     </div>
   );

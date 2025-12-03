@@ -16,4 +16,13 @@ class ProcessingEventBus @Inject constructor() {
         _processingCompleteEvent.emit(recordingId)
         return true
     }
-} 
+
+    data class FavoriteToggledEvent(val id: String, val isFavorite: Boolean)
+
+    private val _favoriteToggledEvent = MutableSharedFlow<FavoriteToggledEvent>(replay = 0, extraBufferCapacity = 1)
+    val favoriteToggledEvent = _favoriteToggledEvent.asSharedFlow()
+
+    suspend fun emitFavoriteToggled(id: String, isFavorite: Boolean) {
+        _favoriteToggledEvent.emit(FavoriteToggledEvent(id, isFavorite))
+    }
+}

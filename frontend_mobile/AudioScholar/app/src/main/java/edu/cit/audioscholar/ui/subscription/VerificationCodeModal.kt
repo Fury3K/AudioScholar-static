@@ -29,12 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.NotificationCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.domain.repository.AuthRepository
+import edu.cit.audioscholar.ui.components.ModernButton
+import edu.cit.audioscholar.ui.components.ModernDialog
+import edu.cit.audioscholar.ui.components.ModernOutlinedButton
 import edu.cit.audioscholar.util.PremiumStatusManager
 import edu.cit.audioscholar.util.Resource
 import kotlinx.coroutines.delay
@@ -97,48 +98,28 @@ fun VerificationCodeModal(
     }
     
     if (isVisible) {
-        Dialog(
+        ModernDialog(
             onDismissRequest = { if (!isVerifying) onDismissRequest() },
-            properties = DialogProperties(dismissOnBackPress = !isVerifying, dismissOnClickOutside = !isVerifying)
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
+            title = stringResource(R.string.verification_title),
+            content = {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.verification_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = if (isCodeSent) 
+                        text = if (isCodeSent)
                             stringResource(R.string.verification_enter_code)
-                        else 
+                        else
                             stringResource(R.string.verification_sending),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     if (isCodeSent && !isVerifying) {
                         ImprovedVerificationCodeInput(
                             code = userInputCode,
-                            onCodeChanged = { 
+                            onCodeChanged = {
                                 if (it.length <= 6 && it.all { char -> char.isDigit() }) {
                                     userInputCode = it
                                     isError = false
@@ -146,7 +127,7 @@ fun VerificationCodeModal(
                             },
                             isError = isError
                         )
-                        
+
                         if (isError) {
                             Text(
                                 text = errorMessage,
@@ -166,67 +147,60 @@ fun VerificationCodeModal(
                             modifier = Modifier.fillMaxWidth(0.8f)
                         )
                     }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = onDismissRequest,
-                            enabled = !isVerifying,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(text = stringResource(R.string.verification_button_cancel))
-                        }
-                        
-                        Button(
-                            onClick = {
-                                if (userInputCode.length < 6) {
-                                    isError = true
-                                    errorMessage = incompleteCodeError
-                                } else if (userInputCode != verificationCode) {
-                                    isError = true
-                                    errorMessage = invalidCodeError
-                                } else {
-                                    isVerifying = true
-                                    scope.launch {
-                                        if (userId != null) {
-                                            Log.d(TAG, "Updating user role for userId: $userId")
-                                            val result = authRepository.updateUserRole(userId, "ROLE_PREMIUM")
-                                            when (result) {
-                                                is Resource.Success -> {
-                                                    Log.i(TAG, "User role updated successfully to ROLE_PREMIUM")
-                                                    isRoleUpdateSuccess = true
-                                                    
-                                                    premiumStatusManager.updatePremiumStatus(true)
-                                                    Log.d(TAG, "Updated premium status in local storage to true")
-                                                }
-                                                is Resource.Error -> {
-                                                    Log.e(TAG, "Failed to update user role: ${result.message}")
-                                                }
-                                                is Resource.Loading -> {
-                                                }
-                                            }
-                                        } else {
-                                            Log.w(TAG, "No userId provided, skipping role update")
+                }
+            },
+            dismissButton = {
+                ModernOutlinedButton(
+                    onClick = onDismissRequest,
+                    enabled = !isVerifying
+                ) {
+                    Text(text = stringResource(R.string.verification_button_cancel))
+                }
+            },
+            confirmButton = {
+                ModernButton(
+                    onClick = {
+                        if (userInputCode.length < 6) {
+                            isError = true
+                            errorMessage = incompleteCodeError
+                        } else if (userInputCode != verificationCode) {
+                            isError = true
+                            errorMessage = invalidCodeError
+                        } else {
+                            isVerifying = true
+                            scope.launch {
+                                if (userId != null) {
+                                    Log.d(TAG, "Updating user role for userId: $userId")
+                                    val result = authRepository.updateUserRole(userId, "ROLE_PREMIUM")
+                                    when (result) {
+                                        is Resource.Success -> {
+                                            Log.i(TAG, "User role updated successfully to ROLE_PREMIUM")
+                                            isRoleUpdateSuccess = true
+
+                                            premiumStatusManager.updatePremiumStatus(true)
+                                            Log.d(TAG, "Updated premium status in local storage to true")
                                         }
-                                        
-                                        delay(3000)
-                                        onVerificationComplete()
+                                        is Resource.Error -> {
+                                            Log.e(TAG, "Failed to update user role: ${result.message}")
+                                        }
+                                        is Resource.Loading -> {
+                                        }
                                     }
+                                } else {
+                                    Log.w(TAG, "No userId provided, skipping role update")
                                 }
-                            },
-                            enabled = isCodeSent && !isVerifying,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(text = stringResource(R.string.verification_button_verify))
+
+                                delay(3000)
+                                onVerificationComplete()
+                            }
                         }
-                    }
+                    },
+                    enabled = isCodeSent && !isVerifying
+                ) {
+                    Text(text = stringResource(R.string.verification_button_verify))
                 }
             }
-        }
+        )
     }
 }
 

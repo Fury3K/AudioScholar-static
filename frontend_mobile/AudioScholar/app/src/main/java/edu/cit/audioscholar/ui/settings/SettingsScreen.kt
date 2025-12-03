@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import edu.cit.audioscholar.ui.components.ModernDialog
 import edu.cit.audioscholar.BuildConfig
 import edu.cit.audioscholar.R
 import edu.cit.audioscholar.domain.model.QualitySetting
@@ -58,7 +59,7 @@ import kotlinx.coroutines.launch
 import edu.cit.audioscholar.ui.settings.SyncMode
 import edu.cit.audioscholar.ui.settings.SyncFrequency
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
 fun SettingsScreen(
     drawerState: DrawerState,
@@ -67,6 +68,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val showThemeDialog = remember { mutableStateOf(false) }
+    val showThemeStyleDialog = remember { mutableStateOf(false) }
     val showQualityDialog = remember { mutableStateOf(false) }
     val showSyncModeDialog = remember { mutableStateOf(false) }
     val showSyncFrequencyDialog = remember { mutableStateOf(false) }
@@ -77,9 +79,21 @@ fun SettingsScreen(
     val legalSheetContent = remember { mutableStateOf("") }
 
     val selectedTheme by viewModel.selectedTheme.collectAsState()
+    val selectedThemeStyle by viewModel.selectedThemeStyle.collectAsState()
     val selectedQuality by viewModel.selectedQuality.collectAsState()
     val selectedSyncMode by viewModel.selectedSyncMode.collectAsState()
     val selectedSyncFrequency by viewModel.selectedSyncFrequency.collectAsState()
+
+    if (showThemeStyleDialog.value) {
+        SelectionDialog(
+            title = stringResource(R.string.settings_dialog_title_theme_style),
+            options = ThemeStyle.entries,
+            currentSelection = selectedThemeStyle,
+            onSelectionChanged = { viewModel.updateThemeStyle(it) },
+            onDismissRequest = { showThemeStyleDialog.value = false },
+            optionLabel = { style -> stringResource(id = style.labelResId) }
+        )
+    }
 
     if (showThemeDialog.value) {
         SelectionDialog(
@@ -208,6 +222,11 @@ fun SettingsScreen(
                 subtitle = stringResource(id = selectedTheme.labelResId),
                 onClick = { showThemeDialog.value = true }
             )
+            SettingsItemRow(
+                title = stringResource(R.string.settings_theme_style),
+                subtitle = stringResource(id = selectedThemeStyle.labelResId),
+                onClick = { showThemeStyleDialog.value = true }
+            )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp))
 
@@ -268,10 +287,10 @@ fun <T> SelectionDialog(
     onDismissRequest: () -> Unit,
     optionLabel: @Composable (T) -> String
 ) {
-    AlertDialog(
+    ModernDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(text = title) },
-        text = {
+        title = title,
+        content = {
             Column(Modifier.selectableGroup()) {
                 options.forEach { option ->
                     Row(
@@ -306,8 +325,7 @@ fun <T> SelectionDialog(
             TextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.dialog_button_cancel))
             }
-        },
-        properties = DialogProperties(dismissOnClickOutside = true)
+        }
     )
 }
 
