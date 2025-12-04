@@ -1,5 +1,6 @@
 package edu.cit.audioscholar.controller;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,6 +42,20 @@ public class AdminController {
 	}
 
 	/**
+	 * Logs authentication details for debugging admin access issues.
+	 */
+	private void logAuthenticationDetails(String endpoint) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+			logger.info("Admin endpoint '{}' accessed by user '{}' with authorities: {}",
+					endpoint, auth.getName(), authorities);
+		} else {
+			logger.warn("Admin endpoint '{}' accessed without authentication context", endpoint);
+		}
+	}
+
+	/**
 	 * Lists users from the authentication provider.
 	 *
 	 * @param limit
@@ -49,6 +67,7 @@ public class AdminController {
 	@GetMapping("/users")
 	public ResponseEntity<Map<String, Object>> listUsers(@RequestParam(defaultValue = "20") int limit,
 			@RequestParam(required = false) String pageToken) {
+		logAuthenticationDetails("/api/admin/users");
 		logger.info("Admin request to list users. Limit: {}, PageToken: {}", limit, pageToken);
 		try {
 			// Retrieve users from Firestore to ensure consistent role mapping
@@ -120,7 +139,7 @@ public class AdminController {
 	 */
 	@GetMapping("/system/health")
 	public ResponseEntity<Map<String, Object>> getSystemHealth() {
-		// Basic health check
+		logAuthenticationDetails("/api/admin/system/health");
 		Map<String, Object> health = new HashMap<>();
 		health.put("status", "UP");
 		health.put("db", "connected"); // Assuming if the app is up, DB is reachable (or handled by monitoring)
