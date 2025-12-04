@@ -1,12 +1,13 @@
-// Determine the API base URL dynamically based on the environment
+// Determine the API base URL from environment variable or fallback to localhost
 const getApiBaseUrl = () => {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:8080/';
-    } else {
-        // Production URL - Update this if your Render backend URL is different
-        return 'https://it342-g3-audioscholar-onrender-com.onrender.com/';
+    // Use VITE_API_URL environment variable if set, otherwise fallback to localhost
+    const envUrl = import.meta.env.VITE_API_URL;
+    if (envUrl) {
+        // Ensure URL ends with trailing slash
+        return envUrl.endsWith('/') ? envUrl : `${envUrl}/`;
     }
+    // Fallback for local development
+    return 'http://localhost:8080/';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
