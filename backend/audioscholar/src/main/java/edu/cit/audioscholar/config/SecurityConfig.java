@@ -90,9 +90,8 @@ public class SecurityConfig {
 			List<String> rolesList = jwt.getClaimAsStringList("roles");
 			if (rolesList != null && !rolesList.isEmpty()) {
 				log.debug("JWT roles (as list) for {}: {}", subject, rolesList);
-				Collection<SimpleGrantedAuthority> authorities = rolesList.stream()
-						.map(SimpleGrantedAuthority::new)
-						.collect(Collectors.toList());
+				Collection<GrantedAuthority> authorities = rolesList.stream()
+						.map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role)).collect(Collectors.toList());
 				log.info("Extracted {} authorities from JWT for user {}: {}", authorities.size(), subject, authorities);
 				return authorities;
 			}
@@ -104,8 +103,8 @@ public class SecurityConfig {
 				return Collections.emptyList();
 			}
 			log.debug("JWT roles (as string) for {}: {}", subject, roles);
-			Collection<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
-					.map(role -> new SimpleGrantedAuthority(role.trim()))
+			Collection<GrantedAuthority> authorities = Arrays.stream(roles.split(","))
+					.map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.trim()))
 					.collect(Collectors.toList());
 			log.info("Extracted {} authorities from JWT for user {}: {}", authorities.size(), subject, authorities);
 			return authorities;
@@ -119,31 +118,32 @@ public class SecurityConfig {
 			@Override
 			public void handle(HttpServletRequest request, HttpServletResponse response,
 					AccessDeniedException accessDeniedException) throws IOException, ServletException {
-				
+
 				String requestUri = request.getRequestURI();
 				String origin = request.getHeader("Origin");
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				
+
 				String username = auth != null ? auth.getName() : "anonymous";
-				Collection<? extends GrantedAuthority> authorities = auth != null ? auth.getAuthorities() : Collections.emptyList();
-				
-				log.warn("ACCESS DENIED - URI: {}, User: {}, Authorities: {}, Origin: {}, Error: {}",
-						requestUri, username, authorities, origin, accessDeniedException.getMessage());
-				
+				Collection<? extends GrantedAuthority> authorities = auth != null
+						? auth.getAuthorities()
+						: Collections.emptyList();
+
+				log.warn("ACCESS DENIED - URI: {}, User: {}, Authorities: {}, Origin: {}, Error: {}", requestUri,
+						username, authorities, origin, accessDeniedException.getMessage());
+
 				// Check if this is an admin endpoint
 				if (requestUri.startsWith("/api/admin")) {
-					boolean hasAdminRole = authorities.stream()
-							.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-					log.error("Admin endpoint access denied for user {}. Has ROLE_ADMIN: {}. " +
-							"User needs to have ROLE_ADMIN in their profile and re-authenticate to get a fresh token.",
+					boolean hasAdminRole = authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+					log.error("Admin endpoint access denied for user {}. Has ROLE_ADMIN: {}. "
+							+ "User needs to have ROLE_ADMIN in their profile and re-authenticate to get a fresh token.",
 							username, hasAdminRole);
 				}
-				
+
 				response.setStatus(HttpStatus.FORBIDDEN.value());
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				response.getWriter().write(String.format(
-						"{\"error\": \"Forbidden\", \"message\": \"Access denied. Required authority not found.\", " +
-						"\"path\": \"%s\", \"userAuthorities\": %s}",
+						"{\"error\": \"Forbidden\", \"message\": \"Access denied. Required authority not found.\", "
+								+ "\"path\": \"%s\", \"userAuthorities\": %s}",
 						requestUri, authorities.toString().replace("\"", "\\\"")));
 			}
 		};
@@ -156,8 +156,7 @@ public class SecurityConfig {
 				"capacitor://localhost", "http://localhost", "https://localhost", "http://localhost:5173",
 				"https://localhost:5173", "http://localhost:5174", "https://localhost:5174", "http://localhost:8080",
 				"https://localhost:8080", "https://it342-g3-audioscholar.onrender.com",
-				"https://it342-g3-audioscholar-onrender-com.onrender.com",
-				"https://audioscholar.vercel.app"));
+				"https://it342-g3-audioscholar-onrender-com.onrender.com", "https://audioscholar.vercel.app"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type",
 				"X-Requested-With", "Accept", "X-CSRF-TOKEN"));

@@ -48,8 +48,8 @@ public class AdminController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
 			Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-			logger.info("Admin endpoint '{}' accessed by user '{}' with authorities: {}",
-					endpoint, auth.getName(), authorities);
+			logger.info("Admin endpoint '{}' accessed by user '{}' with authorities: {}", endpoint, auth.getName(),
+					authorities);
 		} else {
 			logger.warn("Admin endpoint '{}' accessed without authentication context", endpoint);
 		}

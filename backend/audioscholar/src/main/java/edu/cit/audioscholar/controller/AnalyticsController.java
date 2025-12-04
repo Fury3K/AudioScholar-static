@@ -43,8 +43,8 @@ public class AnalyticsController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
 			Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-			logger.info("Analytics endpoint '{}' accessed by user '{}' with authorities: {}",
-					endpoint, auth.getName(), authorities);
+			logger.info("Analytics endpoint '{}' accessed by user '{}' with authorities: {}", endpoint, auth.getName(),
+					authorities);
 		} else {
 			logger.warn("Analytics endpoint '{}' accessed without authentication context", endpoint);
 		}
