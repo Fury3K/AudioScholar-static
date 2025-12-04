@@ -89,24 +89,27 @@ public class SecurityConfig {
 			// Try retrieving as a List (standard for JSON arrays in JWT)
 			List<String> rolesList = jwt.getClaimAsStringList("roles");
 			if (rolesList != null && !rolesList.isEmpty()) {
-				log.debug("JWT roles (as list) for {}: {}", subject, rolesList);
+				log.debug("JWT roles claim parsed as List for user {}: {} (count: {})", subject, rolesList,
+						rolesList.size());
 				Collection<GrantedAuthority> authorities = rolesList.stream()
 						.map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role)).collect(Collectors.toList());
-				log.info("Extracted {} authorities from JWT for user {}: {}", authorities.size(), subject, authorities);
+				log.info("Extracted {} authorities from JWT (List format) for user {}: {}", authorities.size(), subject,
+						authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
 				return authorities;
 			}
 
-			// Fallback: Try retrieving as a comma-separated String
+			// Fallback: Try retrieving as a comma-separated String (legacy token support)
 			String roles = jwt.getClaimAsString("roles");
 			if (roles == null || roles.isEmpty()) {
 				log.warn("No roles found in JWT for user {}. Token may need refresh.", subject);
 				return Collections.emptyList();
 			}
-			log.debug("JWT roles (as string) for {}: {}", subject, roles);
-			Collection<GrantedAuthority> authorities = Arrays.stream(roles.split(","))
-					.map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.trim()))
+			log.debug("JWT roles claim parsed as String (legacy format) for user {}: '{}'", subject, roles);
+			Collection<GrantedAuthority> authorities = Arrays.stream(roles.split(",")).map(String::trim)
+					.filter(role -> !role.isEmpty()).map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role))
 					.collect(Collectors.toList());
-			log.info("Extracted {} authorities from JWT for user {}: {}", authorities.size(), subject, authorities);
+			log.info("Extracted {} authorities from JWT (String format) for user {}: {}", authorities.size(), subject,
+					authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
 			return authorities;
 		});
 		return jwtAuthenticationConverter;

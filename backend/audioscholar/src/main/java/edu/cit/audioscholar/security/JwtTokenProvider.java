@@ -70,8 +70,11 @@ public class JwtTokenProvider {
 	public String generateToken(Authentication authentication) {
 		Object principal = authentication.getPrincipal();
 		String username = authentication.getName();
-		String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-				.collect(Collectors.joining(","));
+		// Store roles as a List<String> instead of comma-separated string
+		// This ensures proper parsing by Spring Security's
+		// getClaimAsStringList("roles")
+		java.util.List<String> authorities = authentication.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority).collect(Collectors.toList());
 
 		logger.debug("Generating token for user: {}, Authorities: {}", username, authorities);
 
