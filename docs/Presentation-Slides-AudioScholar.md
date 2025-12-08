@@ -121,15 +121,15 @@
 **Tech Stack Grid:**
 | Layer | Technology |
 |-------|-----------|
-| Backend | Java, Spring Boot 3.2.0, RabbitMQ |
-| Mobile | Kotlin, Android SDK, Jetpack Compose |
-| Web | ReactJS, Tailwind CSS, Vite |
-| AI/ML | Google Gemini Pro Flash |
-| Cloud | Firebase Auth/Firestore, Nhost (S3), Railway |
+| Backend | Java, Spring Boot, RabbitMQ |
+| Mobile | Kotlin, Android, Jetpack Compose |
+| Web | React, Tailwind CSS, Vite |
+| AI/ML | Google Gemini AI |
+| Cloud | Firebase, Nhost Storage |
 | External APIs | YouTube Data API, ConvertAPI |
 
 > **Speaker Notes:**
-> "Our architecture follows microservices principles. The backend is built with Spring Boot and uses RabbitMQ for asynchronous processing—critical for handling long audio files without blocking the user interface. Firebase handles authentication and real-time data, while Nhost manages heavy file storage. Google Gemini Pro Flash powers our AI summarization."
+> "Our architecture follows microservices principles. The backend uses Spring Boot with RabbitMQ for asynchronous processing—critical for handling long audio files without blocking the user interface. Firebase handles authentication and real-time data, while Nhost manages file storage. Google Gemini powers our AI for both transcription and summarization with context injection."
 
 ---
 
@@ -172,9 +172,9 @@
 
 **Key Technical Points:**
 - **Foreground Service:** Prevents Android from killing the recorder
-- **Offline-First:** Recording works without internet
+- **Offline-First:** Recording works without internet, stored locally
 - **Background Sync:** Automatic upload when connection is available
-- **File Formats:** Supports MP3, WAV, M4A
+- **File Formats:** Supports MP3, WAV, M4A, and other common audio formats
 
 > **Speaker Notes:**
 > "This is Essential Transaction 1: The complete audio recording and upload flow. Watch as I start a recording... [TAP RECORD]. The app uses a Foreground Service—this is critical because Android aggressively kills background processes to save battery. When I stop recording... [TAP STOP], the file is saved locally first, then uploaded in the background. The user can close the app and the upload continues. Once complete, the server queues the file for AI processing."
@@ -190,24 +190,25 @@
 **Visual Content:**
 - **Transaction Flow Diagram:**
   ```
-  [User Uploads PPT Slides (Optional)] → [ConvertAPI: PPT → PDF → Text]
+  [User Uploads PPT Slides (Optional)] → [Cloud Storage] → [Convert to PDF]
          ↓
-  [Audio Processing Triggered] → [Google Gemini receives: Audio + Slide Context]
+  [Audio Uploaded] → [Cloud Storage] → [AI Transcription]
          ↓
-  [Gemini Generates: Summary + Glossary + Key Points]
+  [Transcript + PDF Context] → [AI Summarization]
          ↓
-  [Results Stored in Firestore] → [User Notified: "Study Guide Ready"]
+  [Results Saved] → [Push Notification: "Study Guide Ready"]
          ↓
-  [YouTube API: Fetch Recommended Videos based on Topics]
+  [YouTube API: Fetch Recommended Educational Videos]
   ```
 
 **Output Artifacts:**
 1. **Structured Summary:** Markdown-formatted lecture notes
-2. **Glossary:** Auto-generated definitions of key terms
-3. **Video Recommendations:** Curated YouTube links
+2. **Key Points:** Action items and takeaways
+3. **Glossary:** Auto-generated definitions of key terms
+4. **Video Recommendations:** Curated educational YouTube videos
 
 > **Speaker Notes:**
-> "This is Essential Transaction 2: The AI-powered summarization. First, I'll upload a PowerPoint file... [UPLOAD SLIDES]. The system converts this to text using ConvertAPI. Then, when audio processing runs, Gemini receives both the audio content AND the slide context. This 'Context Injection' dramatically improves accuracy—the AI knows the exact terminology the professor is using. The result is a structured study guide with summary, glossary, and even recommended YouTube videos."
+> "This is Essential Transaction 2: The AI-powered summarization. First, I'll upload a PowerPoint file... [UPLOAD SLIDES]. The file is converted to PDF for context. When audio transcription completes, the system sends both the transcript AND the PDF to Gemini for summarization. This 'Context Injection' dramatically improves accuracy—the AI knows the exact terminology the professor is using. The result is a structured study guide with summary, glossary, key points, and recommended YouTube videos."
 
 **[LIVE DEMO: Show processed recording with summary, glossary, and recommendations]**
 
@@ -291,10 +292,11 @@
 - [ ] Server services confirmed running
 
 ### **Demo Requirements:**
-- [ ] Android device with AudioScholar installed
-- [ ] Laptop with web dashboard open
+- [ ] Android phone with AudioScholar app installed
+- [ ] Laptop with web dashboard open in browser
 - [ ] Sample PowerPoint slides for Context Injection demo
 - [ ] Stable internet connection (or hotspot backup)
+- [ ] Confirm server is running before presentation
 
 ### **Time Allocation Summary:**
 | Section | Member | Duration |
@@ -319,5 +321,51 @@
 
 ---
 
-*Document Version: 2.0 - Restructured for Final Capstone Defense Format*
+## **Technical Implementation Details**
+
+### **Backend Architecture**
+- **Framework:** Spring Boot 3.5.8 on Java 24
+- **Message Queue:** RabbitMQ with multiple queues (processing, transcription, summarization, recommendations, upload, pptx-conversion)
+- **Database:** Google Cloud Firestore (NoSQL)
+- **File Storage:** Nhost (S3-compatible)
+- **Caching:** Caffeine in-memory cache
+- **Security:** Spring Security with JWT + OAuth2 (Google, GitHub)
+- **Rate Limiting:** Bucket4j
+
+### **AI/ML Pipeline**
+- **Audio Transcription:** Google Gemini 2.0-flash with structured JSON schema output
+- **Summarization:** Google Gemini 2.5-flash with context injection (PDF + Transcript)
+- **Key Rotation:** Automatic API key rotation and model fallback on rate limits
+- **Output Schema:** summaryText (Markdown), keyPoints (array), topics (3 YouTube queries), glossary (term/definition pairs)
+
+### **Mobile App (Android)**
+- **Language:** Kotlin
+- **UI:** Jetpack Compose
+- **Min SDK:** 24 (Android 7.0)
+- **Target SDK:** 35 (Android 15)
+- **Architecture:** MVVM with Hilt DI
+- **Local Storage:** Room Database 2.8.1
+- **Networking:** Ktor Client + Retrofit
+- **Auth:** Firebase Auth with Google Sign-In
+
+### **Web Frontend**
+- **Framework:** React 19.0.0
+- **Build Tool:** Vite 6.4.1
+- **Styling:** Tailwind CSS 4.1.1
+- **HTTP Client:** Axios
+- **Auth:** Firebase Web SDK 11.6.0
+- **Routing:** React Router DOM 7.5.2
+
+### **External Service Integrations**
+| Service | Purpose | API Version |
+|---------|---------|-------------|
+| Google Gemini | Audio transcription & summarization | v1beta |
+| YouTube Data API | Educational video recommendations | v3 |
+| ConvertAPI | PPTX to PDF conversion | v2 |
+| Firebase | Auth, Firestore, FCM | Admin SDK 9.6.0 |
+| Nhost | File storage (S3-compatible) | GraphQL |
+
+---
+
+*Document Version: 3.0 - Updated with accurate technical specifications from codebase*
 *Last Updated: December 2025*
