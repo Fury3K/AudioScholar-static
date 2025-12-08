@@ -44,14 +44,14 @@
 **Visual Content:**
 *   **Adviser:** Jasmine A. Tulin
 *   **The Team:**
-    1.  **Math Lee L. Biacolo** (Team Leader, Backend & Mobile Lead) - Knows everything about the project, backend + frontend mobile development
-    2.  **Nathan John Orlanes** (2nd Leader, Frontend Mobile Lead) - Frontend mobile development, major contributions Sept-Dec 2025
-    3.  **Terence John Duterte** (3rd, Frontend Web Lead) - Frontend web (April-May 2025), knows app but not deep logic
-    4.  **Christian Brent Alpez** (Support, External Affairs) - Surveys, gathering information, knows general direction only
-    5.  **Claive Justin Barrientos** (Support) - Minimal help, knows some basics
+    1.  **Math Lee L. Biacolo**
+    2.  **Nathan John Orlanes**
+    3.  **Terence John Duterte**
+    4.  **Christian Brent Alpez**
+    5.  **Claive Justin Barrientos**
 
 > **Speaker Notes:**
-> "Our team consists of five developers with diverse roles. Math Lee is our Team Leader who architected the entire system. Nathan John leads our frontend mobile development. Terence John handles our web platform. Christian Brent manages our external affairs and user research. Claive Justin provides support across various areas. We are guided by our adviser, Ms. Jasmine Tulin."
+> "Our team consists of five developers with diverse roles. Math Lee is our Team Leader who architected the entire system. Nathan John leads our frontend web development. Terence John handles our web platform. Christian Brent manages our external affairs and user research. Claive Justin provides support across various areas. We are guided by our adviser, Ms. Jasmine Tulin."
 
 ---
 
@@ -295,7 +295,6 @@
 
 **Visual Content:**
 *   **Headline:** Thank You!
-*   **Contact Info:** mathlee.biacolo@cit.edu
 *   **GitHub:** https://github.com/MasuRii/AudioScholar
 *   **All Links:** https://linktr.ee/AudioScholar
 *   **Text:** "We are now open for questions."
