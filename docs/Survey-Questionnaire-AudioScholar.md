@@ -2,8 +2,97 @@
 
 **Document ID:** SURVEY-QUEST-008  
 **Date:** December 2025  
-**Version:** 1.0  
-**Status:** Ready for Deployment  
+**Version:** 2.0  
+**Status:** Completed - Survey Results Available  
+
+---
+
+## **Survey Completion Summary**
+
+> **This survey has been completed.** The following section summarizes the survey administration and results. For detailed analysis, see [`SUS-Analysis-Results.md`](./SUS-Analysis-Results.md).
+
+### Survey Administration Details
+
+| Metric | Value |
+|--------|-------|
+| **Total Respondents** | 35 |
+| **Data Collection Period** | December 4-9, 2025 |
+| **Response Source** | CIT.edu students and users |
+| **Survey Instrument** | Standard 10-question SUS questionnaire + custom evaluation sections |
+| **Analysis Date** | December 10, 2025 |
+
+### SUS Results Overview
+
+| Statistic | Value |
+|-----------|-------|
+| **Mean SUS Score** | 64.14 |
+| **Median SUS Score** | 60.00 |
+| **Standard Deviation** | 16.52 |
+| **Score Range** | 40.0 - 100.0 |
+| **Letter Grade** | D (OK/Marginal) |
+| **Percentile** | ~41st percentile |
+
+### Key Findings
+
+**Strengths (Highest Scoring Questions):**
+- Q7 - Learnability: 4.40/5 - Users perceive the system as easy to learn
+- Q5 - Integration: 4.37/5 - Functions are perceived as well-integrated
+- Q1 - Desire to Use: 4.31/5 - Strong intent to continue using the system
+
+**Areas for Improvement (Lowest Scoring Questions):**
+- Q10 - Learning Curve: 3.31/5 - Users feel they needed to learn many things upfront
+- Q8 - Cumbersome: 3.29/5 - Some users find the system cumbersome
+- Q2 - Complexity: 3.17/5 - Perceived as somewhat complex
+
+### Score Distribution
+
+| Score Range | Count | Percentage |
+|-------------|-------|------------|
+| 90-100 (Excellent) | 4 | 11.4% |
+| 80-89 (Good) | 2 | 5.7% |
+| 70-79 (Acceptable) | 6 | 17.1% |
+| 60-69 (Marginal) | 5 | 14.3% |
+| 50-59 (Low) | 16 | 45.7% |
+| Below 50 (Poor) | 2 | 5.7% |
+
+### User Feedback Highlights
+
+- **Positive Feedback**: 4 respondents expressed complete satisfaction with no suggested changes
+- **UI/UX**: Suggestions for visual design enhancement ("simple and plain" design noted)
+- **Audio Quality**: Request for better audio recording/playback quality
+- **Technical Stability**: No technical issues reported during the survey period
+
+> **Full Analysis:** For complete statistical analysis, per-question breakdowns, and detailed recommendations, refer to the [SUS Analysis Results](./SUS-Analysis-Results.md) document.
+
+---
+
+## **Survey Methodology**
+
+### System Usability Scale (SUS) Framework
+
+This survey incorporates the **System Usability Scale (SUS)**, a widely-used standardized questionnaire developed by John Brooke in 1986. The SUS provides a reliable, "quick and dirty" tool for measuring usability.
+
+**SUS Scoring Methodology:**
+1. For odd-numbered questions (1, 3, 5, 7, 9): Score contribution = scale position - 1
+2. For even-numbered questions (2, 4, 6, 8, 10): Score contribution = 5 - scale position
+3. Sum all contributions and multiply by 2.5 to get a score out of 100
+
+**SUS Grading Scale:**
+
+| SUS Score | Grade | Adjective Rating |
+|-----------|-------|------------------|
+| > 84.1 | A+ | Best Imaginable |
+| 80.3-84.1 | A | Excellent |
+| 68-80.3 | B | Good |
+| 68 | C | OK (Average) |
+| 51-68 | D | OK/Marginal |
+| < 51 | F | Poor/Awful |
+
+### Additional Frameworks Used
+
+- **Technology Acceptance Model (TAM)**: Part B measures Perceived Usefulness (PU) and Perceived Ease of Use (PEOU)
+- **ISO 25010 Quality Model**: Part D evaluates software quality characteristics
+- **Net Promoter Score (NPS)**: Question F4 captures recommendation likelihood
 
 ---
 
@@ -121,6 +210,8 @@ Thank you for participating in the evaluation of **AudioScholar**, an educationa
 ## **Part C: System Usability Scale (SUS)**
 *Please rate the following standard usability statements.*
 
+> **Note:** This section uses the standardized SUS questionnaire. Results from 35 respondents yielded a mean SUS score of **64.14** (Grade D - OK/Marginal). See [SUS Analysis Results](./SUS-Analysis-Results.md) for detailed per-question analysis.
+
 **Scale:**  
 1 - Strongly Disagree  
 2 - Disagree  
@@ -128,35 +219,45 @@ Thank you for participating in the evaluation of **AudioScholar**, an educationa
 4 - Agree  
 5 - Strongly Agree
 
-**C1. I think that I would use AudioScholar frequently.** *[Required]*
+**C1. I think that I would like to use this system.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 4.31/5 - Strong intent to use*
 
-**C2. I found AudioScholar unnecessarily complex.** *[Required]*
+**C2. I found the system unnecessarily complex.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 3.17/5 - Area for improvement*
 
-**C3. I thought AudioScholar was easy to use.** *[Required]*
+**C3. I though the system was easy to use.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 4.23/5 - Generally perceived as easy*
 
-**C4. I think that I would need the support of a technical person to use AudioScholar.** *[Required]*
+**C4. I think that I would need the support of a technical person to be able to use this system.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 2.94/5 - Users feel relatively self-sufficient*
 
-**C5. I found the various functions in AudioScholar were well integrated.** *[Required]*
+**C5. I found the various functions in the system were well integrated.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 4.37/5 - Strong integration perception*
 
-**C6. I thought there was too much inconsistency in AudioScholar.** *[Required]*
+**C6. I thought there was too much inconsistency in this system** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 3.11/5 - Some inconsistency perceived*
 
-**C7. I would imagine that most people would learn to use AudioScholar very quickly.** *[Required]*
+**C7. I would imagine that most people would learn this system quickly.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 4.40/5 - Highest scoring question (Learnability)*
 
-**C8. I found AudioScholar very cumbersome to use.** *[Required]*
+**C8. I found the system very cumbersome to use.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 3.29/5 - Area for improvement*
 
-**C9. I felt very confident using AudioScholar.** *[Required]*
+**C9. I felt very confident using the system.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 4.17/5 - Good user confidence*
 
-**C10. I needed to learn a lot of things before I could get going with AudioScholar.** *[Required]*
+**C10. I needed to learn a lot of things before I could get going with this system.** *[Required]*
 *   (1) (2) (3) (4) (5)
+*   *Survey Result: Average 3.31/5 - Learning curve concern*
 
 ---
 
@@ -271,3 +372,19 @@ Thank you for participating in the evaluation of **AudioScholar**, an educationa
 
 **F4. On a scale of 0 to 10, how likely are you to recommend AudioScholar to a classmate?** *[Required]*
 *   [0 - Not likely at all] ... [10 - Extremely likely]
+
+---
+
+## **Related Documents**
+
+| Document | Description | Path |
+|----------|-------------|------|
+| SUS Analysis Results | Complete statistical analysis of SUS survey results | [`docs/SUS-Analysis-Results.md`](./SUS-Analysis-Results.md) |
+| Survey Raw Data | CSV file containing all 35 respondent responses | [`docs/AudioScholar - System Usability Scale (SUS) (3)(1-35).csv`](./AudioScholar%20-%20System%20Usability%20Scale%20(SUS)%20(3)(1-35).csv) |
+| Survey Framework | Theoretical framework for the evaluation methodology | [`docs/Survey-Framework-AudioScholar.md`](./Survey-Framework-AudioScholar.md) |
+| Survey Discussion | Discussion and interpretation of survey findings | [`docs/Survey-Discussion-AudioScholar.md`](./Survey-Discussion-AudioScholar.md) |
+
+---
+
+*Document updated: December 10, 2025*  
+*Survey analysis completed with 35 valid responses*

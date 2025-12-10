@@ -4,7 +4,8 @@
 **Date:** December 2025  
 **Target Audience:** Academic Panel / Final Capstone Defense  
 **Total Slides:** 10  
-**Time Allocation:** 10 Minutes Presentation + 5 Minutes Q&A
+**Time Allocation:** 10 Minutes Presentation + 5 Minutes Q&A  
+**Document Version:** 4.0 - Updated with Actual SUS Survey Results (N=35)
 
 ---
 
@@ -216,68 +217,124 @@
 
 ### **📋 MEMBER 5 SECTION** *(Randomly Selected, ~1.5 minutes)*
 
-#### **SLIDE 8: Validation & Testing Summary**
+#### **SLIDE 8: Validation & Testing Summary - Actual SUS Results**
 
 **Visual Content:**
-- **Testing Overview Table:**
+
+**🎯 SUS Survey Results at a Glance:**
+
+| Metric | Value |
+|--------|-------|
+| **Respondents** | N = 35 |
+| **SUS Score** | **64.14 / 100** |
+| **Grade** | **D (OK/Marginal)** |
+| **Percentile** | ~41st percentile |
+| **Industry Average** | 68.0 |
+
+**Score Distribution Chart:**
+
+| Rating | Percentage | Visual |
+|--------|------------|--------|
+| 🟢 Excellent (90-100) | 11.4% | ████ |
+| 🟢 Good (80-89) | 5.7% | ██ |
+| 🟡 Acceptable (70-79) | 17.1% | ██████ |
+| 🟡 Marginal (60-69) | 14.3% | █████ |
+| 🔴 Low (50-59) | 45.7% | ████████████████ |
+| 🔴 Poor (< 50) | 5.7% | ██ |
+
+**Testing Coverage:**
 
 | Test Type | Scope | Results |
 |-----------|-------|---------|
 | Unit Tests | Backend Services | 85% code coverage |
 | Integration Tests | API Endpoints | All critical paths validated |
 | Load Testing (k6) | Concurrent Users | Stable at 100 VUs |
-| Usability Testing | SUS Survey (N=13) | Score: **76.9/100** (Grade B) |
+| **Usability (SUS)** | **N=35 Students** | **Score: 64.14 (Grade D)** |
 
-**Performance Metrics:**
-- Average API Response Time: < 200ms
-- Audio Processing Time: ~3 min per 1-hour recording
-- Mobile App Startup: < 2 seconds
+**Statistical Confidence:**
+- 95% CI: 58.46 - 69.82
+- Standard Deviation: 16.52
+- Data Collection: December 4-9, 2025
 
 > **Speaker Notes:**
-> "Our validation strategy covered multiple layers. Unit tests achieved 85% code coverage on critical backend services. We used k6 for load testing, confirming stability under 100 concurrent virtual users. Most importantly, our System Usability Scale survey with 13 university students achieved a score of 76.9—rated 'Good' and above the industry average of 68."
+> "Our validation strategy covered multiple layers. Unit tests achieved 85% code coverage on critical backend services. We used k6 for load testing, confirming stability under 100 concurrent virtual users. For usability, we conducted a formal System Usability Scale survey with 35 CIT students from December 4th to 9th. Our SUS score of 64.14 places us in the 'OK/Marginal' category—about 4 points below the industry average of 68. While this indicates room for improvement, it's comparable to established tools like Microsoft PowerPoint which scores 63."
 
 ---
 
-#### **SLIDE 9: Insights, Recommendations & Research Highlights**
+#### **SLIDE 9: SUS Strengths, Weaknesses & Recommendations**
 
 **Visual Content:**
-- **Key Insights from Development:**
-  1. Context Injection reduces AI hallucinations by ~40%
-  2. Foreground Service is essential for reliable mobile recording
-  3. Asynchronous processing is critical for user experience
 
-- **Recommendations for Future Work:**
-  1. Real-time transcription during recording
-  2. Multi-language support (Filipino, Cebuano)
-  3. LMS integration (Canvas, Blackboard)
-  4. Collaborative study group features
+**✅ Top Strengths (Highest Scoring Questions):**
+
+| Rank | Factor | Score | What Users Said |
+|------|--------|-------|-----------------|
+| 🥇 | **Learnability** (Q7) | 4.40/5 | "I would imagine that most people would learn this system quickly." |
+| 🥈 | **Integration** (Q5) | 4.37/5 | "I found the various functions in the system were well integrated." |
+| 🥉 | **Intent to Use** (Q1) | 4.31/5 | "I think that I would like to use this system." |
+| 4 | Ease of Use (Q3) | 4.23/5 | "I though the system was easy to use." |
+| 5 | Confidence (Q9) | 4.17/5 | "I felt very confident using the system." |
+
+**⚠️ Areas for Improvement (Lowest Scoring Questions):**
+
+| Rank | Issue | Score | User Perception |
+|------|-------|-------|-----------------|
+| 1 | **Learning Curve** (Q10) | 3.31/5 | "I needed to learn a lot of things before I could get going with this system." |
+| 2 | **Cumbersome** (Q8) | 3.29/5 | "I found the system very cumbersome to use." |
+| 3 | **Complexity** (Q2) | 3.17/5 | "I found the system unnecessarily complex." |
+| 4 | Inconsistency (Q6) | 3.11/5 | "I thought there was too much inconsistency in this system" |
+
+**🎯 Prioritized Recommendations:**
+
+| Priority | Action Item | Addresses |
+|----------|-------------|-----------|
+| 🔴 High | Interactive onboarding tutorial | Learning Curve (Q10) |
+| 🔴 High | Streamline common workflows | Cumbersome (Q8) |
+| 🟡 Medium | Progressive disclosure for advanced features | Complexity (Q2) |
+| 🟡 Medium | Standardize UI patterns | Inconsistency (Q6) |
+| 🟢 Low | Enhanced visual design | User feedback: "UI is plain" |
+
+**📊 Factor Analysis:**
+- **Learnability Factor:** 68.39 (Above average)
+- **Usability Factor:** 62.44 (Below average)
+
+> **Speaker Notes:**
+> "Our SUS analysis revealed clear strengths and weaknesses. Users strongly agreed the system is learnable—scoring 4.40 out of 5 for quick learning. Integration and intent to use also scored high. However, users felt they needed to learn many things before getting started, and some found workflows cumbersome. Our recommendations prioritize an interactive tutorial for onboarding and streamlining the most common user flows. These targeted improvements could push our score above the 68 threshold into the 'Good' category."
+
+---
+
+#### **SLIDE 10: Conclusion, Research Highlights & Q&A**
+
+**Visual Content:**
+- **Summary Statement:** "AudioScholar bridges the gap between listening and learning."
 
 **Research Paper Highlights:**
 - **Title:** "AudioScholar: An AI-Powered Lecture Note-Taking System Using Context-Aware Summarization"
 - **Key Contributions:**
   1. Novel "Context Injection" approach for academic AI accuracy
-  2. Validated Technology Acceptance Model (TAM) scores: PU=4.46/5, PEOU=4.15/5
-  3. Open-source implementation for academic research reproducibility
+  2. Validated SUS Score: 64.14 (N=35) - Comparable to Microsoft PowerPoint (63.0)
+  3. Strong Learnability Factor (68.39) indicating intuitive design approach
+  4. Open-source implementation for academic research reproducibility
+
+**Key Takeaways from SUS Evaluation:**
+- ✅ Users want to use the system (Q1: 4.31/5)
+- ✅ Easy to learn for most people (Q7: 4.40/5)
+- ⚠️ Initial onboarding needs improvement (Q10: 3.31/5)
+- 📈 Path to "Good" rating: +4 points through targeted UX improvements
+
+**Project Links:**
+- GitHub: https://github.com/MasuRii/AudioScholar
+- All Links: https://linktr.ee/AudioScholar
+
+**Acknowledgments:**
+- Adviser: Ms. Jasmine A. Tulin
+- Cebu Institute of Technology - University
+- 35 CIT students who participated in SUS evaluation
+
+**"We are now open for questions."**
 
 > **Speaker Notes:**
-> "From our research, three key insights emerged: First, Context Injection—feeding slides to the AI—reduced hallucinations significantly. Second, Android's process management required careful engineering with Foreground Services. Third, asynchronous processing was non-negotiable for good UX. Our research paper contributes a novel context-aware summarization approach, validated by strong TAM scores indicating high perceived usefulness and intention to use among students."
-
----
-
-#### **SLIDE 10: Conclusion & Q&A**
-
-**Visual Content:**
-- **Summary Statement:** "AudioScholar bridges the gap between listening and learning."
-- **Project Links:**
-  - GitHub: https://github.com/MasuRii/AudioScholar
-  - All Links: https://linktr.ee/AudioScholar
-- **Acknowledgments:**
-  - Adviser: Ms. Jasmine A. Tulin
-  - Cebu Institute of Technology - University
-- **"We are now open for questions."**
-
-> **Speaker Notes:**
-> "In conclusion, AudioScholar addresses a validated student need—the cognitive bottleneck of note-taking. Our technical implementation is robust, our testing confirms stability, and student feedback shows strong adoption potential. Thank you for your attention. We welcome your questions."
+> "In conclusion, AudioScholar addresses a validated student need—the cognitive bottleneck of note-taking. Our SUS evaluation with 35 students shows strong adoption potential with a Learnability score above average. While our overall score of 64.14 indicates room for improvement, it's competitive with established productivity tools. With targeted improvements in onboarding and workflow simplification, we're confident AudioScholar can reach the 'Good' usability threshold. Thank you for your attention. We welcome your questions."
 
 ---
 
@@ -305,9 +362,36 @@
 | Tech Stack, Server Demo | Member 2 | ~2 min |
 | Essential Transaction 1 Demo | Member 3 (Random) | ~2 min |
 | Essential Transaction 2 Demo | Member 4 (Random) | ~2 min |
-| Testing, Insights, Research | Member 5 (Random) | ~1.5 min |
+| Validation, SUS Results, Insights | Member 5 (Random) | ~1.5 min |
 | **Total Presentation** | | **10 min** |
 | Q&A | All Members | 5 min |
+
+---
+
+## **SUS Quick Reference Card (For Member 5)**
+
+### **Key Numbers to Remember:**
+- **N = 35** respondents (CIT students)
+- **SUS Score = 64.14** (out of 100)
+- **Grade = D** (OK/Marginal category)
+- **Percentile = 41st** (below average but functional)
+- **Industry Average = 68.0** (we are 3.86 points below)
+
+### **Top 3 Strengths:**
+1. Learnability (Q7): **4.40/5** - Easy to learn
+2. Integration (Q5): **4.37/5** - Well-integrated functions
+3. Intent to Use (Q1): **4.31/5** - Users want to use it
+
+### **Top 3 Weaknesses:**
+1. Learning Curve (Q10): **3.31/5** - Too much upfront learning
+2. Cumbersome (Q8): **3.29/5** - Workflow friction
+3. Complexity (Q2): **3.17/5** - Perceived as complex
+
+### **Benchmark Comparison:**
+- AudioScholar: **64.14** ✓
+- PowerPoint: 63.0 (we're better!)
+- Excel: 57.0 (we're much better!)
+- Industry Average: 68.0 (target to beat)
 
 ---
 
@@ -318,6 +402,7 @@
 - Google. (2024). Gemini API Documentation.
 - ISO/IEC 25010:2011 Systems and software quality models.
 - Brooke, J. (1996). SUS: A 'Quick and Dirty' Usability Scale.
+- Sauro, J. (2011). Measuring Usability with the System Usability Scale (SUS).
 
 ---
 
@@ -367,5 +452,6 @@
 
 ---
 
-*Document Version: 3.0 - Updated with accurate technical specifications from codebase*
-*Last Updated: December 2025*
+*Document Version: 4.0 - Updated with Actual SUS Survey Results (N=35, Score: 64.14, Grade D)*  
+*Last Updated: December 10, 2025*  
+*Previous Version: 3.0 - Contained placeholder SUS data (N=13, Score: 76.9)*
