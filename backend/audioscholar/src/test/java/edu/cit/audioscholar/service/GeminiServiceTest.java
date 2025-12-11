@@ -49,7 +49,7 @@ class GeminiServiceTest {
 	void setUp() {
 		// Set configuration values that are still present in GeminiService for legacy
 		// methods.
-		ReflectionTestUtils.setField(geminiService, "transcriptionModelName", "gemini-2.0-flash");
+		ReflectionTestUtils.setField(geminiService, "transcriptionModelName", "gemini-2.5-flash");
 		ReflectionTestUtils.setField(geminiService, "summarizationModelName", "gemini-2.5-flash");
 	}
 
@@ -80,7 +80,7 @@ class GeminiServiceTest {
 			// Mock Rotation Service
 			when(rotationService.executeWithInfiniteRotation(any())).thenAnswer(invocation -> {
 				Function<String, String> apiCallFunction = invocation.getArgument(0);
-				return apiCallFunction.apply("gemini-2.0-flash");
+				return apiCallFunction.apply("gemini-2.5-flash");
 			});
 
 			// Mock Transcription Call
