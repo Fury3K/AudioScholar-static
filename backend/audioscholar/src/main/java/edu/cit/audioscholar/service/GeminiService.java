@@ -45,7 +45,7 @@ public class GeminiService {
 	@Value("${google.ai.api.key}")
 	private String apiKey;
 
-	@Value("${gemini.api.model.transcription:gemini-2.0-flash}")
+	@Value("${gemini.api.model.transcription:gemini-2.5-flash}")
 	private String transcriptionModelName;
 
 	@Value("${gemini.api.model.summarization:gemini-2.5-flash}")
@@ -58,7 +58,7 @@ public class GeminiService {
 
 	// Legacy constants for backward compatibility
 	@Deprecated
-	private static final String TRANSCRIPTION_MODEL_NAME_LEGACY = "gemini-2.0-flash";
+	private static final String TRANSCRIPTION_MODEL_NAME_LEGACY = "gemini-2.5-flash";
 	@Deprecated
 	private static final String SUMMARIZATION_MODEL_NAME_LEGACY = "gemini-2.5-flash";
 
