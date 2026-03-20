@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/AudioScholar-static/',
   plugins: [react(),
     tailwindcss()
   ],
-
 })
