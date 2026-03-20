@@ -56,8 +56,8 @@ const PaymentMethodPage = () => {
                                     }`}
                                 >
                                     <span></span>
-                                    <img src="/gcash.jpg" alt="GCash" className="h-5 w-auto rounded" />
-                                    <img src="/Maya_logo.svg.png" alt="PayMaya" className="h-5 w-auto" />
+                                    <img src={`${import.meta.env.BASE_URL}gcash.jpg`} alt="GCash" className="h-5 w-auto rounded" />
+                                    <img src={`${import.meta.env.BASE_URL}Maya_logo.svg.png`} alt="PayMaya" className="h-5 w-auto" />
                                 </button>
                             </div>
                         </div>

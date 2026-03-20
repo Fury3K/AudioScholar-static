@@ -105,10 +105,10 @@ const UserProfileEdit = () => {
               <div className="flex flex-col items-center space-y-4 mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
                 <img
-                  src={avatarPreview || currentProfileImageUrl || '/icon-512.png'}
+                  src={avatarPreview || currentProfileImageUrl || `${import.meta.env.BASE_URL}icon-512.png`}
                   alt="Avatar Preview"
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600 shadow-md"
-                  onError={(e) => { e.target.onerror = null; e.target.src = '/icon-512.png'; }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = `${import.meta.env.BASE_URL}icon-512.png`; }}
                 />
                 <input
                   type="file"

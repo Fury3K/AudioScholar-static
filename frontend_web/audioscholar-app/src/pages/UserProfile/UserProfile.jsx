@@ -44,11 +44,11 @@ const UserProfile = () => {
 
             <div className="bg-[#1A365D] p-8 md:p-10 text-white flex flex-col items-center justify-center text-center">
               <img
-                src={user?.profileImageUrl || '/icon-512.png'}
+                src={user?.profileImageUrl || `${import.meta.env.BASE_URL}icon-512.png`}
                 alt="Profile"
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mb-5"
                 referrerPolicy="no-referrer"
-                onError={(e) => { e.target.onerror = null; e.target.src = '/icon-512.png'; }}
+                onError={(e) => { e.target.onerror = null; e.target.src = `${import.meta.env.BASE_URL}icon-512.png`; }}
               />
               <h1 className="text-3xl font-bold mb-1">{`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User Name'}</h1>
               <p className="text-indigo-200 mb-4 text-lg">{user?.email || 'email@example.com'}</p>

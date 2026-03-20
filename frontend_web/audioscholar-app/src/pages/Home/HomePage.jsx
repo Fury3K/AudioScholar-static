@@ -20,7 +20,7 @@ export const Header = () => {
         <header className="bg-[#1A365D] shadow-sm py-3">
             <div className="container mx-auto px-4 flex justify-between items-center">
                 <Link to={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-3">
-                    <img src="/AudioScholar - No BG.png" alt="AudioScholar Logo" className="h-14 w-auto" />
+                    <img src={`${import.meta.env.BASE_URL}AudioScholar - No BG.png`} alt="AudioScholar Logo" className="h-14 w-auto" />
                     <span className="font-montserrat font-semibold font-bold text-[24px] leading-[32px] tracking-normal text-white">AudioScholar</span>
                 </Link>
                 <nav className="hidden md:flex items-center space-x-2">
@@ -46,12 +46,12 @@ export const Header = () => {
                                 <FiUpload className="w-4 h-4" /> Upload
                             </Link>
                             <Link to="/profile" className="flex items-center gap-1.5 font-inter font-medium text-sm leading-5 tracking-tight text-white hover:text-indigo-600 hover:bg-white transition-all duration-200 px-3 py-1.5 rounded-md">
-                                <img 
-                                    src={user?.profileImageUrl || '/icon-512.png'} 
-                                    alt="Profile" 
+                                <img
+                                    src={user?.profileImageUrl || `${import.meta.env.BASE_URL}icon-512.png`}
+                                    alt="Profile"
                                     className="w-5 h-5 rounded-full object-cover border border-gray-300 bg-white"
                                     referrerPolicy="no-referrer"
-                                    onError={(e) => { e.target.onerror = null; e.target.src = '/icon-512.png'; }}
+                                    onError={(e) => { e.target.onerror = null; e.target.src = `${import.meta.env.BASE_URL}icon-512.png`; }}
                                 />
                                 <span>{user?.firstName || 'Profile'}</span>
                             </Link>
@@ -339,11 +339,11 @@ const Pricing = () => {
 // Define the new TeamSection component
 const TeamSection = () => {
     const teamMembers = [
-        { name: "Math Lee L. Biacolo", role: "Developer", imgSrc: "/448017950_422357707435559_1572405260216380511_n.jpg" },
-        { name: "Nathan John G. Orlanes", role: "Developer", imgSrc: "/120552317_4626392360735881_682202529014384747_n (1).jpg" },
-        { name: "Terence John N. Duterte", role: "Developer", imgSrc: "/image.jpg" },
-        { name: "Christian Brent G. Alpez", role: "Developer", imgSrc: "/Alpez.jpg" },
-        { name: "Claive Justin J. Barrientos", role: "Developer", imgSrc: "/Barrientos.jpg" },
+        { name: "Math Lee L. Biacolo", role: "Developer", imgSrc: `${import.meta.env.BASE_URL}448017950_422357707435559_1572405260216380511_n.jpg` },
+        { name: "Nathan John G. Orlanes", role: "Developer", imgSrc: `${import.meta.env.BASE_URL}120552317_4626392360735881_682202529014384747_n (1).jpg` },
+        { name: "Terence John N. Duterte", role: "Developer", imgSrc: `${import.meta.env.BASE_URL}image.jpg` },
+        { name: "Christian Brent G. Alpez", role: "Developer", imgSrc: `${import.meta.env.BASE_URL}Alpez.jpg` },
+        { name: "Claive Justin J. Barrientos", role: "Developer", imgSrc: `${import.meta.env.BASE_URL}Barrientos.jpg` },
     ];
 
     return (
@@ -380,7 +380,7 @@ export const Footer = () => {
                 <div className="grid md:grid-cols-4 gap-8">
                     <div>
                         <Link to="/" className="flex items-center gap-3 mb-4">
-                            <img src="/AudioScholar - No BG.png" alt="AudioScholar Logo" className="h-14 w-auto" />
+                            <img src={`${import.meta.env.BASE_URL}AudioScholar - No BG.png`} alt="AudioScholar Logo" className="h-14 w-auto" />
                             <span className="font-montserrat font-semibold font-bold text-[22px] leading-7 tracking-normal text-primary-400">AudioScholar</span>
                         </Link>
                         <p className="font-inter font-normal text-sm leading-5 tracking-normal text-gray-400 mb-4">Transform your lecture experience with AI-powered notes.</p>
