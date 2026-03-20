@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../Home/HomePage';
-import axios from 'axios';
-import { API_BASE_URL } from '../../services/authService';
 
 const CheckoutPage = () => {
     const [tier, setTier] = useState(null);
@@ -40,72 +38,16 @@ const CheckoutPage = () => {
 
         console.log('Confirming subscription...', { tier, paymentDetails });
 
-        // --- Mock Backend Call ---
-        // Simulate API call delay
-        setTimeout(async () => {
-            console.log('Subscription Confirmed (Mocked)!');
-
-            const token = localStorage.getItem('AuthToken');
-            const userId = localStorage.getItem('userId');
-
-            if (!token || !userId) {
-                console.error('AuthToken or UserId not found. Cannot update role.');
-                setSuccessMessage('We encountered an issue updating your account');
-                setSecondaryMessage('Critical user information is missing to update your role. Please re-login or contact support.');
-                setShowSuccessModal(true);
-                setIsLoading(false);
-                localStorage.removeItem('selectedTier');
-                localStorage.removeItem('paymentDetails');
-                return;
-            }
-
-            try {
-                const roleUpdateUrl = `${API_BASE_URL}api/users/${userId}/role`;
-                const roleUpdatePayload = { role: 'ROLE_PREMIUM' };
-                
-                console.log(`Attempting to update role for user ${userId} to ROLE_PREMIUM at ${roleUpdateUrl}`);
-
-                const response = await axios.put(roleUpdateUrl, roleUpdatePayload, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.status === 200 || response.status === 204) {
-                    console.log('Successfully updated user role to ROLE_PREMIUM');
-                    localStorage.setItem('userSubscriptionTier', tier);
-                    setSuccessMessage('Thank you for your purchase!');
-                    setSecondaryMessage('Your Premium membership is now active and your account has been upgraded.');
-                    setShowSuccessModal(true);
-                } else {
-                    console.error('Role update API call was not successful, status:', response.status);
-                    localStorage.setItem('userSubscriptionTier', tier);
-                    setSuccessMessage('Subscription completed, but with an issue');
-                    setSecondaryMessage('Your payment went through, but we could not update your account privileges automatically. Please contact support.');
-                    setShowSuccessModal(true);
-                }
-
-            } catch (err) {
-                console.error('Error updating user role:', err);
-                localStorage.setItem('userSubscriptionTier', tier);
-                let errorMessage = 'Subscription payment processed, but failed to update your account privileges.';
-                if (err.response) {
-                    errorMessage += ` (Server responded with ${err.response.status}).`;
-                    if (err.response.status === 403) {
-                        errorMessage += ' It seems there was a permission issue.';
-                    }
-                }
-                setSuccessMessage('We encountered an issue updating your account');
-                setSecondaryMessage(errorMessage + ' Please contact support if this persists.');
-                setShowSuccessModal(true);
-            }
-            
+        // Demo mode - simulate subscription confirmation
+        setTimeout(() => {
+            localStorage.setItem('userSubscriptionTier', tier);
+            setSuccessMessage('Thank you for your purchase!');
+            setSecondaryMessage('Your Premium membership is now active. (Demo mode)');
+            setShowSuccessModal(true);
             localStorage.removeItem('selectedTier');
             localStorage.removeItem('paymentDetails');
             setIsLoading(false);
-
-        }, 1500); // Simulate 1.5 seconds delay
+        }, 1500);
     };
 
     const handleCloseSuccessModal = () => {

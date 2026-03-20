@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/authService';
 import { Header } from '../Home/HomePage';
 import { FiCheckCircle, FiFile, FiFileText, FiLoader, FiUpload, FiXCircle } from 'react-icons/fi';
 
@@ -168,7 +167,7 @@ const Uploading = () => {
     setSuccess(null);
   };
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = (e) => {
     e.preventDefault();
     setError('');
     setPptxError('');
@@ -178,7 +177,6 @@ const Uploading = () => {
       setError('Please select an audio file first');
       return;
     }
-    // PowerPoint is optional
     if (!title.trim()) {
        setError('Please enter a title for the recording.');
        return;
@@ -186,75 +184,15 @@ const Uploading = () => {
 
     setLoading(true);
 
-    const AuthToken = localStorage.getItem('AuthToken');
-    if (!AuthToken) {
-      setError('Authentication token not found. Please sign in again.');
+    // Demo mode - simulate upload with brief delay
+    setTimeout(() => {
+      setSuccess('File uploaded successfully! (Demo mode - no actual processing occurs)');
+      removeAudioFile();
+      removePptxFile();
+      setTitle('');
+      setDescription('');
       setLoading(false);
-      navigate('/signin');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('audioFile', selectedAudioFile);
-    formData.append('title', title.trim());
-    if (description.trim()) {
-      formData.append('description', description.trim());
-    }
-    if (selectedPptxFile) {
-      formData.append('powerpointFile', selectedPptxFile);
-      console.log("Appending PowerPoint file:", selectedPptxFile.name);
-    }
-
-    console.log("Preparing to upload file(s):", selectedAudioFile.name, "with title:", title.trim());
-
-    try {
-      const UPLOAD_URL = `${API_BASE_URL}api/audio/upload`;
-      console.log(`Attempting to upload to: ${UPLOAD_URL}`);
-
-      const response = await fetch(UPLOAD_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AuthToken}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        let errorMsg = `Upload failed with status: ${response.status}`;
-        try {
-          const errorBody = await response.json();
-          errorMsg = errorBody.message || errorMsg;
-        } catch (jsonError) {
-          console.error("Error parsing error response body:", jsonError);
-          errorMsg = `Upload failed: ${response.status} ${response.statusText}`;
-        }
-        console.error("Upload failed:", errorMsg);
-        setError(errorMsg);
-        setSuccess(null);
-        if (response.status === 401) {
-          console.log("Token expired or invalid, redirecting to sign in.");
-          localStorage.removeItem('AuthToken');
-          localStorage.removeItem('userId');
-          navigate('/signin');
-        }
-
-      } else {
-        const result = await response.json();
-        console.log("Upload successful:", result);
-        setSuccess('File(s) uploaded successfully! Processing has started.');
-        removeAudioFile(); 
-        removePptxFile(); 
-        setTitle('');
-        setDescription('');
-      }
-
-    } catch (err) {
-      console.error("Error during file upload:", err);
-      setError(`An error occurred during upload: ${err.message}`);
-      setSuccess(null);
-    } finally {
-      setLoading(false);
-    }
+    }, 1500);
   };
 
 

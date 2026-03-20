@@ -1,53 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import { FiUpload } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/authService';
+import { Link } from 'react-router-dom';
+import { DEMO_USER } from '../../data/mockData';
 import { Header } from '../Home/HomePage';
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [errorUser, setErrorUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoadingUser(true);
-      setErrorUser(null);
-      const token = localStorage.getItem('AuthToken');
-
-      if (!token) {
-        // setErrorUser('Not authenticated. Please log in.'); // Don't show error here, just redirect if no token
-        setLoadingUser(false);
-        navigate('/signin');
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${API_BASE_URL}api/users/me`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setUser(response.data);
-      } catch (err) {
-        console.error('Error fetching user profile for dashboard:', err);
-        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          // setErrorUser('Session expired or unauthorized. Please log in again.');
-          localStorage.removeItem('AuthToken');
-          localStorage.removeItem('userId');
-          navigate('/signin');
-        } else {
-          setErrorUser('Failed to load user information.');
-        }
-      } finally {
-        setLoadingUser(false);
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
+  const user = DEMO_USER;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">

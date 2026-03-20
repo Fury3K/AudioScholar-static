@@ -1,70 +1,28 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/authService';
+import { DEMO_USER } from '../../data/mockData';
 import { Header } from '../Home/HomePage';
 
 const UserProfileEdit = () => {
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState(DEMO_USER.firstName);
+  const [lastName, setLastName] = useState(DEMO_USER.lastName);
+  const [email, setEmail] = useState(DEMO_USER.email);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [initialFirstName, setInitialFirstName] = useState('');
-  const [initialLastName, setInitialLastName] = useState('');
+  const [initialFirstName, setInitialFirstName] = useState(DEMO_USER.firstName);
+  const [initialLastName, setInitialLastName] = useState(DEMO_USER.lastName);
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [currentProfileImageUrl, setCurrentProfileImageUrl] = useState(null);
+  const [currentProfileImageUrl, setCurrentProfileImageUrl] = useState(DEMO_USER.profileImageUrl);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true);
-      setError(null);
-      setSuccessMessage('');
-      const token = localStorage.getItem('AuthToken');
-
-      if (!token) {
-        setError('Not authenticated.');
-        setLoading(false);
-        navigate('/signin');
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${API_BASE_URL}api/users/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const userData = response.data;
-        setFirstName(userData.firstName || '');
-        setLastName(userData.lastName || '');
-        setEmail(userData.email || '');
-        setInitialFirstName(userData.firstName || '');
-        setInitialLastName(userData.lastName || '');
-        setCurrentProfileImageUrl(userData.profileImageUrl);
-        console.log("Fetched user data for edit:", userData);
-      } catch (err) {
-        console.error('Error fetching user profile for edit:', err);
-        setError('Failed to load user data. Please try again.');
-        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          localStorage.removeItem('AuthToken');
-          localStorage.removeItem('userId');
-          navigate('/signin');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, [navigate]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -105,119 +63,24 @@ const UserProfileEdit = () => {
     };
   }, [avatarPreview]);
 
-  const handleSaveChanges = async (e) => {
+  const handleSaveChanges = (e) => {
     e.preventDefault();
     setSaving(true);
     setError(null);
     setSuccessMessage('');
-    const token = localStorage.getItem('AuthToken');
 
-    if (!token) {
-      setError('Authentication expired. Please log in again.');
-      setSaving(false);
-      navigate('/signin');
-      return;
-    }
-
-    let detailsUpdated = false;
-    let passwordChanged = false;
-    let errorsOccurred = false;
-    let avatarUploaded = false;
-
-    const profileDataChanged =
-      firstName !== initialFirstName ||
-      lastName !== initialLastName;
-
-    if (profileDataChanged) {
-      try {
-        console.log('Attempting to update profile details (name only)...');
-        const updatePayload = { firstName, lastName };
-
-        await axios.put(`${API_BASE_URL}api/users/me`, updatePayload, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        detailsUpdated = true;
-        setInitialFirstName(firstName);
-        setInitialLastName(lastName);
-        console.log('Profile details updated successfully.');
-        window.dispatchEvent(new Event('user-profile-updated'));
-
-      } catch (err) {
-        console.error('Error updating profile details:', err);
-        setError(`Failed to update profile details: ${err.response?.data?.message || err.message}`);
-        errorsOccurred = true;
-      }
-    }
-
-    if (!errorsOccurred && avatarFile) {
-      try {
-
-        console.log('Attempting to upload new avatar...');
-        const formData = new FormData();
-        formData.append('avatar', avatarFile);
-
-        const response = await axios.post(`${API_BASE_URL}api/users/me/avatar`, formData, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-
-        avatarUploaded = true;
-        setCurrentProfileImageUrl(response.data.profileImageUrl);
+    // Demo mode - simulate save
+    setTimeout(() => {
+      setInitialFirstName(firstName);
+      setInitialLastName(lastName);
+      if (avatarFile) {
         setAvatarFile(null);
-        setAvatarPreview(null);
-        document.getElementById('avatarInput').value = null;
-        console.log('Avatar uploaded successfully:', response.data);
-        window.dispatchEvent(new Event('user-profile-updated'));
-
-      } catch (err) {
-        console.error('Error uploading avatar:', err);
-        setError(`Failed to upload avatar: ${err.response?.data?.message || err.message}`);
-        errorsOccurred = true;
       }
-    }
-
-    if (newPassword || confirmPassword) {
-      if (newPassword !== confirmPassword) {
-        setError('New passwords do not match.');
-        errorsOccurred = true;
-      } else if (newPassword.length < 6) {
-        setError('New password must be at least 6 characters long.');
-        errorsOccurred = true;
-      } else {
-        if (!errorsOccurred) {
-          try {
-            console.log('Attempting to change password...');
-            await axios.post(`${API_BASE_URL}api/auth/change-password`, { newPassword }, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            passwordChanged = true;
-            setNewPassword('');
-            setConfirmPassword('');
-            console.log('Password changed successfully.');
-          } catch (err) {
-            console.error('Error changing password:', err);
-            setError(`Failed to change password: ${err.response?.data?.message || err.message}`);
-            errorsOccurred = true;
-          }
-        }
-      }
-    }
-
-    setSaving(false);
-
-    if (!errorsOccurred && (detailsUpdated || passwordChanged || avatarUploaded)) {
-      let message = [];
-      if (detailsUpdated) message.push('Profile details updated.');
-      if (passwordChanged) message.push('Password changed.');
-      if (avatarUploaded) message.push('Avatar updated.');
-      setSuccessMessage(message.join(' ') + ' Successfully!');
-    } else if (!errorsOccurred && !detailsUpdated && !passwordChanged && !avatarUploaded) {
-      setSuccessMessage('No changes were detected.');
-    }
-
+      setNewPassword('');
+      setConfirmPassword('');
+      setSaving(false);
+      setSuccessMessage('Changes saved successfully! (Demo mode)');
+    }, 500);
   };
 
   const handleCancel = () => {

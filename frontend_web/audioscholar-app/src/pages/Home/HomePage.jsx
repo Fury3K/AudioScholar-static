@@ -1,98 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { FiGrid, FiLogIn, FiLogOut, FiMic, FiUpload, FiUser, FiUserPlus, FiCheckCircle, FiYoutube, FiCloud, FiBriefcase, FiChevronLeft, FiChevronRight, FiSun, FiMoon } from 'react-icons/fi';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/authService';
+import { DEMO_USER } from '../../data/mockData';
 import { useTheme } from '../../context/ThemeContext';
 
 export const Header = () => {
     const navigate = useNavigate();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const { theme, toggleTheme } = useTheme();
-    const [user, setUser] = useState(null);
+    // Static demo: always authenticated with demo user
+    const isAuthenticated = true;
+    const user = DEMO_USER;
 
-    const loadUser = React.useCallback(() => {
-        const token = localStorage.getItem('AuthToken');
-        setIsAuthenticated(!!token);
-
-        if (!token) {
-            setUser(null);
-            return;
-        }
-
-        fetch(`${API_BASE_URL}api/users/me`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            cache: 'no-store'
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch user');
-                return res.json();
-            })
-            .then(data => {
-                setUser(data);
-            })
-            .catch(err => {
-                console.error("Failed to fetch user info for header:", err);
-            });
-    }, []);
-
-    useEffect(() => {
-        loadUser();
-    }, [loadUser]);
-
-    useEffect(() => {
-        const handleProfileUpdated = () => {
-            loadUser();
-        };
-
-        window.addEventListener('user-profile-updated', handleProfileUpdated);
-        return () => {
-            window.removeEventListener('user-profile-updated', handleProfileUpdated);
-        };
-    }, [loadUser]);
-
-    const handleLogout = async () => {
-        const token = localStorage.getItem('AuthToken'); // Get token before clearing
-        
-        // 1. Perform local logout immediately
-        console.log('Performing local logout...');
-        localStorage.removeItem('AuthToken');
-        localStorage.removeItem('userId');
-        setIsAuthenticated(false);
-        setUser(null);
+    const handleLogout = () => {
+        // In demo mode, just navigate home (re-auth happens automatically)
         navigate('/');
-        console.log('Local logout complete, user redirected.');
-
-        // 2. Call backend logout endpoint (fire and forget, mostly)
-        if (token) {
-            console.log('Calling backend logout endpoint...');
-            try {
-                 // Ensure API_BASE_URL is defined or import it if necessary
-                 // If you use axios elsewhere, you can use that instead of fetch
-                 const response = await fetch(`${API_BASE_URL}api/auth/logout`, { // Assuming API_BASE_URL is available
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        // No 'Content-Type' needed for empty body POST
-                    },
-                    // No body needed for this endpoint based on controller
-                 });
-
-                 if (response.ok) {
-                    console.log('Backend logout successful.');
-                 } else {
-                     // Log error but don't show to user as they are already logged out locally
-                     const errorBody = await response.text(); // Get text response in case it's not JSON
-                     console.error(`Backend logout failed: ${response.status} - ${errorBody}`);
-                 }
-            } catch (error) {
-                 // Log network or other errors
-                 console.error('Error calling backend logout endpoint:', error);
-            }
-        } else {
-             console.warn('No token found, skipping backend logout call.');
-        }
     };
 
     return (

@@ -1,53 +1,12 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/authService';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { DEMO_USER } from '../../data/mockData';
 import { Header } from '../Home/HomePage';
 
 const UserProfile = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem('AuthToken');
-
-      if (!token) {
-        setError('Not authenticated. Please log in.');
-        setLoading(false);
-        navigate('/signin');
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${API_BASE_URL}api/users/me`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setUser(response.data);
-        console.log("Fetched user profile:", response.data);
-      } catch (err) {
-        console.error('Error fetching user profile:', err);
-        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          setError('Session expired or unauthorized. Please log in again.');
-          localStorage.removeItem('AuthToken');
-          localStorage.removeItem('userId');
-          navigate('/signin');
-        } else {
-          setError('Failed to load user profile.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
+  const user = DEMO_USER;
+  const loading = false;
+  const error = null;
 
   if (loading) {
     return (

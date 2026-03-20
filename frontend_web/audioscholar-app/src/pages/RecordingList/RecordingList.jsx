@@ -1,10 +1,8 @@
-import axios from 'axios';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiAlertTriangle, FiCheckCircle, FiClock, FiExternalLink, FiFile, FiLoader, FiTrash2, FiUploadCloud, FiSearch, FiRefreshCw, FiWifiOff } from 'react-icons/fi';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/authService';
-import { recordingService } from '../../services/recordingService';
+import { Link } from 'react-router-dom';
+import { DEMO_RECORDINGS } from '../../data/mockData';
 import { Header } from '../Home/HomePage';
 
 const TERMINAL_STATUSES = ['COMPLETE', 'COMPLETED', 'FAILED', 'PROCESSING_HALTED_UNSUITABLE_CONTENT', 'PROCESSING_HALTED_NO_SPEECH', 'SUMMARY_FAILED', 'COMPLETED_WITH_WARNINGS'];
@@ -26,181 +24,18 @@ const PROCESSING_STATUSES = [
 const UPLOAD_TIMEOUT_SECONDS = 10 * 60;
 
 const RecordingList = () => {
-    const [recordings, setRecordings] = useState([]);
-    const [filteredRecordings, setFilteredRecordings] = useState([]);
+    const [recordings, setRecordings] = useState([...DEMO_RECORDINGS]);
+    const [filteredRecordings, setFilteredRecordings] = useState([...DEMO_RECORDINGS]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
-    const pollIntervalRef = useRef(null);
-    const isMountedRef = useRef(true);
-    const deletedIdsRef = useRef(new Set());
-
-    // ... (existing fetchRecordings, startPolling, useEffect, handleDelete, handleDeleteAllRecordings, formatDate, getStatusBadge code remains same until return)
-
-    const fetchRecordings = useCallback(async () => {
-        console.log("Fetching recordings...");
-        setLoading(true); // Ensure loading state is set when retrying
-        setError(null);
-        const token = localStorage.getItem('AuthToken');
-        if (!token) {
-            setError("User not authenticated. Please log in.");
-            setLoading(false);
-            navigate('/signin');
-            return null;
-        }
-
-        try {
-            const url = `${API_BASE_URL}api/audio/metadata`;
-            const response = await axios.get(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            // Filter out locally deleted items
-            const validRecordings = response.data.filter(rec => !deletedIdsRef.current.has(rec.id));
-
-            // Normalize isFavorite/favorite field from backend to ensure consistency
-            const normalizedRecordings = validRecordings.map(rec => ({
-                ...rec,
-                isFavorite: rec.isFavorite !== undefined ? rec.isFavorite : (rec.favorite !== undefined ? rec.favorite : false)
-            }));
-
-            const sortedRecordings = normalizedRecordings.sort((a, b) =>
-                (b.uploadTimestamp?.seconds ?? 0) - (a.uploadTimestamp?.seconds ?? 0)
-            );
-
-            console.log("Fetched recordings:", sortedRecordings);
-            setRecordings(sortedRecordings);
-            setFilteredRecordings(sortedRecordings);
-            
-            // Update cache with fresh data
-            localStorage.setItem('recording_list', JSON.stringify(sortedRecordings));
-            
-            return sortedRecordings;
-
-        } catch (err) {
-            console.error('Error fetching recordings:', err);
-            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                setError("Session expired or not authorized. Please log in again.");
-                localStorage.removeItem('AuthToken');
-                navigate('/signin');
-            } else {
-                setError('Failed to fetch recordings. Please check your connection and try again.');
-            }
-            return null;
-        } finally {
-            setLoading(false);
-        }
-    }, [navigate]);
-
-    const startPolling = useCallback((initialData) => {
-        if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current);
-            pollIntervalRef.current = null;
-            console.log("Cleared existing poll interval");
-        }
-
-        const needsPolling = initialData?.some(rec => {
-            const statusUpper = rec.status?.toUpperCase();
-            const isTerminal = TERMINAL_STATUSES.includes(statusUpper);
-            if (isTerminal) return false;
-
-            const isUploading = UPLOADING_STATUSES.includes(statusUpper);
-            if (isUploading) {
-                const elapsedSeconds = rec.uploadTimestamp?.seconds
-                    ? (Date.now() / 1000) - rec.uploadTimestamp.seconds
-                    : 0;
-                if (elapsedSeconds > UPLOAD_TIMEOUT_SECONDS) {
-                    console.log(`[Polling Check - ${rec.id}] Upload status ${statusUpper} timed out (${Math.round(elapsedSeconds)}s > ${UPLOAD_TIMEOUT_SECONDS}s). No polling needed for this item.`);
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        if (!needsPolling) {
-            console.log("No recordings require further status checks (all terminal or timed-out uploads). Polling not started.");
-            return;
-        }
-
-        console.log("Starting polling for recordings not in a terminal or timed-out upload state...");
-        pollIntervalRef.current = setInterval(async () => {
-            if (!isMountedRef.current) {
-                console.log("Component unmounted, stopping poll interval.");
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
-                return;
-            }
-            console.log("Polling for updates...");
-            // Silent fetch for polling (don't set global loading)
-            const token = localStorage.getItem('AuthToken');
-            if (!token) return;
-
-            try {
-                const response = await axios.get(`${API_BASE_URL}api/audio/metadata`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const validRecordings = response.data.filter(rec => !deletedIdsRef.current.has(rec.id));
-                const sortedRecordings = validRecordings.sort((a, b) =>
-                    (b.uploadTimestamp?.seconds ?? 0) - (a.uploadTimestamp?.seconds ?? 0)
-                );
-                
-                if (isMountedRef.current) {
-                    setRecordings(sortedRecordings);
-                    // Update polling status
-                     const stillNeedsPolling = sortedRecordings.some(rec => {
-                        const statusUpper = rec.status?.toUpperCase();
-                        const isTerminal = TERMINAL_STATUSES.includes(statusUpper);
-                        if (isTerminal) return false;
-
-                        const isUploading = UPLOADING_STATUSES.includes(statusUpper);
-                        if (isUploading) {
-                            const elapsedSeconds = rec.uploadTimestamp?.seconds
-                                ? (Date.now() / 1000) - rec.uploadTimestamp.seconds
-                                : 0;
-                            if (elapsedSeconds > UPLOAD_TIMEOUT_SECONDS) return false;
-                        }
-                        return true;
-                    });
-
-                    if (!stillNeedsPolling) {
-                        clearInterval(pollIntervalRef.current);
-                        pollIntervalRef.current = null;
-                    }
-                }
-            } catch (err) {
-                console.error("Error during poll:", err);
-            }
-        }, 15000);
-
-    }, []);
 
     useEffect(() => {
-        isMountedRef.current = true;
-        
-        const cachedRecordings = localStorage.getItem('recording_list');
-        if (cachedRecordings) {
-            const parsed = JSON.parse(cachedRecordings);
-            setRecordings(parsed);
-            setFilteredRecordings(parsed); 
-        }
-
-        fetchRecordings().then(initialData => {
-            if (initialData && isMountedRef.current) {
-                localStorage.setItem('recording_list', JSON.stringify(initialData));
-                startPolling(initialData);
-            }
-        });
-
-        return () => {
-            console.log("RecordingList component unmounting, clearing interval.");
-            isMountedRef.current = false;
-            if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
-            }
-        };
-    }, [fetchRecordings, startPolling]);
+        // Simulate brief loading for demo
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 300);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Update filtered recordings when search query or recordings change
     useEffect(() => {
@@ -212,132 +47,28 @@ const RecordingList = () => {
         setFilteredRecordings(filtered);
     }, [searchQuery, recordings]);
 
-    const handleToggleFavorite = async (recording) => {
-        const originalIsFavorite = recording.isFavorite;
-        const newIsFavorite = !originalIsFavorite;
-
-        // Optimistic Update
-        const updateRecording = (rec) => {
+    const handleToggleFavorite = (recording) => {
+        const newIsFavorite = !recording.isFavorite;
+        setRecordings(prev => prev.map(rec => {
             if (rec.id === recording.id) {
                 return { ...rec, isFavorite: newIsFavorite, favoriteCount: (rec.favoriteCount || 0) + (newIsFavorite ? 1 : -1) };
             }
             return rec;
-        };
-
-        setRecordings(prev => prev.map(updateRecording));
-
-        try {
-            await recordingService.toggleFavorite(recording.id);
-        } catch (err) {
-            console.error("Failed to toggle favorite", err);
-            // Revert
-             setRecordings(prev => prev.map(rec => {
-                if (rec.id === recording.id) {
-                    return { ...rec, isFavorite: originalIsFavorite, favoriteCount: (rec.favoriteCount || 0) };
-                }
-                return rec;
-            }));
-        }
+        }));
     };
 
-
-    const handleDelete = async (idToDelete) => {
-        if (!window.confirm('Are you sure you want to delete this recording and its summary? This action cannot be undone.')) {
+    const handleDelete = (idToDelete) => {
+        if (!window.confirm('Are you sure you want to delete this recording? (Demo mode - resets on refresh)')) {
             return;
         }
-
-        // Optimistic update
-        deletedIdsRef.current.add(idToDelete);
-        const updatedRecordings = recordings.filter(rec => rec.id !== idToDelete);
-        setRecordings(updatedRecordings);
-
-        const token = localStorage.getItem('AuthToken');
-        if (!token) {
-            // Revert optimistic update if no token
-            deletedIdsRef.current.delete(idToDelete);
-            fetchRecordings().then(data => data && setRecordings(data));
-            setError("Authentication required.");
-            navigate('/signin');
-            return;
-        }
-
-        try {
-            const url = `${API_BASE_URL}api/audio/metadata/${idToDelete}`;
-            await axios.delete(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            console.log(`Recording ${idToDelete} deleted successfully (Backend).`);
-        } catch (err) {
-            console.error('Error deleting recording:', err);
-            // Revert optimistic update on failure
-            deletedIdsRef.current.delete(idToDelete);
-            fetchRecordings().then(data => data && setRecordings(data));
-
-            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                setError("Session expired or not authorized. Please log in again.");
-                localStorage.removeItem('AuthToken');
-                navigate('/signin');
-            } else {
-                setError('Failed to delete recording. Please try again.');
-            }
-        }
+        setRecordings(prev => prev.filter(rec => rec.id !== idToDelete));
     };
 
-    const handleDeleteAllRecordings = async () => {
-        if (!window.confirm('Are you sure you want to delete ALL your recordings and their summaries? This action cannot be undone.')) {
+    const handleDeleteAllRecordings = () => {
+        if (!window.confirm('Delete all recordings? (Demo mode - resets on refresh)')) {
             return;
         }
-
-        const token = localStorage.getItem('AuthToken');
-        if (!token) {
-            setError("Authentication required to delete all recordings.");
-            navigate('/signin');
-            return;
-        }
-
-        const recordingsToDelete = [...recordings];
-        if (recordingsToDelete.length === 0) {
-            setError("No recordings to delete.");
-            return;
-        }
-
-        // Optimistic Update: Clear UI immediately
-        const idsToDelete = recordingsToDelete.map(r => r.id);
-        idsToDelete.forEach(id => deletedIdsRef.current.add(id));
         setRecordings([]);
-        
-        // Stop polling immediately since list is empty
-        if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current);
-            pollIntervalRef.current = null;
-        }
-
-        // Background Processing (Fire and Forget)
-        const deletePromises = recordingsToDelete.map(recording => {
-            const url = `${API_BASE_URL}api/audio/metadata/${recording.id}`;
-            return axios.delete(url, { headers: { 'Authorization': `Bearer ${token}` } })
-                .then(response => ({ id: recording.id, status: 'fulfilled', response }))
-                .catch(error => ({ id: recording.id, status: 'rejected', reason: error }));
-        });
-
-        // We do NOT await this to block the UI. We let it run in background.
-        Promise.allSettled(deletePromises).then(results => {
-            let successfulDeletions = 0;
-            let failedDeletions = 0;
-
-            results.forEach(result => {
-                if (result.status === 'fulfilled' && (result.value.response.status === 200 || result.value.response.status === 204)) {
-                    successfulDeletions++;
-                } else {
-                    failedDeletions++;
-                    const recordingId = result.status === 'fulfilled' ? result.value.id : (result.reason && result.reason.id);
-                    console.error(`Failed to delete recording ${recordingId || 'unknown'} in background:`, result.status === 'rejected' ? result.reason : result.value.response);
-                }
-            });
-            console.log(`Background deletion complete. Success: ${successfulDeletions}, Failed: ${failedDeletions}`);
-        }).catch(err => {
-             console.error('Error in background batch deletion:', err);
-        });
     };
 
     const formatDate = (timestamp) => {
@@ -465,11 +196,8 @@ const RecordingList = () => {
     const groupedRecordings = groupRecordings(filteredRecordings);
 
     const handleRetry = () => {
-        fetchRecordings().then(initialData => {
-             if (initialData) {
-                startPolling(initialData);
-             }
-        });
+        setRecordings([...DEMO_RECORDINGS]);
+        setError(null);
     };
 
     return (

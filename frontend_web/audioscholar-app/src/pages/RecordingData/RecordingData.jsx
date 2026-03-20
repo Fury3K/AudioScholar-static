@@ -1,12 +1,10 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FiExternalLink, FiCopy, FiCheck, FiEdit, FiSave, FiX, FiLoader, FiAlertTriangle, FiCheckCircle, FiUploadCloud, FiClock, FiHeadphones, FiDownload, FiEye, FiEdit2 } from 'react-icons/fi';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
-import { API_BASE_URL } from '../../services/authService';
+import { DEMO_RECORDINGS, DEMO_SUMMARIES, DEMO_RECOMMENDATIONS, DEMO_NOTES } from '../../data/mockData';
 import { noteService } from '../../services/noteService';
-import { recordingService } from '../../services/recordingService';
 import { Header } from '../Home/HomePage';
 
 const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
@@ -245,302 +243,69 @@ const RecordingData = () => {
   const [isEditingNotes, setIsEditingNotes] = useState(true);
   const [isSavingNotes, setIsSavingNotes] = useState(false);
 
-  // Load Notes from Backend
+  // Load Notes from mock data
   useEffect(() => {
-    const loadNotes = async () => {
-      if (id) {
-        try {
-          const notes = await noteService.getNotes(id);
-          if (notes && notes.length > 0) {
-            // Assuming one note per recording for now, or taking the most recent
-            // If backend returns list, we pick the first one
-            const currentNote = notes[0];
-            setUserNotes(currentNote.content);
-            setNoteId(currentNote.id);
-            setIsEditingNotes(false); // Start in preview mode if notes exist
-          }
-        } catch (err) {
-          console.error('Failed to load notes:', err);
-          // Fallback or silent fail - maybe show a toast notification in a real app
-        }
+    if (id) {
+      const notes = DEMO_NOTES[id] || [];
+      if (notes.length > 0) {
+        setUserNotes(notes[0].content);
+        setNoteId(notes[0].id);
+        setIsEditingNotes(false);
       }
-    };
-    loadNotes();
+    }
   }, [id]);
 
-  // Save Notes to Backend
+  // Save Notes locally
   const handleSaveNotes = async () => {
     if (!id) return;
-
     setIsSavingNotes(true);
     try {
       if (noteId) {
-        // Update existing note
-        const updatedNote = await noteService.updateNote(noteId, userNotes);
-        setUserNotes(updatedNote.content);
+        await noteService.updateNote(noteId, userNotes);
       } else {
-        // Create new note
         const newNote = await noteService.createNote(id, userNotes);
         setNoteId(newNote.id);
-        setUserNotes(newNote.content);
       }
       setIsEditingNotes(false);
     } catch (err) {
       console.error('Failed to save note:', err);
-      alert('Failed to save note. Please try again.');
     } finally {
       setIsSavingNotes(false);
     }
   };
 
-  const handleToggleFavorite = async () => {
+  const handleToggleFavorite = () => {
     if (!recordingData) return;
-
-    const originalIsFavorite = recordingData.isFavorite;
-    const newIsFavorite = !originalIsFavorite;
-
-    // Optimistic update
     setRecordingData(prev => ({
       ...prev,
-      isFavorite: newIsFavorite,
-      favoriteCount: (prev.favoriteCount || 0) + (newIsFavorite ? 1 : -1)
+      isFavorite: !prev.isFavorite,
+      favoriteCount: (prev.favoriteCount || 0) + (!prev.isFavorite ? 1 : -1)
     }));
-
-    try {
-      await recordingService.toggleFavorite(recordingData.id);
-    } catch (err) {
-      console.error("Failed to toggle favorite:", err);
-      // Revert
-      setRecordingData(prev => ({
-        ...prev,
-        isFavorite: originalIsFavorite,
-        favoriteCount: (prev.favoriteCount || 0)
-      }));
-    }
   };
 
-  const fetchRecordingData = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Force fresh fetch to ensure isFavorite status is current
-      // const cachedData = localStorage.getItem(`recording_metadata_${id}`);
-      // if (cachedData) {
-      //   setRecordingData(JSON.parse(cachedData));
-      //   setLoading(false);
-      //   return;
-      // }
-
-      const token = localStorage.getItem('AuthToken');
-      if (!token) {
-        setError("User not authenticated. Please log in.");
-        setLoading(false);
-        navigate('/signin');
-        return;
-      }
-      const listUrl = `${API_BASE_URL}api/audio/metadata`;
-      console.log(`Fetching metadata list from: ${listUrl} to find ID: ${id}`);
-      const response = await axios.get(listUrl, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const allRecordings = response.data;
-      const foundRecording = allRecordings.find(rec => rec.id === id);
-
-      if (foundRecording) {
-        // Normalize favorite status
-        foundRecording.isFavorite = foundRecording.isFavorite !== undefined ? foundRecording.isFavorite : (foundRecording.favorite !== undefined ? foundRecording.favorite : false);
-        
-        localStorage.setItem(`recording_metadata_${id}`, JSON.stringify(foundRecording));
-        setRecordingData(foundRecording);
-        console.log("Found recording metadata:", foundRecording);
-      } else {
-        console.error(`Metadata with ID ${id} not found in the fetched list.`);
-        setError("Recording metadata not found or access denied.");
-      }
-    } catch (err) {
-      console.error('Error fetching recording list:', err);
-      if (err.response) {
-        if (err.response.status === 401 || err.response.status === 403) {
-          setError("Session expired or not authorized. Please log in again.");
-          localStorage.removeItem('AuthToken');
-          navigate('/signin');
-        } else {
-          setError(`Failed to fetch recording metadata. Status: ${err.response.status}`);
-        }
-      } else if (err.request) {
-        setError("Network error: Could not reach the server.");
-      } else {
-        setError("An unexpected error occurred while fetching metadata.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [id, navigate]);
-
-  const fetchDetails = React.useCallback(async (actualRecordingId) => {
-    if (!actualRecordingId) {
-      console.warn("Cannot fetch details, recordingId is missing from metadata.");
-      setSummaryError("Cannot fetch summary: Internal data missing.");
-      setRecommendationsError("Cannot fetch recommendations: Internal data missing.");
-      return;
-    }
-    console.log(`Fetching details for recordingId: ${actualRecordingId}`);
-    setSummaryLoading(true);
-    setSummaryError(null);
-    setRecommendationsLoading(true);
-    setRecommendationsError(null);
-
-    const token = localStorage.getItem('AuthToken');
-    if (!token) {
-      setError("User not authenticated. Please log in.");
-      setSummaryLoading(false);
-      setRecommendationsLoading(false);
-      navigate('/signin');
-      return;
-    }
-    const headers = { 'Authorization': `Bearer ${token}` };
-
-    const summaryCacheKey = `recording_summary_${actualRecordingId}`;
-    const recommendationsCacheKey = `recording_recommendations_${actualRecordingId}`;
-
-    const cachedSummary = localStorage.getItem(summaryCacheKey);
-    const cachedRecommendations = localStorage.getItem(recommendationsCacheKey);
-
-    let summaryStatus = null;
-
-    if (cachedSummary) {
-      setSummaryData(JSON.parse(cachedSummary));
-      setSummaryLoading(false);
-      summaryStatus = 200;
-    } else {
-      const summaryUrl = `${API_BASE_URL}api/recordings/${actualRecordingId}/summary`;
-      try {
-        console.log(`Fetching summary from: ${summaryUrl}`);
-        const summaryResponse = await axios.get(summaryUrl, { headers });
-        summaryStatus = summaryResponse.status;
-
-        if (summaryResponse.status === 200) {
-          localStorage.setItem(summaryCacheKey, JSON.stringify(summaryResponse.data));
-          setSummaryData(summaryResponse.data);
-          console.log("Fetched summary (200 OK):", summaryResponse.data);
-        } else if (summaryResponse.status === 202) {
-          const message = summaryResponse.data?.message || "Processing is ongoing.";
-          console.log(`Summary status 202 Accepted: ${message}`);
-          setSummaryError(message);
-          setSummaryData(null);
-        } else {
-          console.warn(`Unexpected success status for summary: ${summaryResponse.status}`);
-          setSummaryError(`Unexpected status: ${summaryResponse.status}`);
-          setSummaryData(null);
-        }
-      } catch (err) {
-        console.error('Error fetching summary:', err);
-        summaryStatus = err.response?.status;
-        if (err.response) {
-          const errorData = err.response.data;
-          const message = errorData?.message || `Failed to fetch summary (Status: ${err.response.status})`;
-          if (err.response.status === 404) {
-            setSummaryError('Summary not found or recording processing failed/halted.');
-          } else if (err.response.status === 403) {
-            setSummaryError('Access denied to summary.');
-          } else if (err.response.status === 401) {
-            setError("Session expired or not authorized. Please log in again.");
-            localStorage.removeItem('AuthToken');
-            navigate('/signin');
-          } else if (err.response.status === 500 && errorData?.status?.startsWith('PROCESSING_HALTED')) {
-            setSummaryError(`Processing halted: ${errorData.message || 'Content unsuitable or no speech detected.'}`);
-          } else if (err.response.status === 500 && errorData?.status === 'FAILED') {
-            setSummaryError(`Processing failed: ${errorData.message || 'An error occurred during processing.'}`);
-          }
-          else {
-            setSummaryError(message);
-          }
-        } else if (err.request) {
-          setSummaryError("Network error fetching summary.");
-        } else {
-          setSummaryError("An unexpected error occurred fetching summary.");
-        }
-        setSummaryData(null);
-      } finally {
-        setSummaryLoading(false);
-      }
-    }
-
-    const shouldFetchRecommendations = summaryStatus === 200 || summaryStatus === 202;
-
-    if (shouldFetchRecommendations) {
-      if (cachedRecommendations) {
-        setRecommendationsData(JSON.parse(cachedRecommendations));
-        setRecommendationsLoading(false);
-      } else {
-        const recommendationsUrl = `${API_BASE_URL}api/v1/recommendations/recording/${actualRecordingId}`;
-        try {
-          console.log(`Fetching recommendations from: ${recommendationsUrl}`);
-          const recommendationsResponse = await axios.get(recommendationsUrl, { headers });
-
-          if (recommendationsResponse.status === 200) {
-            localStorage.setItem(recommendationsCacheKey, JSON.stringify(recommendationsResponse.data));
-            setRecommendationsData(recommendationsResponse.data || []);
-            console.log("Fetched recommendations (200 OK):", recommendationsResponse.data);
-          } else {
-            console.warn(`Unexpected success status for recommendations: ${recommendationsResponse.status}`);
-            setRecommendationsError(`Unexpected status: ${recommendationsResponse.status}`);
-            setRecommendationsData([]);
-          }
-        } catch (err) {
-          console.error('Error fetching recommendations:', err);
-          if (err.response) {
-            const message = err.response.data?.message || `Failed to fetch recommendations (Status: ${err.response.status})`;
-            if (err.response.status === 404) {
-              setRecommendationsError('No recommendations found for this recording.');
-            } else if (err.response.status === 403) {
-              setRecommendationsError('Access denied to recommendations.');
-            } else if (err.response.status === 401) {
-              setError("Session expired or not authorized. Please log in again.");
-              localStorage.removeItem('AuthToken');
-              navigate('/signin');
-            } else {
-              setRecommendationsError(message);
-            }
-          } else if (err.request) {
-            setRecommendationsError("Network error fetching recommendations.");
-          } else {
-            setRecommendationsError("An unexpected error occurred fetching recommendations.");
-          }
-          setRecommendationsData([]);
-        } finally {
-          setRecommendationsLoading(false);
-        }
-      }
-    } else {
-      console.log("Skipping recommendations fetch because summary was not successful or processing.");
-      setRecommendationsError("Recommendations not available as processing did not complete successfully.");
-      setRecommendationsLoading(false);
-      setRecommendationsData([]);
-    }
-  }, [navigate]);
-
+  // Load mock data
   useEffect(() => {
     if (id) {
-      console.log(`RecordingData component mounted or id changed: ${id}`);
-      fetchRecordingData();
+      const found = DEMO_RECORDINGS.find(rec => rec.id === id);
+      if (found) {
+        setRecordingData(found);
+        setSummaryData(DEMO_SUMMARIES[id] || null);
+        setRecommendationsData(DEMO_RECOMMENDATIONS[id] || []);
+        if (!DEMO_SUMMARIES[id]) {
+          setSummaryError('Summary not available for this recording.');
+        }
+        if (!DEMO_RECOMMENDATIONS[id] || DEMO_RECOMMENDATIONS[id].length === 0) {
+          setRecommendationsError('No recommendations available.');
+        }
+      } else {
+        setError("Recording not found.");
+      }
+      setLoading(false);
     } else {
-      console.error("RecordingData: No ID found in params.");
       setError("Recording ID is missing.");
       setLoading(false);
     }
-  }, [id, fetchRecordingData]);
-
-  useEffect(() => {
-    if (recordingData?.recordingId) {
-      console.log(`Metadata loaded, fetching details for recordingId: ${recordingData.recordingId}`);
-      fetchDetails(recordingData.recordingId);
-    } else if (recordingData && !recordingData.recordingId) {
-      console.error("Metadata found, but recordingId is missing:", recordingData);
-      setSummaryError("Cannot fetch details: Critical recording identifier is missing.");
-      setRecommendationsError("Cannot fetch details: Critical recording identifier is missing.");
-    }
-  }, [recordingData, fetchDetails]);
+  }, [id]);
 
   const formatDate = (timestamp) => {
     if (timestamp?.seconds) {
