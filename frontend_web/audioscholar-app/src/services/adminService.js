@@ -1,76 +1,40 @@
-import { API_BASE_URL as AUTH_API_BASE } from './authService';
-
-const API_BASE_URL = `${AUTH_API_BASE}api/admin`;
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('AuthToken');
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  };
-};
+// Static demo mode - admin service returns mock data
+import {
+  DEMO_ADMIN_USERS,
+  DEMO_ADMIN_OVERVIEW,
+  DEMO_ADMIN_ACTIVITY,
+  DEMO_ADMIN_USER_DISTRIBUTION,
+  DEMO_ADMIN_CONTENT_ENGAGEMENT,
+} from '../data/mockData';
 
 export const adminService = {
-  // User Management
-  getUsers: async (limit = 20, startAfter = null) => {
-    const params = new URLSearchParams({ limit });
-    if (startAfter) params.append('startAfter', startAfter);
-    
-    const response = await fetch(`${API_BASE_URL}/users?${params.toString()}`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch users');
-    return await response.json();
+  getUsers: async () => {
+    return DEMO_ADMIN_USERS;
   },
 
   updateUserStatus: async (uid, disabled) => {
-    const response = await fetch(`${API_BASE_URL}/users/${uid}/status`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ disabled }),
-    });
-    if (!response.ok) throw new Error('Failed to update user status');
+    const user = DEMO_ADMIN_USERS.find(u => u.uid === uid);
+    if (user) user.disabled = disabled;
   },
 
   updateUserRoles: async (uid, roles) => {
-    const response = await fetch(`${API_BASE_URL}/users/${uid}/roles`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ roles }),
-    });
-    if (!response.ok) throw new Error('Failed to update user roles');
+    const user = DEMO_ADMIN_USERS.find(u => u.uid === uid);
+    if (user) user.roles = roles;
   },
 
-  // Analytics
   getOverview: async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/overview`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch overview stats');
-    return await response.json();
+    return DEMO_ADMIN_OVERVIEW;
   },
 
   getActivityStats: async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/activity`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch activity stats');
-    return await response.json();
+    return DEMO_ADMIN_ACTIVITY;
   },
 
   getUserDistribution: async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/users/distribution`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch user distribution');
-    return await response.json();
+    return DEMO_ADMIN_USER_DISTRIBUTION;
   },
 
   getContentEngagement: async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/content/engagement`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch content engagement');
-    return await response.json();
+    return DEMO_ADMIN_CONTENT_ENGAGEMENT;
   },
 };

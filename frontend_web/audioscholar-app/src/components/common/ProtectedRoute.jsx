@@ -1,15 +1,13 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 
+// Static demo mode - all routes are accessible
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem('AuthToken');
-
-    if (!token) {
-        console.log('ProtectedRoute: No token found, redirecting to /signin');
-        return <Navigate to="/signin" replace />;
+    // Ensure demo token exists
+    if (!localStorage.getItem('AuthToken')) {
+        localStorage.setItem('AuthToken', 'demo-static-token');
+        localStorage.setItem('userId', 'demo-user-001');
     }
-
     return children;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

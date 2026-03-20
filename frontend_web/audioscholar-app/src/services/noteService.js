@@ -1,57 +1,57 @@
-import { API_BASE_URL as AUTH_API_BASE } from './authService';
+// Static demo mode - notes stored in memory
+import { DEMO_NOTES } from '../data/mockData';
 
-const API_BASE_URL = `${AUTH_API_BASE}api/notes`;
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('AuthToken');
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  };
-};
+let noteIdCounter = 100;
 
 export const noteService = {
   createNote: async (recordingId, content, tags = []) => {
-    const response = await fetch(API_BASE_URL, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ recordingId, content, tags }),
-    });
-    if (!response.ok) throw new Error('Failed to create note');
-    return await response.json();
+    const newNote = {
+      id: `note-${++noteIdCounter}`,
+      recordingId,
+      content,
+      tags,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    if (!DEMO_NOTES[recordingId]) {
+      DEMO_NOTES[recordingId] = [];
+    }
+    DEMO_NOTES[recordingId].push(newNote);
+    return newNote;
   },
 
   getNotes: async (recordingId) => {
-    const response = await fetch(`${API_BASE_URL}?recordingId=${recordingId}`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch notes');
-    return await response.json();
+    return DEMO_NOTES[recordingId] || [];
   },
 
   getNote: async (noteId) => {
-    const response = await fetch(`${API_BASE_URL}/${noteId}`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch note');
-    return await response.json();
+    for (const notes of Object.values(DEMO_NOTES)) {
+      const found = notes.find(n => n.id === noteId);
+      if (found) return found;
+    }
+    throw new Error('Note not found');
   },
 
   updateNote: async (noteId, content, tags = []) => {
-    const response = await fetch(`${API_BASE_URL}/${noteId}`, {
-      method: 'PATCH',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ content, tags }),
-    });
-    if (!response.ok) throw new Error('Failed to update note');
-    return await response.json();
+    for (const notes of Object.values(DEMO_NOTES)) {
+      const found = notes.find(n => n.id === noteId);
+      if (found) {
+        found.content = content;
+        found.tags = tags;
+        found.updatedAt = new Date().toISOString();
+        return found;
+      }
+    }
+    throw new Error('Note not found');
   },
 
   deleteNote: async (noteId) => {
-    const response = await fetch(`${API_BASE_URL}/${noteId}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to delete note');
+    for (const [key, notes] of Object.entries(DEMO_NOTES)) {
+      const idx = notes.findIndex(n => n.id === noteId);
+      if (idx !== -1) {
+        DEMO_NOTES[key].splice(idx, 1);
+        return;
+      }
+    }
   },
 };

@@ -1,127 +1,25 @@
-// Determine the API base URL from environment variable or fallback to localhost
-const getApiBaseUrl = () => {
-    // Use VITE_API_URL environment variable if set, otherwise fallback to localhost
-    const envUrl = import.meta.env.VITE_API_URL;
-    if (envUrl) {
-        // Ensure URL ends with trailing slash
-        return envUrl.endsWith('/') ? envUrl : `${envUrl}/`;
-    }
-    // Fallback for local development
-    return 'http://localhost:8080/';
+// Static demo mode - no backend required
+import { DEMO_USER } from '../data/mockData';
+
+export const API_BASE_URL = '/';
+
+// Auto-authenticate for demo mode
+if (!localStorage.getItem('AuthToken')) {
+    localStorage.setItem('AuthToken', 'demo-static-token');
+    localStorage.setItem('userId', DEMO_USER.uid);
+}
+
+export const verifyFirebaseTokenWithBackend = async () => {
+    return { success: true, token: 'demo-static-token', userId: DEMO_USER.uid };
 };
 
-export const API_BASE_URL = getApiBaseUrl();
-
-/**
- * Sends the Firebase ID token obtained from frontend Firebase authentication
- * to the backend for verification and to receive an API JWT.
- * @param {string} idToken - The Firebase ID token.
- * @returns {Promise<object>} - A promise that resolves with the backend's response (e.g., { success, message, token, userId })
- */
-export const verifyFirebaseTokenWithBackend = async (idToken) => {
-    const VERIFY_ENDPOINT_PATH = 'api/auth/verify-firebase-token';
-
-    try {
-        const response = await fetch(`${API_BASE_URL}${VERIFY_ENDPOINT_PATH}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ idToken: idToken }),
-        });
-
-        const responseData = await response.json();
-
-        if (!response.ok) {
-            const error = new Error(responseData.message || `Backend verification failed: ${response.statusText}`);
-            error.status = response.status;
-            error.data = responseData;
-            throw error;
-        }
-
-        if (!responseData.success || !responseData.token) {
-            const error = new Error(responseData.message || 'Backend verification succeeded but response format is incorrect or token missing.');
-            error.data = responseData;
-            throw error;
-        }
-
-        return responseData;
-
-    } catch (error) {
-        console.error("Error during backend Firebase token verification API call:", error);
-        throw error;
-    }
+export const verifyGoogleTokenWithBackend = async () => {
+    return { success: true, token: 'demo-static-token', userId: DEMO_USER.uid };
 };
 
-/**
- * Sends the Google ID token obtained from frontend Firebase authentication
- * (specifically via Google Sign-In) to the backend for verification
- * and to receive an API JWT.
- * @param {string} googleIdToken - The raw Google ID token.
- * @returns {Promise<object>} - A promise that resolves with the backend's response.
- */
-export const verifyGoogleTokenWithBackend = async (googleIdToken) => {
-    const VERIFY_ENDPOINT_PATH = 'api/auth/verify-google-token';
-
-    try {
-        const response = await fetch(`${API_BASE_URL}${VERIFY_ENDPOINT_PATH}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ idToken: googleIdToken }),
-        });
-
-        const responseData = await response.json();
-
-        if (!response.ok) {
-            const error = new Error(responseData.message || `Backend Google verification failed: ${response.statusText}`);
-            error.status = response.status;
-            error.data = responseData;
-            throw error;
-        }
-
-        if (!responseData.success || !responseData.token) {
-            const error = new Error(responseData.message || 'Backend Google verification succeeded but response format is incorrect or token missing.');
-            error.data = responseData;
-            throw error;
-        }
-
-        return responseData;
-
-    } catch (error) {
-        console.error("Error during backend Google token verification API call:", error);
-        throw error;
-    }
+export const signUp = async () => {
+    return { success: true, message: 'Demo mode - sign up simulated' };
 };
 
-export const signUp = async (userData) => {
-    const SIGNUP_ENDPOINT_PATH = 'api/auth/register';
-
-    try {
-        const response = await fetch(`${API_BASE_URL}${SIGNUP_ENDPOINT_PATH}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData),
-        });
-
-        const responseData = await response.json();
-
-        if (!response.ok) {
-            console.error('Backend sign up error response:', responseData);
-            const error = new Error(responseData.message || `HTTP error! status: ${response.status}`);
-            error.status = response.status;
-            error.data = responseData;
-            throw error;
-        }
-
-        return responseData;
-
-    } catch (error) {
-        console.error("Error during sign up API call:", error);
-        throw error;
-    }
-};
-
+// Helper to get the demo user (used by components that fetch /api/users/me)
+export const getDemoUser = () => DEMO_USER;
