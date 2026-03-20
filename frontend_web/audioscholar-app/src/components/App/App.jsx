@@ -29,7 +29,7 @@ import ProtectedRoute from '../common/ProtectedRoute';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/AudioScholar-static">
       <div className="min-h-screen flex flex-col">
         <DemoBanner />
         <Routes>
