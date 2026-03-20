@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import DemoBanner from '../common/DemoBanner';
 import AboutPage from '../../pages/About/AboutPage';
 import GithubAuthCallback from '../../pages/Auth/GithubCallback/GithubAuthCallback';
 import SignIn from '../../pages/Auth/SignIn/SignIn';
@@ -30,6 +31,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
+        <DemoBanner />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
